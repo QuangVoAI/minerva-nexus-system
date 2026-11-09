@@ -1,0 +1,9 @@
+order_id,tracking_code,recipient_name,phone,address,area_id,service_level,sla_deadline,cod_amount
+ORD-001,MNX000001,Nguyễn Thị Mai,0911223344,12 Huỳnh Tấn Phát P. Tân Thuận Đông,Q7_TAN_THUAN,EXPRESS,+35,250000
+ORD-002,MNX000002,Trần Văn Hùng,0922334455,45 Nguyễn Thị Thập P. Tân Phú,Q7_TAN_PHONG,STANDARD,+85,0
+ORD-003,MNX000003,Lê Cẩm Tú,0933445566,88 Nguyễn Đức Cảnh Phú Mỹ Hưng,Q7_PHU_MY_HUNG,EXPRESS,+25,520000
+ORD-004,MNX000004,Phan Hoàng Nam,0944556677,105 Lê Văn Lương Phước Kiển,NHA_BE,STANDARD,+180,150000
+ORD-005,MNX000005,Đỗ Thị Lan,0955667788,23 Đường số 7 KDC Trung Sơn,BINH_CHANH,ECONOMY,+320,0
+ORD-006,MNX000006,Vũ Quang Huy,0966778899,56 Trần Trọng Cung Tân Thuận Đông,Q7_TAN_THUAN,STANDARD,+110,380000
+ORD-007,MNX000007,Bùi Thanh Hương,0977889900,12 Nguyễn Hữu Thọ P. Tân Hưng,Q7_TAN_PHONG,EXPRESS,+45,0
+ORD-008,MNX000008,Đặng Quốc Anh,0988990011,79 Lâm Văn Bền P. Tân Kiểng,Q7_TAN_THUAN,ECONOMY,+280,450000
