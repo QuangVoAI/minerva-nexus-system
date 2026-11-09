@@ -87,3 +87,4 @@ Khi lên bục thuyết trình trước giảng viên, thực hiện đúng 5 b�
 ## 5. BẢN QUYỀN VÀ BẢO TRÌ
 * Đồ án học thuật thực hiện bởi Nhóm N10 - Khoa Công nghệ Thông tin - Trường ĐH Tôn Đức Thắng.
 * Mọi đóng góp code vui lòng tham khảo file [CONTRIBUTING.md](CONTRIBUTING.md).
+

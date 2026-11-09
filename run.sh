@@ -21,8 +21,12 @@ if [ ! -d "bin" ] || [ -z "$(ls -A bin 2>/dev/null)" ]; then
 fi
 
 echo "=================================================="
-echo "  KHỞI CHẠY HỆ THỐNG MINERVA NEXUS (GUI)"
+echo "  KHỞI CHẠY HỆ THỐNG MINERVA NEXUS"
+echo "  Backend REST API & Web Frontend: http://localhost:8080"
 echo "  Runtime: $($JAVA_CMD -version 2>&1 | head -n 1)"
 echo "=================================================="
+
+# Tự động mở trình duyệt hiển thị Web Frontend trên macOS
+(sleep 1 && which open &>/dev/null && open http://localhost:8080) &
 
 $JAVA_CMD -cp bin vn.edu.tdtu.minervanexus.Main

@@ -1,0 +1,378 @@
+package vn.edu.tdtu.minervanexus.server;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
+import vn.edu.tdtu.minervanexus.common.FailureReason;
+import vn.edu.tdtu.minervanexus.common.OrderStatus;
+import vn.edu.tdtu.minervanexus.common.ServiceLevel;
+import vn.edu.tdtu.minervanexus.model.Assignment;
+import vn.edu.tdtu.minervanexus.model.DeliveryOrder;
+import vn.edu.tdtu.minervanexus.model.Driver;
+import vn.edu.tdtu.minervanexus.model.RiskPrediction;
+import vn.edu.tdtu.minervanexus.model.StatusHistory;
+import vn.edu.tdtu.minervanexus.service.IAnalyticsService;
+import vn.edu.tdtu.minervanexus.service.IDispatchEngine;
+import vn.edu.tdtu.minervanexus.service.IDriverShiftService;
+import vn.edu.tdtu.minervanexus.service.IOrderService;
+
+import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
+
+public class WebServer {
+    private final int port;
+    private final IOrderService orderService;
+    private final IDriverShiftService driverShiftService;
+    private final IDispatchEngine dispatchEngine;
+    private final IAnalyticsService analyticsService;
+    private HttpServer server;
+
+    public WebServer(int port,
+                     IOrderService orderService,
+                     IDriverShiftService driverShiftService,
+                     IDispatchEngine dispatchEngine,
+                     IAnalyticsService analyticsService) {
+        this.port = port;
+        this.orderService = orderService;
+        this.driverShiftService = driverShiftService;
+        this.dispatchEngine = dispatchEngine;
+        this.analyticsService = analyticsService;
+    }
+
+    public void start() throws IOException {
+        server = HttpServer.create(new InetSocketAddress(port), 0);
+
+        // Static files handler (web/)
+        server.createContext("/", new StaticFileHandler());
+
+        // API Endpoints
+        server.createContext("/api/orders", new OrdersHandler());
+        server.createContext("/api/drivers", new DriversHandler());
+        server.createContext("/api/dispatch/suggestions", new DispatchSuggestionsHandler());
+        server.createContext("/api/dispatch/approve", new DispatchApproveHandler());
+        server.createContext("/api/dispatch/reject", new DispatchRejectHandler());
+        server.createContext("/api/driver/update", new DriverStatusUpdateHandler());
+        server.createContext("/api/order/history", new OrderHistoryHandler());
+        server.createContext("/api/analytics", new AnalyticsHandler());
+
+        server.setExecutor(null); // default executor
+        server.start();
+        System.out.println("✓ Máy chủ Minerva Nexus Web Backend đang chạy tại: http://localhost:" + port);
+    }
+
+    public void stop() {
+        if (server != null) {
+            server.stop(0);
+        }
+    }
+
+    // --- Handlers ---
+
+    private class StaticFileHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String path = exchange.getRequestURI().getPath();
+            if (path.equals("/")) {
+                path = "/index.html";
+            }
+
+            File file = new File("web" + path);
+            if (!file.exists() || file.isDirectory()) {
+                file = new File("minerva-nexus-system/web" + path);
+            }
+
+            if (file.exists() && !file.isDirectory()) {
+                String mime = getMimeType(file.getName());
+                exchange.getResponseHeaders().set("Content-Type", mime);
+                exchange.sendResponseHeaders(200, file.length());
+                try (OutputStream os = exchange.getResponseBody(); FileInputStream fis = new FileInputStream(file)) {
+                    fis.transferTo(os);
+                }
+            } else {
+                String notFound = "404 Not Found: " + path;
+                exchange.sendResponseHeaders(404, notFound.length());
+                try (OutputStream os = exchange.getResponseBody()) {
+                    os.write(notFound.getBytes(StandardCharsets.UTF_8));
+                }
+            }
+        }
+
+        private String getMimeType(String filename) {
+            if (filename.endsWith(".html")) return "text/html; charset=UTF-8";
+            if (filename.endsWith(".css")) return "text/css; charset=UTF-8";
+            if (filename.endsWith(".js")) return "application/javascript; charset=UTF-8";
+            if (filename.endsWith(".png")) return "image/png";
+            if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) return "image/jpeg";
+            if (filename.endsWith(".svg")) return "image/svg+xml";
+            if (filename.endsWith(".json")) return "application/json; charset=UTF-8";
+            return "application/octet-stream";
+        }
+    }
+
+    private class OrdersHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+                List<DeliveryOrder> orders = orderService.getAllOrders();
+                StringBuilder sb = new StringBuilder("[");
+                for (int i = 0; i < orders.size(); i++) {
+                    DeliveryOrder o = orders.get(i);
+                    RiskPrediction pred = dispatchEngine.predictOrderRisk(o);
+                    sb.append("{")
+                            .append("\"orderId\":\"").append(o.getOrderId()).append("\",")
+                            .append("\"trackingCode\":\"").append(o.getTrackingCode()).append("\",")
+                            .append("\"recipientName\":\"").append(escape(o.getRecipientName())).append("\",")
+                            .append("\"recipientPhone\":\"").append(escape(o.getRecipientPhone())).append("\",")
+                            .append("\"address\":\"").append(escape(o.getDeliveryAddress())).append("\",")
+                            .append("\"areaId\":\"").append(o.getAreaId()).append("\",")
+                            .append("\"serviceLevel\":\"").append(o.getServiceLevel().name()).append("\",")
+                            .append("\"serviceLevelDisplay\":\"").append(o.getServiceLevel().getDisplayName()).append("\",")
+                            .append("\"slaDeadline\":\"").append(o.getFormattedSla()).append("\",")
+                            .append("\"codAmount\":").append(o.getCodAmount()).append(",")
+                            .append("\"status\":\"").append(o.getStatus().name()).append("\",")
+                            .append("\"statusDisplay\":\"").append(o.getStatus().getDescription()).append("\",")
+                            .append("\"assignedDriverId\":").append(o.getAssignedDriverId() != null ? "\"" + o.getAssignedDriverId() + "\"" : "null").append(",")
+                            .append("\"failureCount\":").append(o.getFailureCount()).append(",")
+                            .append("\"riskLevel\":\"").append(pred.getRiskLabel().name()).append("\",")
+                            .append("\"riskExplanation\":\"").append(escape(pred.getExplanation())).append("\",")
+                            .append("\"riskProbability\":").append(String.format(Locale.US, "%.2f", pred.getRiskProbability()))
+                            .append("}");
+                    if (i < orders.size() - 1) sb.append(",");
+                }
+                sb.append("]");
+                sendJson(exchange, 200, sb.toString());
+            } else if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+                String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                Map<String, String> params = parseFormOrJson(body);
+                String name = params.getOrDefault("recipientName", "Khách hàng");
+                String phone = params.getOrDefault("phone", "0900000000");
+                String address = params.getOrDefault("address", "Quận 7, TP.HCM");
+                String areaId = params.getOrDefault("areaId", "Q7_TAN_THUAN");
+                ServiceLevel sl = ServiceLevel.valueOf(params.getOrDefault("serviceLevel", "STANDARD").toUpperCase());
+                double cod = 0;
+                try { cod = Double.parseDouble(params.getOrDefault("codAmount", "0")); } catch (Exception ignored) {}
+
+                DeliveryOrder created = orderService.createOrder(name, phone, address, areaId, sl, cod);
+                sendJson(exchange, 201, "{\"success\":true,\"orderId\":\"" + created.getOrderId() + "\",\"trackingCode\":\"" + created.getTrackingCode() + "\"}");
+            }
+        }
+    }
+
+    private class DriversHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            List<Driver> drivers = driverShiftService.getAllDrivers();
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < drivers.size(); i++) {
+                Driver d = drivers.get(i);
+                double pct = d.getCapacityPerShift() > 0 ? ((double) d.getCurrentLoad() / d.getCapacityPerShift()) * 100.0 : 0.0;
+                sb.append("{")
+                        .append("\"driverId\":\"").append(d.getDriverId()).append("\",")
+                        .append("\"name\":\"").append(escape(d.getName())).append("\",")
+                        .append("\"phone\":\"").append(d.getPhone()).append("\",")
+                        .append("\"assignedAreaId\":\"").append(d.getAssignedAreaId()).append("\",")
+                        .append("\"currentLoad\":").append(d.getCurrentLoad()).append(",")
+                        .append("\"capacityPerShift\":").append(d.getCapacityPerShift()).append(",")
+                        .append("\"workloadPercent\":").append(String.format(Locale.US, "%.1f", pct)).append(",")
+                        .append("\"active\":").append(d.isActive())
+                        .append("}");
+                if (i < drivers.size() - 1) sb.append(",");
+            }
+            sb.append("]");
+            sendJson(exchange, 200, sb.toString());
+        }
+    }
+
+    private class DispatchSuggestionsHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            List<Assignment> suggestions = dispatchEngine.generateDispatchSuggestions("SHIFT-01");
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < suggestions.size(); i++) {
+                Assignment a = suggestions.get(i);
+                Optional<DeliveryOrder> orderOpt = orderService.getOrderById(a.getOrderId());
+                Optional<Driver> driverOpt = driverShiftService.getDriverById(a.getDriverId());
+
+                String orderCode = orderOpt.map(DeliveryOrder::getTrackingCode).orElse(a.getOrderId());
+                String orderArea = orderOpt.map(DeliveryOrder::getAreaId).orElse("");
+                String driverName = driverOpt.map(Driver::getName).orElse(a.getDriverId());
+                String driverPhone = driverOpt.map(Driver::getPhone).orElse("");
+
+                sb.append("{")
+                        .append("\"assignmentId\":\"").append(a.getAssignmentId()).append("\",")
+                        .append("\"orderId\":\"").append(a.getOrderId()).append("\",")
+                        .append("\"trackingCode\":\"").append(orderCode).append("\",")
+                        .append("\"orderArea\":\"").append(orderArea).append("\",")
+                        .append("\"driverId\":\"").append(a.getDriverId()).append("\",")
+                        .append("\"driverName\":\"").append(escape(driverName)).append("\",")
+                        .append("\"driverPhone\":\"").append(driverPhone).append("\",")
+                        .append("\"suggestedScore\":").append(String.format(Locale.US, "%.0f", a.getSuggestedScore())).append(",")
+                        .append("\"matchReason\":\"").append(escape(a.getMatchReason())).append("\",")
+                        .append("\"decisionStatus\":\"").append(a.getDecisionStatus()).append("\"")
+                        .append("}");
+                if (i < suggestions.size() - 1) sb.append(",");
+            }
+            sb.append("]");
+            sendJson(exchange, 200, sb.toString());
+        }
+    }
+
+    private class DispatchApproveHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+                String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                Map<String, String> p = parseFormOrJson(body);
+                String assignId = p.get("assignmentId");
+                boolean ok = dispatchEngine.approveAssignment(assignId, "DISPATCHER_WEB");
+                sendJson(exchange, 200, "{\"success\":" + ok + "}");
+            }
+        }
+    }
+
+    private class DispatchRejectHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+                String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                Map<String, String> p = parseFormOrJson(body);
+                String assignId = p.get("assignmentId");
+                boolean ok = dispatchEngine.rejectAssignment(assignId);
+                sendJson(exchange, 200, "{\"success\":" + ok + "}");
+            }
+        }
+    }
+
+    private class DriverStatusUpdateHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+                String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                Map<String, String> p = parseFormOrJson(body);
+                String orderId = p.get("orderId");
+                String action = p.get("action"); // TRANSIT, DELIVERED, FAILED
+                String driverId = p.getOrDefault("driverId", "DRIVER_APP");
+                String reasonCode = p.getOrDefault("reasonCode", "CUSTOMER_UNREACHABLE");
+                String note = p.getOrDefault("note", "");
+
+                boolean ok = false;
+                if ("TRANSIT".equalsIgnoreCase(action)) {
+                    ok = orderService.updateOrderStatus(orderId, OrderStatus.IN_TRANSIT, driverId, "Tài xế quét xuất kho bắt đầu đi phát");
+                } else if ("DELIVERED".equalsIgnoreCase(action)) {
+                    ok = orderService.updateOrderStatus(orderId, OrderStatus.DELIVERED, driverId, "Giao thành công, thu COD");
+                    driverShiftService.decrementDriverLoad(driverId);
+                } else if ("FAILED".equalsIgnoreCase(action)) {
+                    FailureReason reason = FailureReason.valueOf(reasonCode);
+                    ok = orderService.reportDeliveryFailure(orderId, driverId, reason, note);
+                    driverShiftService.decrementDriverLoad(driverId);
+                }
+
+                sendJson(exchange, 200, "{\"success\":" + ok + "}");
+            }
+        }
+    }
+
+    private class OrderHistoryHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String query = exchange.getRequestURI().getQuery();
+            String orderId = "";
+            if (query != null && query.contains("orderId=")) {
+                orderId = query.split("orderId=")[1].split("&")[0];
+            }
+
+            List<StatusHistory> hist = orderService.getOrderHistory(orderId);
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < hist.size(); i++) {
+                StatusHistory h = hist.get(i);
+                sb.append("{")
+                        .append("\"historyId\":\"").append(h.getHistoryId()).append("\",")
+                        .append("\"oldStatus\":").append(h.getOldStatus() != null ? "\"" + h.getOldStatus().getDescription() + "\"" : "null").append(",")
+                        .append("\"newStatus\":\"").append(h.getNewStatus().getDescription()).append("\",")
+                        .append("\"actorId\":\"").append(h.getActorId()).append("\",")
+                        .append("\"reasonCode\":\"").append(h.getReasonCode()).append("\",")
+                        .append("\"note\":\"").append(escape(h.getNote())).append("\",")
+                        .append("\"time\":\"").append(h.getChangedAt().toString()).append("\"")
+                        .append("}");
+                if (i < hist.size() - 1) sb.append(",");
+            }
+            sb.append("]");
+            sendJson(exchange, 200, sb.toString());
+        }
+    }
+
+    private class AnalyticsHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            int total = analyticsService.getTotalOrders();
+            int delivered = analyticsService.getDeliveredOrdersCount();
+            int failed = analyticsService.getFailedOrdersCount();
+            int pending = analyticsService.getPendingOrdersCount();
+            double successRate = analyticsService.getSuccessDeliveryRate();
+            double slaRate = analyticsService.getOnTimeSlaRate();
+            int highRisk = analyticsService.getHighRiskOrdersCount();
+
+            String json = String.format(Locale.US,
+                    "{\"totalOrders\":%d,\"deliveredCount\":%d,\"failedCount\":%d,\"pendingCount\":%d,\"successRate\":%.1f,\"slaRate\":%.1f,\"highRiskCount\":%d}",
+                    total, delivered, failed, pending, successRate, slaRate, highRisk);
+            sendJson(exchange, 200, json);
+        }
+    }
+
+    // --- Utility Methods ---
+
+    private void sendJson(HttpExchange exchange, int statusCode, String json) throws IOException {
+        byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
+        exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+        exchange.sendResponseHeaders(statusCode, bytes.length);
+        try (OutputStream os = exchange.getResponseBody()) {
+            os.write(bytes);
+        }
+    }
+
+    private String escape(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", " ").replace("\r", "");
+    }
+
+    private Map<String, String> parseFormOrJson(String body) {
+        Map<String, String> map = new HashMap<>();
+        if (body == null || body.trim().isEmpty()) return map;
+
+        body = body.trim();
+        if (body.startsWith("{") && body.endsWith("}")) {
+            // Primitive JSON key-value parser for simple payloads
+            String inner = body.substring(1, body.length() - 1);
+            String[] pairs = inner.split(",");
+            for (String pair : pairs) {
+                String[] kv = pair.split(":", 2);
+                if (kv.length == 2) {
+                    String k = kv[0].trim().replace("\"", "");
+                    String v = kv[1].trim().replace("\"", "");
+                    map.put(k, v);
+                }
+            }
+        } else {
+            // Form URL Encoded
+            String[] pairs = body.split("&");
+            for (String pair : pairs) {
+                String[] kv = pair.split("=", 2);
+                if (kv.length == 2) {
+                    try {
+                        String k = URLDecoder.decode(kv[0], StandardCharsets.UTF_8);
+                        String v = URLDecoder.decode(kv[1], StandardCharsets.UTF_8);
+                        map.put(k, v);
+                    } catch (Exception ignored) {}
+                }
+            }
+        }
+        return map;
+    }
+}

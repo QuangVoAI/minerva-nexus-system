@@ -148,3 +148,4 @@ public class DispatchEngineImpl implements IDispatchEngine {
         return assignmentRepository.findPendingAssignments();
     }
 }
+

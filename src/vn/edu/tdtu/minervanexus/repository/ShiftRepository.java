@@ -19,3 +19,4 @@ public class ShiftRepository {
         return new ArrayList<>(shiftMap.values());
     }
 }
+

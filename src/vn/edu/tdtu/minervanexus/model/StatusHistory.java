@@ -53,3 +53,4 @@ public class StatusHistory {
     public LocalDateTime getChangedAt() { return changedAt; }
     public void setChangedAt(LocalDateTime changedAt) { this.changedAt = changedAt; }
 }
+

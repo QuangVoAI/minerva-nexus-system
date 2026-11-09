@@ -98,3 +98,4 @@ public class AnalyticsServiceImpl implements IAnalyticsService {
         return workload;
     }
 }
+

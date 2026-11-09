@@ -78,3 +78,4 @@ Trước khi bấm nút **Merge Pull Request**, Quang cần kiểm tra:
 - [ ] Chạy `./run.sh` kiểm tra dữ liệu mẫu load đúng và giao diện đồ họa không bị treo.
 - [ ] Bấm **Squash and Merge** hoặc **Merge Pull Request** vào `main`.
 - [ ] Thông báo cho cả nhóm cập nhật lại nhánh `main` của mình.
+

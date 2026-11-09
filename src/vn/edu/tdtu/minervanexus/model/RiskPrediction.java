@@ -48,3 +48,4 @@ public class RiskPrediction {
     public LocalDateTime getPredictedAt() { return predictedAt; }
     public void setPredictedAt(LocalDateTime predictedAt) { this.predictedAt = predictedAt; }
 }
+

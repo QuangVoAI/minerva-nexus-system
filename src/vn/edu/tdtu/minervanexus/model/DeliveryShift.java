@@ -47,3 +47,4 @@ public class DeliveryShift {
         return "Ca " + shiftId + " (" + startTime + " - " + endTime + ") [" + status + "]";
     }
 }
+

@@ -87,3 +87,4 @@ public class MainFrame extends JFrame {
         if (dashboardPanel != null) dashboardPanel.reloadMetrics();
     }
 }
+

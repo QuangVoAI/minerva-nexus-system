@@ -57,3 +57,4 @@ public class Assignment {
     public String getDecisionStatus() { return decisionStatus; }
     public void setDecisionStatus(String decisionStatus) { this.decisionStatus = decisionStatus; }
 }
+

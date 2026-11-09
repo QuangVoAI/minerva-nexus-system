@@ -56,16 +56,32 @@ public class Main {
         driverShiftService.createShift("HUB-Q7-01", LocalDate.now(), LocalTime.of(8, 0), LocalTime.of(12, 0));
         System.out.println("✓ Đã khởi tạo ca giao hàng sáng (08:00 - 12:00) tại Hub Quận 7");
 
-        // 4. Khởi chạy Giao diện đồ họa Swing
-        SwingUtilities.invokeLater(() -> {
-            try {
-                // Tùy biến Look and Feel theo hệ điều hành
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception ignored) {}
+        // 4. Khởi chạy Web Server (cổng 8080) phục vụ Giao diện Web Frontend Figma
+        try {
+            vn.edu.tdtu.minervanexus.server.WebServer webServer =
+                    new vn.edu.tdtu.minervanexus.server.WebServer(8080, orderService, driverShiftService, dispatchEngine, analyticsService);
+            webServer.start();
+            System.out.println("=================================================");
+            System.out.println("  ✓ WEB FRONTEND SẴN SÀNG TẠI: http://localhost:8080");
+            System.out.println("=================================================");
+        } catch (Exception e) {
+            System.err.println("Lỗi khởi chạy WebServer: " + e.getMessage());
+        }
 
-            MainFrame frame = new MainFrame(orderService, driverShiftService, dispatchEngine, analyticsService);
-            frame.setVisible(true);
-            System.out.println("✓ Giao diện đồ họa Minerva Nexus đã sẵn sàng!");
-        });
+        // 5. Khởi chạy Giao diện đồ họa Swing (nếu môi trường có màn hình)
+        try {
+            if (!java.awt.GraphicsEnvironment.isHeadless()) {
+                SwingUtilities.invokeLater(() -> {
+                    try {
+                        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    } catch (Exception ignored) {}
+
+                    MainFrame frame = new MainFrame(orderService, driverShiftService, dispatchEngine, analyticsService);
+                    frame.setVisible(true);
+                    System.out.println("✓ Giao diện đồ họa Minerva Nexus đã sẵn sàng!");
+                });
+            }
+        } catch (Exception ignored) {}
     }
 }
+

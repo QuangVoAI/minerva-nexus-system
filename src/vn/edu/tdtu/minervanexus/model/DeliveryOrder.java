@@ -105,3 +105,4 @@ public class DeliveryOrder {
         return trackingCode + " [" + status.getDescription() + "] - " + recipientName + " (" + areaId + ")";
     }
 }
+

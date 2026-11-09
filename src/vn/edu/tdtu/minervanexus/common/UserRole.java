@@ -23,3 +23,4 @@ public enum UserRole {
         return description;
     }
 }
+

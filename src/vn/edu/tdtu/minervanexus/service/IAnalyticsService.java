@@ -19,3 +19,4 @@ public interface IAnalyticsService {
 
     Map<String, Double> getDriverWorkloadPercentage();
 }
+
