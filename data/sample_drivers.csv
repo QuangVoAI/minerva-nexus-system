@@ -1,7 +1,7 @@
 driver_id,name,phone,assigned_area_id,capacity_per_shift
-DRV-01,Nguyễn Văn An,0901234567,Q7_TAN_THUAN,15
-DRV-02,Trần Quốc Bảo,0912345678,Q7_TAN_PHONG,15
-DRV-03,Lê Hoàng Nam,0987654321,Q7_PHU_MY_HUNG,18
-DRV-04,Phạm Đức Minh,0933445566,NHA_BE,12
-DRV-05,Võ Minh Trí,0944556677,BINH_CHANH,15
-
+DRV-01,Nguyễn Văn An,0901234567,Tân Thuận Đông,15
+DRV-02,Trần Thị Minh Châu,0912345678,Tân Thuận Tây,15
+DRV-03,Lê Hoàng Nam,0987654321,Tân Phú,40
+DRV-04,Phạm Quốc Huy,0933445566,Bình Thuận,15
+DRV-05,Võ Minh Đức,0944556677,Phú Mỹ,40
+DRV-06,Đặng Thu Hà,0955667788,Tân Kiểng,15

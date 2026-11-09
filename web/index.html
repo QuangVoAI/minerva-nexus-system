@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HUB / OPS — Minerva Nexus Hub Management</title>
+  <title>HUB / OPS — Minerva Nexus Logistics Management</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- SIDEBAR: EXACT FIGMA "Điều hướng Hub" -->
+  <!-- ========================================================================
+       SIDEBAR: EXACT FIGMA "Điều hướng Hub"
+       ======================================================================== -->
   <aside class="sidebar">
     <div class="brand-section">
-      <div class="brand-icon">⚡</div>
+      <div class="brand-icon-box">⚡</div>
       <div>
         <div class="brand-title">HUB / OPS</div>
         <div class="brand-sub">Vận hành logistics</div>
@@ -22,70 +24,71 @@
     <div class="hub-selector-box">
       <div class="hub-selector-label">Điểm vận hành</div>
       <div class="hub-selector-val">
-        <span>Hub Quận 7</span>
-        <span style="font-size: 10px; color: #8fa0b3;">▾</span>
+        <span>Hub Q.7</span>
+        <span style="font-size: 11px; color: #7d91a6;">▾</span>
       </div>
     </div>
 
+    <!-- Navigation Scroll -->
     <nav class="nav-scroll">
       <div class="menu-group-label">Vận hành ca trực</div>
       <a class="nav-link active" onclick="switchView('dashboard')">
-        <span>📊</span> Bàn điều hành
+        <span>⊞</span> Bàn điều hành
       </a>
       <a class="nav-link" onclick="switchView('orders')">
-        <span>📦</span> Tiếp nhận đơn
+        <span>📥</span> Tiếp nhận đơn
       </a>
       <a class="nav-link" onclick="switchView('shifts')">
-        <span>🚚</span> Ca giao & điểm danh
+        <span>⏱</span> Ca giao & điểm danh
       </a>
       <a class="nav-link" onclick="switchView('dispatch')">
-        <span>⚡</span> Gợi ý phân công
+        <span>🔀</span> Gợi ý phân công
         <span class="nav-badge danger" id="sidebar-urgent-count">6</span>
       </a>
       <a class="nav-link" onclick="switchView('detail')">
-        <span>📑</span> Hồ sơ đơn hàng
-      </a>
-      <a class="nav-link" onclick="switchView('drivers')">
-        <span>👥</span> Đội tài xế
-      </a>
-      <a class="nav-link" onclick="switchView('sla-alerts')">
-        <span>⚠️</span> Cảnh báo SLA
-        <span class="nav-badge danger">6</span>
+        <span>📄</span> Hồ sơ đơn hàng
       </a>
 
-      <div class="menu-group-label" style="margin-top: 10px;">Quản lý</div>
-      <a class="nav-link" onclick="switchView('history')">
-        <span>🕒</span> Lịch sử ca trực
-      </a>
-      <a class="nav-link" onclick="switchView('config')">
-        <span>⚙️</span> Cấu hình Hub
+      <div class="menu-group-label" style="margin-top: 10px;">Quản trị & Phân quyền</div>
+      <a class="nav-link" onclick="switchView('login-view')">
+        <span>🔐</span> Đăng nhập (SCR-01)
       </a>
       <a class="nav-link" onclick="switchView('figma-view')" style="border-top: 1px solid rgba(255,255,255,0.08); margin-top: 10px;">
         <span>🎨</span> 18 Bản vẽ gốc Figma
-        <span class="nav-badge">18</span>
+        <span class="nav-badge subtle">18</span>
       </a>
     </nav>
 
-    <!-- Bottom User Session (Exact Figma: Trần Văn Bình - Điều phối viên) -->
-    <div class="sidebar-user">
-      <div class="user-avatar">TB</div>
-      <div class="user-info">
-        <div class="user-name">Trần Văn Bình</div>
-        <div class="user-role-badge">
-          <span style="color: #55ceca;">●</span> Điều phối viên
+    <!-- Sidebar Bottom: System Links & User Profile -->
+    <div class="sidebar-bottom">
+      <div class="sidebar-system-links">
+        <a><span style="color:#10b981;">●</span> Hệ thống hoạt động bình thường</a>
+        <a onclick="alert('Dự án Minerva Nexus - Đồ án tốt nghiệp / Phân tích thiết kế yêu cầu TDTU N10\nLeader: Võ Xuân Quang (523H0173)')">❓ Trợ giúp & BRS/SRS</a>
+      </div>
+
+      <div class="sidebar-user-card">
+        <div class="sidebar-user-avatar">TB</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-role">Điều phối viên Hub</div>
+          <div class="sidebar-user-name">Trần Văn Bình</div>
+          <div class="sidebar-user-status">
+            <span>●</span> Đang trong ca trực
+          </div>
         </div>
       </div>
     </div>
   </aside>
 
-  <!-- MAIN WORKSPACE -->
+  <!-- ========================================================================
+       MAIN WORKSPACE
+       ======================================================================== -->
   <main class="main-content">
     
     <!-- TOPBAR: EXACT FIGMA -->
     <header class="topbar">
       <div class="breadcrumb-trail">
         <span>Vận hành Hub</span>
-        <span>/</span>
+        <span>&gt;</span>
         <strong id="topbar-crumb">Bàn điều hành</strong>
       </div>
 
@@ -94,109 +97,142 @@
           <span class="pulse-dot"></span>
           <span>Kết nối · <span id="topbar-clock">Cập nhật 09:25:48</span></span>
         </div>
-        <button class="btn-driver-sim-toggle" onclick="toggleMobileSim()">
-          📱 <span>Mở Tác vụ tài xế (SCR-07)</span>
+        <button class="btn-mobile-sim-toggle" onclick="toggleMobileSim()">
+          📱 <span>Tác vụ tài xế (SCR-07 &amp; SCR-08)</span>
         </button>
-        <div class="user-avatar" style="width: 28px; height: 28px; font-size: 10px;">TB</div>
+        <div class="topbar-avatar" id="topbar-avatar-badge">TB</div>
       </div>
     </header>
 
     <!-- VIEWS CONTAINER -->
     <div class="views-container">
 
-      <!-- VIEW 1: SCR-02 BÀN ĐIỀU HÀNH TRUNG TÂM HUB -->
+      <!-- ==================================================================
+           VIEW 1: SCR-02 BÀN ĐIỀU HÀNH TRUNG TÂM HUB
+           ================================================================== -->
       <section id="view-dashboard" class="view-section active">
         <div class="screen-header-block">
           <div>
-            <div class="screen-title">
-              <span>Bàn điều hành trung tâm Hub</span>
-              <span class="scr-tag">SCR-02</span>
+            <div class="screen-title-row">
+              <h1 class="screen-title">Bàn điều hành trung tâm Hub</h1>
             </div>
             <div class="screen-sub">
               Hub Quận 7 · Ca sáng 08:00 - 12:00 · Điều phối viên Trần Văn Bình
             </div>
           </div>
           <div class="live-monitor-pill">
-            <span style="color: var(--teal-dark);">●</span> Giám sát thời gian thực
+            <span style="color: #007791;">●</span> Giám sát thời gian thực
           </div>
         </div>
 
-        <!-- Row 1: Công suất Hub & Giám sát SLA thời gian thực -->
+        <!-- Top Row: Card 1 (Dark Navy) & Card 2 (SLA Monitor) -->
         <div class="dashboard-top-row">
           
-          <!-- Card 1: Công suất Hub -->
-          <div class="figma-card">
-            <div class="card-top-head">
-              <span class="card-title-text">Công suất Hub</span>
-              <span class="card-meta-tag" id="hub-driver-count-tag">8 tài xế trực</span>
+          <!-- Card 1: Công suất Hub (Dark Navy #0a2233) -->
+          <div class="hub-capacity-card">
+            <div class="capacity-top">
+              <span class="capacity-top-title">Công suất Hub</span>
+              <span class="capacity-driver-badge" id="hub-driver-badge">👥 8 tài xế trực</span>
             </div>
-            <div class="capacity-content">
-              <div>
-                <div class="capacity-donut-num" id="hub-capacity-pct">79%</div>
-                <div class="capacity-donut-sub">công suất Hub</div>
-              </div>
-              <div class="capacity-detail-col">
-                <div class="cap-fraction" id="hub-capacity-fraction">95 / 120 đơn</div>
-                <div style="font-size: 12px; color: var(--text-muted);">Đã tiếp nhận · Sức chứa tối đa</div>
-                <div style="font-size: 12px; color: var(--teal-primary); font-weight: 600; margin-top: 4px;" id="hub-remaining-capacity">
-                  Tổng sức chứa đội: Còn 25 đơn
+
+            <div class="capacity-middle">
+              <!-- SVG Donut Chart -->
+              <div class="donut-gauge-wrapper">
+                <svg viewBox="0 0 100 100">
+                  <circle class="donut-gauge-bg" cx="50" cy="50" r="40"></circle>
+                  <circle class="donut-gauge-fill" id="hub-donut-fill" cx="50" cy="50" r="40"></circle>
+                </svg>
+                <div class="donut-gauge-text">
+                  <div class="donut-gauge-percent" id="hub-capacity-pct">79%</div>
+                  <div class="donut-gauge-label">công suất Hub</div>
                 </div>
               </div>
+
+              <div class="capacity-right-col">
+                <div class="capacity-large-fraction" id="hub-capacity-fraction">
+                  95 <span>/ 120 đơn</span>
+                </div>
+                <div class="capacity-detail-sub">Đã tiếp nhận · Sức chứa tối đa</div>
+                <div class="capacity-detail-sub">Tổng sức chứa đội</div>
+              </div>
+            </div>
+
+            <div class="capacity-bottom-badge" id="hub-remaining-capacity">
+              📦 Còn 25 đơn
             </div>
           </div>
 
-          <!-- Card 2: Giám sát SLA thời gian thực (72 / 17 / 6) -->
-          <div class="figma-card">
-            <div class="card-top-head">
-              <span class="card-title-text">Giám sát SLA thời gian thực</span>
-              <span class="card-meta-tag" style="background: var(--success-light); color: var(--success);" id="hub-order-intake-tag">
-                95 đơn đã tiếp nhận · Cảnh báo: Bật
-              </span>
-            </div>
-            
-            <div class="sla-tier-grid">
-              <div class="sla-tier-box safe">
-                <span class="tier-title">An toàn</span>
-                <span class="tier-count" id="tier-safe-count">72</span>
-                <span class="tier-sub">> 120 phút</span>
+          <!-- Card 2: Giám sát SLA thời gian thực -->
+          <div class="sla-monitor-card">
+            <div class="sla-monitor-header">
+              <div>
+                <div class="sla-monitor-title">Giám sát SLA thời gian thực</div>
+                <div class="sla-monitor-sub" id="sla-intake-count-text">95 đơn đã tiếp nhận</div>
               </div>
-              <div class="sla-tier-box warning">
-                <span class="tier-title">Cận hạn</span>
-                <span class="tier-count" id="tier-warn-count">17</span>
-                <span class="tier-sub">60 - 120 phút</span>
-              </div>
-              <div class="sla-tier-box danger">
-                <span class="tier-title">Nguy cơ cao</span>
-                <span class="tier-count" id="tier-danger-count">6</span>
-                <span class="tier-sub">< 60 phút</span>
+              <div class="alert-badge-on">
+                <span>🚨</span> Cảnh báo: Bật
               </div>
             </div>
 
-            <!-- Danger Banner -->
-            <div class="urgent-banner">
-              <div class="urgent-banner-text">
-                <span>⚠️</span>
-                <span id="urgent-banner-msg">6 đơn nguy cơ cao cần điều phối ngay. Ưu tiên theo thời gian còn lại.</span>
+            <!-- Continuous 3-color Progress Bar -->
+            <div class="sla-continuous-bar">
+              <div class="sla-segment-safe" id="sla-bar-safe" title="An toàn (> 120 phút)"></div>
+              <div class="sla-segment-warn" id="sla-bar-warn" title="Cận hạn (60 - 120 phút)"></div>
+              <div class="sla-segment-danger" id="sla-bar-danger" title="Nguy cơ cao (< 60 phút)"></div>
+            </div>
+
+            <!-- 3 Stat Boxes -->
+            <div class="sla-boxes-row">
+              <div class="sla-stat-box safe">
+                <div class="sla-box-head"><span>🛡</span> An toàn</div>
+                <div class="sla-box-number" id="tier-safe-num">72 <span>đơn</span></div>
+                <div class="sla-box-sub">&gt; 120 phút</div>
               </div>
-              <div style="font-size: 11.5px; font-weight: 700; color: #991b1b;" id="earliest-sla-tag">
-                Đến hạn sớm nhất: 00:12:38
+
+              <div class="sla-stat-box warn">
+                <div class="sla-box-head"><span>⏱</span> Cận hạn</div>
+                <div class="sla-box-number" id="tier-warn-num">17 <span>đơn</span></div>
+                <div class="sla-box-sub">60 - 120 phút</div>
               </div>
+
+              <div class="sla-stat-box danger">
+                <div class="sla-box-head"><span>⚠️</span> Nguy cơ cao</div>
+                <div class="sla-box-number" id="tier-danger-num">6 <span>đơn</span></div>
+                <div class="sla-box-sub">&lt; 60 phút</div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+              <span style="color: #ef4444;">⭕</span> Cập nhật theo thời gian thực mỗi 8 giây
             </div>
           </div>
 
         </div>
 
-        <!-- Row 2: Hàng đợi khẩn cấp (Exact Figma Table) -->
+        <!-- Warning Banner -->
+        <div class="urgent-banner-block">
+          <div class="urgent-banner-left">
+            <div class="urgent-banner-icon">🚨</div>
+            <div>
+              <div class="urgent-banner-text-bold" id="urgent-banner-head">6 đơn có nguy cơ vi phạm SLA cao</div>
+              <div class="urgent-banner-text-sub">Ưu tiên theo thời gian còn lại.</div>
+            </div>
+          </div>
+          <div class="urgent-banner-right">
+            Đến hạn sớm nhất <strong id="earliest-sla-mono">00:12:38</strong>
+          </div>
+        </div>
+
+        <!-- Table Panel: Hàng đợi khẩn cấp (Exact Figma) -->
         <div class="table-panel">
           <div class="table-head-bar">
             <div class="table-title">
               <span>Hàng đợi khẩn cấp</span>
-              <span style="font-size: 12px; font-weight: 600; color: var(--danger); background: var(--danger-light); padding: 3px 8px; border-radius: 4px;" id="queue-badge">
-                6 đơn · Dưới 60 phút
-              </span>
+              <span style="background: #fee2e2; color: #dc2626; font-size: 11.5px; padding: 2px 8px; border-radius: 4px;" id="queue-badge-count">6 đơn</span>
+              <span style="font-size: 12px; color: var(--text-muted); font-weight: normal; margin-left: 6px;">Dưới 60 phút</span>
             </div>
             <div style="font-size: 12px; color: var(--text-muted);">
-              Sắp xếp: <strong>SLA gần nhất</strong>
+              ⇅ Sắp xếp: <strong>SLA gần nhất</strong>
             </div>
           </div>
 
@@ -205,9 +241,9 @@
               <tr>
                 <th style="width: 170px;">Mã đơn</th>
                 <th>Khu vực giao</th>
-                <th style="width: 140px;">SLA còn lại</th>
-                <th style="width: 140px;">Trạng thái SLA</th>
-                <th style="width: 140px; text-align: right;">Hành động</th>
+                <th style="width: 150px;">SLA còn lại</th>
+                <th style="width: 150px;">Trạng thái SLA</th>
+                <th style="width: 130px; text-align: right;">Hành động</th>
               </tr>
             </thead>
             <tbody id="figma-urgent-tbody">
@@ -215,368 +251,1425 @@
             </tbody>
           </table>
 
-          <div style="padding: 12px 20px; background: #f8fafc; border-top: 1px solid var(--border-light); font-size: 11.5px; color: var(--text-muted); display: flex; justify-content: space-between;">
-            <span id="queue-footer-info">Hiển thị 6 / 6 đơn khẩn cấp · Đồng hồ: giờ : phút : giây</span>
-            <span>Phạm vi: đơn đã tiếp nhận tại Hub Quận 7 · Giờ Việt Nam (UTC+7)</span>
+          <div style="padding: 10px 20px; background: #f8fafc; border-top: 1px solid var(--card-border); font-size: 11.5px; color: var(--text-muted); display: flex; justify-content: space-between;">
+            <span id="queue-footer-text">Hiển thị 6 / 6 đơn khẩn cấp</span>
+            <span>Đồng hồ: giờ : phút : giây</span>
+          </div>
+          <div style="padding: 6px 20px 10px 20px; background: #f8fafc; font-size: 11px; color: #94a3b8; display: flex; justify-content: space-between;">
+            <span>Phạm vi: đơn đã tiếp nhận tại Hub Quận 7 trong ca hiện tại</span>
+            <span>Giờ Việt Nam · UTC+7</span>
           </div>
         </div>
       </section>
 
-      <!-- VIEW 2: SCR-03 TIẾP NHẬN & PHÂN LOẠI ĐƠN -->
+      <!-- ==================================================================
+           VIEW 2: SCR-03 TIẾP NHẬN & PHÂN LOẠI ĐƠN HÀNG
+           ================================================================== -->
       <section id="view-orders" class="view-section">
         <div class="screen-header-block">
           <div>
-            <div class="screen-title">
-              <span>Tiếp nhận & phân loại đơn hàng</span>
-              <span class="scr-tag">SCR-03</span>
-            </div>
-            <div class="screen-sub">
-              BR-01 · Kiểm tra vùng phục vụ, số điện thoại và COD ≤ 10.000.000 ₫/đơn với tài xế xe máy.
-            </div>
+            <div class="screen-sub" style="margin-bottom: 2px;">Tiếp nhận tại Hub</div>
+            <h1 class="screen-title">Tiếp nhận &amp; phân loại đơn hàng</h1>
           </div>
           <div style="display: flex; gap: 10px;">
-            <button class="btn-dispatch-action" onclick="openCreateOrderModal()">+ Tạo đơn gửi lẻ</button>
-            <button class="btn-dispatch-action" style="background: #101f32;" onclick="loadAllOrders()">Nạp danh sách đơn</button>
+            <button class="btn-outline" onclick="openCreateOrderModal()">+ Tạo đơn gửi lẻ</button>
+            <button class="btn-dispatch-action" onclick="loadAllOrders()">⤓ Nạp danh sách đơn (Import CSV)</button>
           </div>
         </div>
 
-        <!-- 4 State Summary Cards (SCR-03 Figma) -->
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px;">
-          <div class="figma-card" style="padding: 14px;">
-            <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">CHỜ THẨM ĐỊNH</div>
-            <div style="font-size: 24px; font-weight: 800; color: #64748b; margin: 4px 0;">12</div>
-            <div style="font-size: 11px; color: var(--danger);">3 đơn lỗi cần xử lý</div>
+        <!-- Success Banner -->
+        <div id="scr03-success-banner" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 24px; height: 24px; border-radius: 50%; background: #dcfce7; color: #15803d; display: flex; align-items: center; justify-content: center; font-weight: bold;">✔</div>
+            <div>
+              <div style="font-weight: 700; color: #166534; font-size: 13px;" id="scr03-banner-title">Đã tạo đơn MNX000105 · Dữ liệu hợp lệ, chuyển Sẵn sàng phát.</div>
+              <div style="font-size: 11.5px; color: #15803d; margin-top: 2px;">09:20 · 09/11/2026 — Địa chỉ hợp lệ, đủ số điện thoại, COD trong giới hạn.</div>
+            </div>
           </div>
-          <div class="figma-card" style="padding: 14px; border-left: 3px solid var(--teal-primary);">
-            <div style="font-size: 11px; color: var(--teal-primary); font-weight: 600;">SẴN SÀNG PHÁT</div>
-            <div style="font-size: 24px; font-weight: 800; color: var(--teal-primary); margin: 4px 0;" id="scr03-ready-count">58</div>
-            <div style="font-size: 11px; color: var(--success);">READY_TO_DISPATCH · Đã hợp lệ</div>
-          </div>
-          <div class="figma-card" style="padding: 14px;">
-            <div style="font-size: 11px; color: #d97706; font-weight: 600;">ĐÃ GÁN TÀI XẾ</div>
-            <div style="font-size: 24px; font-weight: 800; color: #d97706; margin: 4px 0;" id="scr03-assigned-count">21</div>
-            <div style="font-size: 11px; color: var(--text-muted);">ASSIGNED · Chờ nhận bàn giao</div>
-          </div>
-          <div class="figma-card" style="padding: 14px;">
-            <div style="font-size: 11px; color: #2563eb; font-weight: 600;">ĐANG GIAO</div>
-            <div style="font-size: 24px; font-weight: 800; color: #2563eb; margin: 4px 0;" id="scr03-transit-count">14</div>
-            <div style="font-size: 11px; color: var(--text-muted);">IN_TRANSIT · Đang đi tuyến</div>
+          <div style="display: flex; align-items: center; gap: 12px; font-size: 12px;">
+            <a style="color: #007791; font-weight: 600; cursor: pointer;" onclick="switchView('detail')">Xem đơn</a>
+            <span style="cursor: pointer; color: #94a3b8;" onclick="document.getElementById('scr03-success-banner').style.display='none'">✕</span>
           </div>
         </div>
 
-        <div class="table-panel">
-          <div class="table-head-bar">
-            <input type="text" id="order-search-input" placeholder="Tìm mã đơn, tên hoặc số điện thoại..." style="padding: 6px 12px; border: 1px solid var(--border-light); border-radius: 6px; width: 320px; font-size: 12.5px;" oninput="filterOrdersTable()">
-            <div style="display: flex; gap: 10px;">
-              <select id="filter-area" style="padding: 6px 10px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 12px;" onchange="filterOrdersTable()">
-                <option value="">Tất cả khu vực</option>
-                <option value="Q7_TAN_THUAN">Tân Thuận Đông, Q.7</option>
-                <option value="Q7_TAN_PHONG">Tân Phong, Q.7</option>
-                <option value="Q7_PHU_MY_HUNG">Phú Mỹ Hưng, Q.7</option>
-                <option value="NHA_BE">Huyện Nhà Bè</option>
-              </select>
+        <!-- 4 Summary KPI Cards -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px;">
+          <div class="figma-card" style="padding: 14px; cursor: pointer;" onclick="filterByTab('error')">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-size: 11px; color: var(--text-muted); font-weight: 700;">CHỜ THẨM ĐỊNH</span>
+              <span style="color: #64748b;">⏱</span>
+            </div>
+            <div style="font-size: 26px; font-weight: 800; color: #475569; margin: 4px 0;">12</div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="scr-tag" style="background: #fef3c7; color: #b45309;">PENDING</span>
+              <span style="font-size: 11px; color: #dc2626; font-weight: 600;">3 đơn lỗi</span>
             </div>
           </div>
 
-          <table class="figma-table">
-            <thead>
-              <tr>
-                <th>Mã Vận Đơn</th>
-                <th>Người Nhận & SĐT</th>
-                <th>Địa Chỉ Phát</th>
-                <th>Tuyến Hub</th>
-                <th>Dịch Vụ</th>
-                <th>Hạn Chót SLA</th>
-                <th>Thu Hộ COD</th>
-                <th>Trạng Thái</th>
-                <th>Tài Xế Gán</th>
-                <th>Thao Tác</th>
-              </tr>
-            </thead>
-            <tbody id="orders-table-body">
-              <!-- Populated by JS -->
-            </tbody>
-          </table>
-        </div>
-      </section>
+          <div class="figma-card" style="padding: 14px; border-left: 3px solid var(--teal-primary); cursor: pointer;" onclick="filterByTab('all')">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-size: 11px; color: var(--teal-dark); font-weight: 700;">SẴN SÀNG PHÁT</span>
+              <span style="color: var(--teal-primary);">📦</span>
+            </div>
+            <div style="font-size: 26px; font-weight: 800; color: var(--teal-primary); margin: 4px 0;" id="scr03-ready-count">58</div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="scr-tag" style="background: #e0f2fe; color: #0369a1;">READY_TO_DISPATCH</span>
+              <span style="font-size: 11px; color: #16a34a; font-weight: 600;">Đã hợp lệ</span>
+            </div>
+          </div>
 
-      <!-- VIEW 3: SCR-05 GỢI Ý PHÂN CÔNG TỐI ƯU (AI DISPATCH) -->
-      <section id="view-dispatch" class="view-section">
-        <div class="screen-header-block">
+          <div class="figma-card" style="padding: 14px;">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-size: 11px; color: #d97706; font-weight: 700;">ĐÃ GÁN TÀI XẾ</span>
+              <span style="color: #d97706;">👤</span>
+            </div>
+            <div style="font-size: 26px; font-weight: 800; color: #d97706; margin: 4px 0;" id="scr03-assigned-count">21</div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="scr-tag" style="background: #fef3c7; color: #92400e;">ASSIGNED</span>
+              <span style="font-size: 11px; color: var(--text-muted);">Chờ nhận bàn giao</span>
+            </div>
+          </div>
+
+          <div class="figma-card" style="padding: 14px;">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-size: 11px; color: #6366f1; font-weight: 700;">ĐANG GIAO</span>
+              <span style="color: #6366f1;">🚚</span>
+            </div>
+            <div style="font-size: 26px; font-weight: 800; color: #6366f1; margin: 4px 0;" id="scr03-transit-count">14</div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="scr-tag" style="background: #ede9fe; color: #5b21b6;">IN_TRANSIT</span>
+              <span style="font-size: 11px; color: var(--text-muted);">Đang đi tuyến</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rule Banner BR-01 -->
+        <div class="rule-banner-bar">
           <div>
-            <div class="screen-title">
-              <span>Gợi ý phân công tối ưu</span>
-              <span class="scr-tag">SCR-05 / SRS 4.8 · 4.12</span>
-            </div>
-            <div class="screen-sub">
-              AI / Heuristic · Ưu tiên đơn khẩn cấp, khớp tuyến và cân bằng tải trước khi xuất Hub.
-            </div>
+            <strong>🛡 BR-01</strong> · Chỉ đơn hợp lệ mới được xuất kho. Kiểm tra vùng phục vụ, số điện thoại và COD ≤ 10.000.000 ₫/đơn với tài xế xe máy.
           </div>
-          <button class="btn-dispatch-action" style="padding: 8px 16px; font-size: 13px;" onclick="runAIDispatch()">
-            ⚡ Chạy lại gợi ý
+        </div>
+
+        <!-- Sub Tabs (Tất cả 105 / Đơn lỗi • 3 / Lịch sử) -->
+        <div style="display: flex; gap: 8px; margin-bottom: 14px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px;">
+          <button id="btn-tab-orders-all" class="btn-outline" style="border-radius: 20px; font-weight: 700; background: #0a1926; color: #ffffff; border-color: #0a1926;" onclick="switchOrderSubTab('all')">
+            Tất cả 105
+          </button>
+          <button id="btn-tab-orders-error" class="btn-outline" style="border-radius: 20px; font-weight: 700;" onclick="switchOrderSubTab('error')">
+            Đơn lỗi cần xử lý <span style="background: #fee2e2; color: #dc2626; padding: 1px 6px; border-radius: 10px; font-size: 10.5px; margin-left: 4px;">• 3</span>
+          </button>
+          <button id="btn-tab-orders-history" class="btn-outline" style="border-radius: 20px;" onclick="switchOrderSubTab('history')">
+            Lịch sử nhập liệu
           </button>
         </div>
 
-        <!-- 4 Quick Cards + Matching Formula Card (Exact Figma) -->
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr) 1.2fr; gap: 14px; margin-bottom: 20px;">
-          <div class="figma-card" style="padding: 14px;">
-            <div style="font-size: 26px; font-weight: 800; color: var(--text-main);" id="ai-ready-count">06</div>
-            <div style="font-size: 12px; font-weight: 600; color: var(--navy); margin-top: 2px;">Đơn sẵn sàng</div>
-            <div style="font-size: 10.5px; color: var(--text-muted);">READY_TO_DISPATCH</div>
-          </div>
-          <div class="figma-card" style="padding: 14px;">
-            <div style="font-size: 26px; font-weight: 800; color: var(--text-main);" id="ai-eligible-drivers">04</div>
-            <div style="font-size: 12px; font-weight: 600; color: var(--navy); margin-top: 2px;">Tài xế đủ điều kiện</div>
-            <div style="font-size: 10.5px; color: var(--success);">Đang trực ca · còn chỗ</div>
-          </div>
-          <div class="figma-card" style="padding: 14px; border-left: 3px solid var(--danger);">
-            <div style="font-size: 26px; font-weight: 800; color: var(--danger);" id="ai-priority-orders">02</div>
-            <div style="font-size: 12px; font-weight: 600; color: var(--danger); margin-top: 2px;">Đơn cần ưu tiên</div>
-            <div style="font-size: 10.5px; color: var(--danger);">SLA dưới 60 phút</div>
-          </div>
-          <div class="figma-card" style="padding: 14px;">
-            <div style="font-size: 26px; font-weight: 800; color: var(--text-main);">6/6</div>
-            <div style="font-size: 12px; font-weight: 600; color: var(--navy); margin-top: 2px;">Đơn có đề xuất</div>
-            <div style="font-size: 10.5px; color: var(--text-muted);">Chưa thay đổi</div>
-          </div>
-          <div class="figma-card" style="padding: 14px; background: #f8fafc; border: 1px dashed var(--border-subtle);">
-            <div style="font-size: 11.5px; font-weight: 700; color: var(--navy);">ĐIỂM KHỚP = w1×tuyến + w2×SLA + w3×tải</div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">w1 = 0.5 · w2 = 0.3 · w3 = 0.2</div>
-            <div style="font-size: 10.5px; color: var(--teal-primary); font-weight: 600; margin-top: 4px;">Quy tắc Heuristic chuẩn SRS 4.8</div>
+        <!-- TAB CONTENT 1: REGULAR TABLE -->
+        <div id="subtab-all-container">
+          <div class="table-panel">
+            <div class="table-head-bar" style="flex-wrap: wrap; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="text" id="order-search-input" placeholder="🔍 Tìm mã đơn, tên hoặc số điện thoại..." style="padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; width: 280px; font-size: 12px;" oninput="filterOrdersTable()">
+                <select id="filter-date" style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+                  <option>📅 09/11/2026</option>
+                </select>
+                <select id="filter-status-select" style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;" onchange="filterOrdersTable()">
+                  <option value="">Trạng thái: Tất cả</option>
+                  <option value="READY_TO_DISPATCH">Sẵn sàng phát</option>
+                  <option value="ASSIGNED">Đã gán tài xế</option>
+                  <option value="IN_TRANSIT">Đang giao</option>
+                  <option value="DELIVERED">Giao thành công</option>
+                </select>
+              </div>
+              <div style="display: flex; gap: 6px;">
+                <button class="btn-outline" style="font-size: 11px;" onclick="document.getElementById('order-search-input').value=''; filterOrdersTable();">Đặt lại</button>
+              </div>
+            </div>
+
+            <table class="figma-table">
+              <thead>
+                <tr>
+                  <th style="width: 30px;"><input type="checkbox"></th>
+                  <th>Mã đơn</th>
+                  <th>Nguồn</th>
+                  <th>Người nhận</th>
+                  <th>Địa chỉ</th>
+                  <th>Dịch vụ</th>
+                  <th>COD</th>
+                  <th>Trạng thái</th>
+                  <th style="text-align: right;">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-body">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+
+            <div style="padding: 12px 20px; background: #f8fafc; border-top: 1px solid var(--card-border); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center;">
+              <span>1–20 / 105 đơn · 20/trang</span>
+              <div style="display: flex; gap: 4px;">
+                <button class="btn-outline" style="padding: 3px 8px; font-size: 11px;">&lt;</button>
+                <button class="btn-outline" style="padding: 3px 8px; font-size: 11px; background: #0a1926; color: #fff;">1</button>
+                <button class="btn-outline" style="padding: 3px 8px; font-size: 11px;">2</button>
+                <button class="btn-outline" style="padding: 3px 8px; font-size: 11px;">3</button>
+                <button class="btn-outline" style="padding: 3px 8px; font-size: 11px;">&gt;</button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="table-panel">
-          <div class="table-head-bar">
-            <div class="table-title">
-              <span>Đề xuất phân công</span>
-              <span style="font-size: 11.5px; background: #e2e8f0; padding: 2px 8px; border-radius: 4px;">6 đơn · SLA < 60 phút</span>
+        <!-- TAB CONTENT 2: EXACT FIGMA 5_5357 (Đơn lỗi cần xử lý) -->
+        <div id="subtab-error-container" style="display: none;">
+          <!-- Inspection Report Banner -->
+          <div style="background: #ffffff; border: 1px solid var(--card-border); border-radius: 10px; padding: 14px 20px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 20px;">📄</span>
+              <div>
+                <div style="font-weight: 700; font-size: 13.5px; color: var(--text-main);">Đã nhập và kiểm tra danh sách đơn</div>
+                <div style="font-size: 11.5px; color: var(--text-muted);">don_shopee_q7_09112026.xlsx · 12 dòng · An Lê · 09:15, 09/11/2026</div>
+              </div>
             </div>
-            <button class="btn-dispatch-action" style="background: var(--success);" onclick="approveAllSuggestions()">✔ Duyệt tất cả đề xuất</button>
+            <button class="btn-outline" style="font-size: 11.5px;">⤓ Tải báo cáo kiểm tra</button>
           </div>
 
-          <table class="figma-table">
-            <thead>
-              <tr>
-                <th>Đơn / Địa chỉ</th>
-                <th>SLA Còn Lại</th>
-                <th>Tài Xế Đề Xuất</th>
-                <th>Tải Hiện Tại</th>
-                <th>Độ Khớp</th>
-                <th>Lý Do Ghép Nối AI</th>
-                <th style="text-align: right;">Hành Động</th>
-              </tr>
-            </thead>
-            <tbody id="dispatch-table-body">
-              <!-- Populated by JS -->
-            </tbody>
-          </table>
+          <!-- 3 Stat Boxes -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px;">
+            <div class="figma-card" style="padding: 14px;">
+              <div style="font-size: 26px; font-weight: 800; color: var(--text-main);">12</div>
+              <div style="font-size: 12px; font-weight: 600; color: var(--text-main); margin-top: 2px;">Tổng số đơn đã nhập</div>
+              <div style="font-size: 11px; color: var(--text-muted);">Đã kiểm tra đủ 12/12 dòng</div>
+            </div>
+            <div class="figma-card" style="padding: 14px; border-left: 3px solid var(--success);">
+              <div style="font-size: 26px; font-weight: 800; color: var(--success);">9</div>
+              <div style="font-size: 12px; font-weight: 600; color: var(--success); margin-top: 2px;">Hợp lệ · Sẵn sàng phát</div>
+              <div style="font-size: 11px; color: var(--text-muted);">READY_TO_DISPATCH</div>
+            </div>
+            <div class="figma-card" style="padding: 14px; border-left: 3px solid var(--danger);">
+              <div style="font-size: 26px; font-weight: 800; color: var(--danger);">3</div>
+              <div style="font-size: 12px; font-weight: 600; color: var(--danger); margin-top: 2px;">Không hợp lệ · Chờ xử lý</div>
+              <div style="font-size: 11px; color: var(--danger);">PENDING · Không được xuất kho phát</div>
+            </div>
+          </div>
+
+          <div class="rule-banner-bar" style="border-left-color: #dc2626;">
+            <div>
+              <strong>🛡 3 đơn chưa hợp lệ được giữ ở PENDING.</strong> Chỉ chuyển READY_TO_DISPATCH sau khi sửa và kiểm tra lại thành công (BR-01).
+            </div>
+          </div>
+
+          <!-- Error Table -->
+          <div class="table-panel">
+            <div class="table-head-bar">
+              <div class="table-title">
+                <span>3 Lỗi · Mỗi dòng hiển thị lý do và cách sửa</span>
+              </div>
+              <button class="btn-outline" style="font-size: 11.5px;">⤓ Tải danh sách lỗi</button>
+            </div>
+
+            <table class="figma-table">
+              <thead>
+                <tr>
+                  <th>Dòng / Mã nguồn</th>
+                  <th>Người nhận / Liên hệ</th>
+                  <th>Địa chỉ / Phường</th>
+                  <th>COD</th>
+                  <th>Kết quả kiểm tra / Lý do lỗi</th>
+                  <th style="text-align: right;">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div style="font-weight: 700;">Dòng 05</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">SPX-711205 · Shopee Excel</div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 600;">Nguyễn Minh Khang</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">0908 222 333</div>
+                  </td>
+                  <td>
+                    <div style="color: #dc2626; font-weight: 600;">72 Lê Văn Việt</div>
+                    <div style="font-size: 11px; color: #dc2626;">Phường Hiệp Phú, TP. Thủ Đức</div>
+                  </td>
+                  <td>
+                    <div>650.000 ₫</div>
+                    <div style="font-size: 10.5px; color: var(--text-muted);">Tài xế xe máy</div>
+                  </td>
+                  <td>
+                    <div style="color: #dc2626; font-weight: 700;">● Địa chỉ ngoài vùng phục vụ</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted);">Không thuộc ServiceArea của Hub Quận 7. Sửa địa chỉ hoặc chuyển Hub phù hợp.</div>
+                  </td>
+                  <td style="text-align: right;">
+                    <button class="btn-dispatch-action" style="font-size: 11px; padding: 4px 8px;" onclick="fixErrorOrder(1)">✎ Sửa &amp; kiểm tra lại</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div style="font-weight: 700;">Dòng 08</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">SPX-711208 · Shopee Excel</div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 600;">Võ Thị Bích Ngọc</div>
+                    <div style="font-size: 11px; color: #dc2626; font-weight: 700;">Thiếu số điện thoại</div>
+                  </td>
+                  <td>
+                    <div>98 Nguyễn Thị Thập</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Phường Tân Phong</div>
+                  </td>
+                  <td>
+                    <div>320.000 ₫</div>
+                    <div style="font-size: 10.5px; color: var(--text-muted);">Tài xế xe máy</div>
+                  </td>
+                  <td>
+                    <div style="color: #dc2626; font-weight: 700;">● Thiếu số điện thoại người nhận</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted);">Chưa có thông tin liên hệ để giao hàng. Bổ sung số điện thoại hợp lệ.</div>
+                  </td>
+                  <td style="text-align: right;">
+                    <button class="btn-dispatch-action" style="font-size: 11px; padding: 4px 8px;" onclick="fixErrorOrder(2)">✎ Sửa &amp; kiểm tra lại</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div style="font-weight: 700;">Dòng 11</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">SPX-711211 · Shopee Excel</div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 600;">Trần Đức Hưng</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">0912 555 678</div>
+                  </td>
+                  <td>
+                    <div>12 Nguyễn Lương Bằng</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Phú Mỹ Hưng</div>
+                  </td>
+                  <td>
+                    <div style="color: #dc2626; font-weight: 800;">12.500.000 ₫</div>
+                    <div style="font-size: 10.5px; color: var(--text-muted);">Tài xế xe máy</div>
+                  </td>
+                  <td>
+                    <div style="color: #dc2626; font-weight: 700;">● COD vượt giới hạn xe máy</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted);">Vượt 2.500.000 ₫ so với mức tối đa. Điều chỉnh COD về ≤ 10.000.000 ₫.</div>
+                  </td>
+                  <td style="text-align: right;">
+                    <button class="btn-dispatch-action" style="font-size: 11px; padding: 4px 8px;" onclick="fixErrorOrder(3)">✎ Sửa &amp; kiểm tra lại</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-      <!-- VIEW 4: SCR-04 CA GIAO & ĐIỂM DANH TÀI XẾ -->
+      <!-- ==================================================================
+           VIEW 3: SCR-05 GỢI Ý PHÂN CÔNG TỐI ƯU (AI DISPATCH)
+           ================================================================== -->
+      <section id="view-dispatch" class="view-section">
+        <div class="screen-header-block">
+          <div>
+            <div class="screen-title-row">
+              <h1 class="screen-title">Gợi ý phân công tối ưu</h1>
+              <span class="scr-tag" style="background:#e0f2fe; color:#0369a1;">AI / Heuristic</span>
+            </div>
+            <div class="screen-sub">
+              Ưu tiên đơn khẩn cấp, khớp tuyến và cân bằng tải trước khi xuất Hub.
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <button class="btn-outline" onclick="runAIDispatch()">🔄 Chạy lại gợi ý</button>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Cập nhật 09:20:00 · 09/11/2026</div>
+          </div>
+        </div>
+
+        <!-- 4 KPI Boxes + Formula -->
+        <div class="dispatch-kpi-bar">
+          <div class="dispatch-kpis">
+            <div class="dispatch-kpi-item">
+              <div class="dispatch-kpi-num" id="ai-ready-count">06</div>
+              <div class="dispatch-kpi-title">Đơn sẵn sàng</div>
+              <div class="dispatch-kpi-sub">READY_TO_DISPATCH</div>
+            </div>
+
+            <div class="dispatch-kpi-divider"></div>
+
+            <div class="dispatch-kpi-item">
+              <div class="dispatch-kpi-num" id="ai-eligible-drivers">04</div>
+              <div class="dispatch-kpi-title">Tài xế đủ điều kiện</div>
+              <div class="dispatch-kpi-sub" style="color: #16a34a;">Đang trực ca · còn chỗ</div>
+            </div>
+
+            <div class="dispatch-kpi-divider"></div>
+
+            <div class="dispatch-kpi-item">
+              <div class="dispatch-kpi-num" style="color: #dc2626;" id="ai-priority-orders">02</div>
+              <div class="dispatch-kpi-title" style="color: #dc2626;">Đơn cần ưu tiên</div>
+              <div class="dispatch-kpi-sub" style="color: #dc2626;">SLA dưới 60 phút</div>
+            </div>
+
+            <div class="dispatch-kpi-divider"></div>
+
+            <div class="dispatch-kpi-item">
+              <div class="dispatch-kpi-num">6/6</div>
+              <div class="dispatch-kpi-title">Đơn có đề xuất</div>
+              <div class="dispatch-kpi-sub">Chưa thay đổi</div>
+            </div>
+          </div>
+
+          <div class="dispatch-formula-box">
+            <div style="font-weight: 700; color: var(--text-main);">🔗 Điểm khớp w1 × tuyến + w2 × SLA + w3 × tải</div>
+            <div style="color: var(--text-muted); margin-top: 2px;">
+              w1 = 0.5 · w2 = 0.3 · w3 = 0.2 · <a style="color: #007791; cursor: pointer;">Cấu hình ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 70/30 Split Layout (Exact Figma 7_1728) -->
+        <div class="dispatch-split-grid">
+          
+          <!-- Left: Proposals Table (70%) -->
+          <div class="proposals-container">
+            <div class="table-head-bar">
+              <div class="table-title">
+                <span>Đề xuất phân công</span>
+                <span class="scr-tag">6 đơn</span>
+              </div>
+              <div style="display: flex; gap: 12px; font-size: 12px; align-items: center;">
+                <span style="color: #dc2626; font-weight: 600;">🚩 SLA &lt; 60 phút</span>
+                <span style="color: var(--text-muted);">|</span>
+                <strong id="dispatch-selected-summary">Đã chọn 4 / 6</strong>
+              </div>
+            </div>
+
+            <div class="proposals-filter-bar">
+              <input type="text" placeholder="🔍 Tìm mã đơn, địa chỉ..." id="dispatch-search" oninput="filterDispatchList()">
+              <select><option>Tất cả</option></select>
+              <select><option>Can thiệp</option></select>
+              <div style="margin-left: auto; font-size: 11.5px; color: var(--text-muted);">⇅ SLA</div>
+            </div>
+
+            <table class="figma-table">
+              <thead>
+                <tr>
+                  <th style="width: 30px;"><input type="checkbox" checked onchange="toggleSelectAllProposals(this)"></th>
+                  <th>Đơn / Địa chỉ</th>
+                  <th>SLA</th>
+                  <th>Tài xế</th>
+                  <th>Tải</th>
+                  <th>Khớp</th>
+                  <th>Can thiệp</th>
+                </tr>
+              </thead>
+              <tbody id="dispatch-table-body">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+
+            <div style="padding: 10px 16px; background: #f8fafc; border-top: 1px solid var(--card-border); font-size: 11.5px; color: var(--text-muted); display: flex; justify-content: space-between;">
+              <span>6/6 đề xuất · Không có đơn bị loại</span>
+              <span>Tải hiện tại: 09:20, chưa cộng đơn đã chọn</span>
+            </div>
+          </div>
+
+          <!-- Right: Inspector Panel (30%) -->
+          <div class="inspector-panel" id="dispatch-inspector">
+            <div class="inspector-header">
+              <span class="inspector-title" id="inspector-title">Vì sao khớp 96%?</span>
+              <span style="cursor: pointer; color: var(--text-muted);">⛶</span>
+            </div>
+
+            <div class="inspector-score-row">
+              <div>
+                <div style="font-weight: 800; font-size: 14px; color: var(--text-main);" id="inspector-order-code">MNX000001</div>
+                <div style="font-size: 11.5px; color: #dc2626; font-weight: 600;" id="inspector-sla-tag">🚩 SLA 35 phút</div>
+              </div>
+              <div class="inspector-big-score" id="inspector-score-num">96%</div>
+            </div>
+
+            <!-- 3 Breakdown Bars -->
+            <div class="breakdown-bars-group">
+              <div class="breakdown-item">
+                <div class="breakdown-label-row">
+                  <span>Trùng tuyến địa bàn · w1</span>
+                  <strong id="bar-w1-val">50 / 50</strong>
+                </div>
+                <div class="breakdown-bar-track">
+                  <div class="breakdown-bar-fill" id="bar-w1-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+
+              <div class="breakdown-item">
+                <div class="breakdown-label-row">
+                  <span>Độ cấp bách SLA · w2</span>
+                  <strong id="bar-w2-val">30 / 30</strong>
+                </div>
+                <div class="breakdown-bar-track">
+                  <div class="breakdown-bar-fill" id="bar-w2-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+
+              <div class="breakdown-item">
+                <div class="breakdown-label-row">
+                  <span>Cân bằng tải · w3</span>
+                  <strong id="bar-w3-val">16 / 20</strong>
+                </div>
+                <div class="breakdown-bar-track">
+                  <div class="breakdown-bar-fill" id="bar-w3-fill" style="width: 80%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cyan Heuristic Note -->
+            <div class="inspector-note-box" id="inspector-note-text">
+              Trùng 100% tuyến + Tải còn trống nhiều + Gần vị trí giao.<br>
+              <span style="font-size: 10.5px; opacity: 0.85;">Vị trí gần hỗ trợ; không cộng thêm vào 3 trọng số.</span>
+            </div>
+
+            <!-- Driver Selector -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 11.5px; font-weight: 700;">Tài xế đề xuất</span>
+                <span class="scr-tag" style="background:#dcfce7; color:#15803d; font-size:10px;">Đang trực ca</span>
+              </div>
+              <select id="inspector-driver-select" style="width: 100%; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; font-weight: 600;" onchange="onDriverOverrideChange(this.value)">
+                <!-- Populated by JS -->
+              </select>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                Nhấn tên tài xế để đổi nếu có vấn đề thực tế.<br>
+                ⏱ Đổi tài xế sẽ được ghi nhận vào Audit Log.
+              </div>
+            </div>
+
+            <!-- Workload Impact Preview -->
+            <div class="workload-preview-card">
+              <div class="workload-preview-title">
+                <span>Tải sau phê duyệt</span>
+                <span style="color: var(--text-muted);">3 tài xế · 4 đơn</span>
+              </div>
+              <div class="workload-item">
+                <span>Nguyễn Văn An</span>
+                <strong style="color: var(--teal-primary);">+2 (4 ➔ 6/15)</strong>
+              </div>
+              <div class="workload-item">
+                <span>Trần Quốc Bình</span>
+                <strong style="color: var(--teal-primary);">+1 (6 ➔ 7/15)</strong>
+              </div>
+              <div class="workload-item">
+                <span>Lê Thị Chi</span>
+                <strong style="color: var(--teal-primary);">+1 (8 ➔ 9/15)</strong>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Sticky Approval Bar -->
+        <div class="sticky-approval-bar">
+          <div class="approval-left">
+            <span style="font-size: 20px;">📋</span>
+            <div>
+              <div class="approval-title" id="sticky-title">4 đơn đã chọn · Sẵn sàng phê duyệt</div>
+              <div class="approval-sub">2 đơn SLA khẩn cấp · 3 tài xế · 1 thay đổi</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn-outline" style="border: none;" onclick="uncheckAllProposals()">Bỏ chọn</button>
+            <button class="btn-dispatch-action" style="padding: 8px 18px; font-size: 13px;" onclick="approveSelectedSuggestions()">
+              ✔ Phê duyệt
+            </button>
+          </div>
+        </div>
+
+        <!-- Bottom Compliance Bar -->
+        <div style="margin-top: 14px; padding: 10px 14px; background: #ffffff; border: 1px solid var(--card-border); border-radius: 8px; font-size: 11.5px; color: #475569; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            🛡 <strong>READY_TO_DISPATCH ➔ ASSIGNED</strong> | currentLoad += 1 / đơn | Kiểm tra sức chứa · Giao dịch nguyên tử, lỗi sẽ hoàn tác.
+          </div>
+          <div>
+            🗄 AuditLog lưu: người duyệt, thời gian, thuật toán v2.4 và thay đổi. <a style="color: #007791; cursor: pointer;" onclick="switchView('detail')">Lịch sử ↗</a>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================================================================
+           VIEW 4: SCR-04 CA GIAO & ĐIỂM DANH TÀI XẾ
+           ================================================================== -->
       <section id="view-shifts" class="view-section">
         <div class="screen-header-block">
           <div>
-            <div class="screen-title">
-              <span>Lập ca giao & điểm danh tài xế</span>
-              <span class="scr-tag">SCR-04</span>
-            </div>
-            <div class="screen-sub">
-              BR-03 · Kiểm soát sức tải của đội xe theo ca trực (15-20 đơn/xe máy).
-            </div>
+            <h1 class="screen-title">Lập ca giao &amp; điểm danh tài xế</h1>
           </div>
-          <span class="live-monitor-pill">Ca sáng: 08:00 - 12:00</span>
+          <button class="btn-outline" onclick="alert('Lịch sử điểm danh ca sáng: 4/6 tài xế đã điểm danh đúng hạn lúc 07:45 - 07:52.')">🕒 Lịch sử điểm danh</button>
         </div>
 
+        <!-- Shift Control Card -->
+        <div class="figma-card" style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">NGÀY VẬN HÀNH</span>
+                <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                  <span style="font-weight: 700; font-size: 13.5px;">📅 09/11/2026</span>
+                  <span class="scr-tag">Hôm nay ▾</span>
+                </div>
+              </div>
+
+              <div style="width: 1px; height: 32px; background: #e2e8f0;"></div>
+
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">CA GIAO</span>
+                <div style="display: flex; gap: 8px; margin-top: 2px;">
+                  <button class="btn-outline" style="background: #e0f2fe; border-color: #0284c7; color: #0369a1; font-weight: 700;">
+                    ● Ca 1  08:00 - 12:00
+                  </button>
+                  <button class="btn-outline" style="color: #64748b;">
+                    ○ Ca 2  13:30 - 17:30 ⏱
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 12px; color: var(--text-muted);">Kết thúc dự kiến lúc 12:00</span>
+              <button class="btn-outline" style="color: #dc2626; border-color: #fecaca; font-weight: 600;" onclick="alert('Đã kết ca 1. Toàn bộ tài xế sẽ nộp bảng đối soát.')">⦿ Kết ca</button>
+            </div>
+          </div>
+
+          <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-muted);">
+            <div>
+              Trạng thái ca: <span>○ Chưa mở ➔</span> <strong style="color: #16a34a;">● Đang hoạt động</strong> <span>➔ ○ Đã đóng / kết ca</span>
+            </div>
+            <div>Mở lúc 08:00 bởi Mai Linh · Trưởng ca</div>
+          </div>
+        </div>
+
+        <!-- 4 Stat Summary Boxes -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px;">
+          <div class="figma-card" style="padding: 14px;">
+            <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">TÀI XẾ TRONG CA</div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--text-main); margin: 4px 0;">6 <span style="font-size: 13px; font-weight: 500;">tài xế</span></div>
+            <div style="font-size: 11px; color: var(--text-muted);">4 xe máy · 2 xe bán tải</div>
+          </div>
+
+          <div class="figma-card" style="padding: 14px; border-left: 3px solid var(--teal-primary);">
+            <div style="font-size: 11px; color: var(--teal-dark); font-weight: 600;">ĐÃ ĐIỂM DANH</div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--teal-primary); margin: 4px 0;">4 <span style="font-size: 13px; font-weight: 500;">/ 6</span></div>
+            <div style="font-size: 11px; color: #dc2626; font-weight: 600;">2 tài xế chưa điểm danh</div>
+          </div>
+
+          <div class="figma-card" style="padding: 14px;">
+            <div style="font-size: 11px; color: var(--teal-dark); font-weight: 600;">ĐANG NHẬN ĐƠN</div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--teal-primary); margin: 4px 0;">3 <span style="font-size: 13px; font-weight: 500;">tài xế</span></div>
+            <div style="font-size: 11px; color: #d97706;">1 tài xế tạm dừng nhận việc</div>
+          </div>
+
+          <div class="figma-card" style="padding: 14px;">
+            <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">TẢI CỦA TÀI XẾ ĐÃ ĐIỂM DANH</div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--text-main); margin: 4px 0;">48 <span style="font-size: 13px; font-weight: 500;">/ 85 đơn</span></div>
+            <div style="font-size: 11px; color: var(--teal-primary); font-weight: 600;">56% công suất đã được sử dụng</div>
+          </div>
+        </div>
+
+        <div class="rule-banner-bar">
+          <div>
+            <strong>🛡 BR-03</strong> · Chỉ gán đơn cho tài xế đã điểm danh trong ca đang mở. Không thể gán đơn khi tài xế chưa điểm danh. Nút nhận đơn sẽ bị khóa và tải hiện tại luôn bằng 0.
+          </div>
+          <span style="font-size: 11px; color: var(--text-muted);">🔒 Không thể bỏ qua</span>
+        </div>
+
+        <!-- Drivers Table -->
         <div class="table-panel">
+          <div class="table-head-bar">
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-outline" style="border-radius: 20px; background: #0a1926; color: #fff;">Tất cả 6</button>
+              <button class="btn-outline" style="border-radius: 20px;">Đã điểm danh 4</button>
+              <button class="btn-outline" style="border-radius: 20px;">Chưa điểm danh 2</button>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn-outline" style="font-size: 11.5px;">⤓ Xuất danh sách</button>
+              <button class="btn-dispatch-action" style="font-size: 11.5px;" onclick="checkInNewDriver()">+ Điểm danh tài xế</button>
+            </div>
+          </div>
+
           <table class="figma-table">
             <thead>
               <tr>
-                <th>Mã Tài Xế</th>
-                <th>Họ Và Tên</th>
-                <th>Số Điện Thoại</th>
-                <th>Tuyến Phụ Trách</th>
-                <th>Tải Đơn</th>
-                <th>Sức Chứa Ca</th>
-                <th>Tiến Độ Tải (%)</th>
-                <th>Trạng Thái Điểm Danh</th>
+                <th>Mã tài xế &amp; họ tên</th>
+                <th>Tuyến phụ trách</th>
+                <th>Phương tiện</th>
+                <th>Trạng thái điểm danh</th>
+                <th style="width: 170px;">Tải hiện tại</th>
+                <th style="width: 170px;">Nhận đơn</th>
               </tr>
             </thead>
             <tbody id="drivers-table-body">
               <!-- Populated by JS -->
             </tbody>
           </table>
+
+          <div style="padding: 10px 20px; background: #f8fafc; border-top: 1px solid var(--card-border); font-size: 11.5px; color: var(--text-muted); display: flex; justify-content: space-between;">
+            <span>● 3 tài xế có thể nhận đơn · 1 tạm dừng · 2 bị khóa theo BR-03</span>
+            <span>Hiển thị 1-6 trên 6 tài xế</span>
+          </div>
         </div>
       </section>
 
-      <!-- VIEW 5: SCR-06 HỒ SƠ CHI TIẾT ĐƠN HÀNG -->
+      <!-- ==================================================================
+           VIEW 5: SCR-06 HỒ SƠ CHI TIẾT ĐƠN HÀNG
+           ================================================================== -->
       <section id="view-detail" class="view-section">
         <div class="screen-header-block">
           <div>
-            <div class="screen-title">
-              <span>Hồ sơ chi tiết đơn hàng</span>
-              <span class="scr-tag">SCR-06</span>
-            </div>
-            <div class="screen-sub">
-              Sổ cái kiểm toán lịch sử thay đổi trạng thái (Immutable Audit Trail) theo SRS 4.5.4 & 4.11
-            </div>
+            <div class="screen-sub" style="margin-bottom: 2px;">Đơn hàng &gt; Hồ sơ chi tiết</div>
+            <h1 class="screen-title">Hồ sơ chi tiết đơn hàng</h1>
           </div>
-          <select id="detail-order-select" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-light); font-weight: 600;" onchange="loadOrderHistoryDetail(this.value)">
-          </select>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <select id="detail-order-select" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--card-border); font-weight: 600;" onchange="loadOrderHistoryDetail(this.value)">
+              <option value="ORD-018">VF261109-00842 (Đang vận chuyển)</option>
+              <option value="ORD-001">DH-Q7-08421 (Hàng đợi khẩn cấp)</option>
+              <option value="ORD-FAIL-2">VF261106-00317 (2 Lần giao thất bại - Kịch bản ngoại lệ)</option>
+            </select>
+            <span class="scr-tag">🔒 Chỉ đọc</span>
+            <button class="btn-outline" onclick="alert('Đã xuất hồ sơ chi tiết (PDF / Audit Log) thành công!')">⤓ Xuất hồ sơ</button>
+          </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px;">
-          <div class="figma-card" id="detail-info-box" style="font-size: 13px; line-height: 2;">
-            <!-- Info populated by JS -->
+        <!-- Top Order Info Box (Exact Figma 8_1341) -->
+        <div class="figma-card" style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 34px; height: 34px; background: #e0f2fe; color: #0284c7; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;">📦</div>
+              <div>
+                <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">MÃ VẬN ĐƠN</div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <strong style="font-size: 17px; color: var(--text-main);" id="detail-tracking-title">VF261109-00842</strong>
+                  <span style="cursor: pointer; color: var(--text-muted);" title="Copy">📋</span>
+                  <span class="scr-tag" style="background:#e0f2fe; color:#0369a1;" id="detail-status-pill">Đang vận chuyển</span>
+                </div>
+              </div>
+            </div>
+            <div style="font-size: 11.5px; color: var(--text-muted); text-align: right;">
+              <div>Cập nhật</div>
+              <strong style="color: var(--text-main);" id="detail-update-time">09/11/2026 · 08:40:02</strong>
+            </div>
           </div>
+
+          <!-- 4 Meta attributes -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 12px; font-size: 12px;">
+            <div>
+              <div style="color: var(--text-muted);">Ngày tạo</div>
+              <div style="font-weight: 600; margin-top: 2px;">09/11/2026 · 08:00:15</div>
+            </div>
+            <div>
+              <div style="color: var(--text-muted);">Dịch vụ</div>
+              <div style="font-weight: 600; margin-top: 2px;">Giao tiêu chuẩn · Nội thành</div>
+            </div>
+            <div>
+              <div style="color: var(--text-muted);">Hàng hóa</div>
+              <div style="font-weight: 600; margin-top: 2px;">Áo thun cotton · 1 kiện · 0,8 kg</div>
+            </div>
+            <div>
+              <div style="color: var(--text-muted);">Nguồn tạo</div>
+              <div style="font-weight: 600; margin-top: 2px;">File tích hợp · SORA-10482</div>
+            </div>
+          </div>
+
+          <!-- Sender & Recipient Columns -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: 12.5px;">
+            <div>
+              <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">NGƯỜI GỬI</div>
+              <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+                <strong style="color: var(--text-main);">Sora Studio · Lê Thu Hà</strong>
+                <a style="color: #007791; font-weight: 600;">0903 456 218</a>
+              </div>
+              <div style="color: #475569; margin-top: 2px;">28 Nguyễn Trãi, Phường Bến Thành, TP. Hồ Chí Minh</div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">KH-00218 · sora.ops@example.com</div>
+            </div>
+
+            <div>
+              <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">NGƯỜI NHẬN</div>
+              <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+                <strong style="color: var(--text-main);" id="detail-recip-name">Phạm Minh Anh</strong>
+                <a style="color: #007791; font-weight: 600;" id="detail-recip-phone">0918 672 345</a>
+              </div>
+              <div style="color: #475569; margin-top: 2px;" id="detail-recip-addr">112 Võ Văn Tần, Phường Xuân Hòa, TP. Hồ Chí Minh</div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Ghi chú: Gọi trước 10 phút.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Column Split (Left Audit Timeline / Right Finance & Exception) -->
+        <div style="display: grid; grid-template-columns: 1fr 360px; gap: 16px;">
+          
+          <!-- Left: Nhật ký vận hành (Audit Trail) -->
           <div class="figma-card">
-            <h3 style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 16px;">Dòng thời gian lịch sử trạng thái</h3>
-            <div id="timeline-container" style="padding-left: 10px; border-left: 2px solid var(--border-light);">
-              <!-- Timeline populated by JS -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <strong style="font-size: 14.5px; color: var(--text-main);">⏱ Nhật ký vận hành</strong>
+                <span class="scr-tag" id="detail-event-count">3 sự kiện</span>
+              </div>
+              <div class="scr-tag" style="background:#f0fdf4; color:#15803d; font-size:10.5px;">🛡 Nhật ký bất biến · Chỉ đọc</div>
+            </div>
+
+            <div style="font-size: 11.5px; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px;">
+              <span>Thứ Hai, 09/11/2026</span>
+              <span>Cũ ➔ Mới</span>
+            </div>
+
+            <div id="timeline-container" style="display: flex; flex-direction: column; gap: 16px;">
+              <!-- Populated by JS -->
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #f1f5f9; font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between;">
+              <span>📋 Hiển thị toàn bộ lịch sử vận đơn</span>
+              <span id="detail-history-count-foot">3/3 bản ghi</span>
+            </div>
+          </div>
+
+          <!-- Right: Thu tiền & Quản lý ngoại lệ -->
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            
+            <!-- Thu tiền & đối soát -->
+            <div class="figma-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <strong style="font-size: 13.5px; color: var(--text-main);">💵 Thu tiền &amp; đối soát</strong>
+                <span style="font-size: 11px; color: var(--text-muted);">VND</span>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Tiền hàng</span>
+                  <strong>650.000 ₫</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Phí vận chuyển · Người gửi trả</span>
+                  <span>25.000 ₫</span>
+                </div>
+                <div style="border-top: 1px solid #f1f5f9; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-weight: 700; color: var(--text-main);">Tiền thu COD</span>
+                  <strong style="font-size: 16px; color: var(--teal-primary);" id="detail-cod-amount">650.000 ₫</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--text-muted);">Trạng thái thu</span>
+                  <span class="scr-tag" style="background:#f1f5f9; color:#475569;" id="detail-cod-status">Chưa thu</span>
+                </div>
+                <div style="border-top: 1px dashed #f1f5f9; padding-top: 8px; display: flex; justify-content: space-between; font-size: 11.5px;">
+                  <span style="color: var(--text-muted);">Đã thu</span>
+                  <span>0 ₫</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11.5px;">
+                  <span style="color: var(--text-muted);">Đối soát</span>
+                  <span>Chưa phát sinh</span>
+                </div>
+              </div>
+
+              <div style="margin-top: 10px; font-size: 11px; color: var(--text-muted); background: #f8fafc; padding: 6px 10px; border-radius: 6px;">
+                Đơn đang vận chuyển. COD chỉ xác nhận khi tài xế thu tiền.
+              </div>
+            </div>
+
+            <!-- Quản lý ngoại lệ -->
+            <div class="figma-card" id="detail-exception-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <strong style="font-size: 13.5px; color: var(--text-main);">🛡 Quản lý ngoại lệ</strong>
+                <span style="color: #64748b;">!</span>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-size: 11px; color: var(--text-muted);">Số lần thất bại</div>
+                  <div style="font-size: 10.5px; color: var(--text-muted);">failureCount</div>
+                </div>
+                <div style="font-size: 32px; font-weight: 800; color: #475569;" id="detail-failure-count">0</div>
+              </div>
+
+              <div id="detail-failure-info" style="margin-top: 12px; font-size: 12px; color: #16a34a; background: #f0fdf4; padding: 8px 10px; border-radius: 6px; display: flex; align-items: center; gap: 6px;">
+                <span>✔</span> Chưa có ngoại lệ.
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           VIEW 6: SCR-01 ĐĂNG NHẬP HỆ THỐNG (DESKTOP & MOBILE)
+           ================================================================== -->
+      <section id="view-login-view" class="view-section">
+        <div class="screen-header-block">
+          <div>
+            <h1 class="screen-title">Đăng nhập hệ thống (SCR-01)</h1>
+            <div class="screen-sub">Biến thể Desktop (2:1889) và Mobile Tài xế (2:1957) chuẩn Figma</div>
+          </div>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid var(--card-border); border-radius: 12px; overflow: hidden; display: grid; grid-template-columns: 460px 1fr; min-height: 520px; box-shadow: var(--card-shadow);">
+          <!-- Left Hero Half (Dark Navy #0a1926) -->
+          <div style="background: #0a1926; padding: 36px 30px; color: #ffffff; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">
+                <div class="brand-icon-box">⚡</div>
+                <div>
+                  <div style="font-weight: 800; font-size: 15px;">HUB / OPS</div>
+                  <div style="font-size: 11px; color: #7d91a6;">Vận hành logistics</div>
+                </div>
+              </div>
+
+              <div style="width: 30px; height: 3px; background: #007791; margin-bottom: 16px;"></div>
+
+              <h2 style="font-size: 26px; font-weight: 800; line-height: 1.3; margin-bottom: 24px;">
+                Đúng Hub. Đúng vai trò.<br>Vận hành thông suốt.
+              </h2>
+
+              <div style="background: #112232; border: 1px solid #1c3247; border-radius: 12px; padding: 14px; position: relative;">
+                <div style="height: 120px; background: linear-gradient(180deg, #1e3a5f 0%, #0d2033 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 38px;">
+                  🏢
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 11.5px;">
+                  <div>
+                    <div style="color: #94a3b8;">Mạng lưới Hub</div>
+                    <div style="font-weight: 700; color: #ffffff;">Quận 7 · TP. Hồ Chí Minh</div>
+                  </div>
+                  <span>📍</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="font-size: 11px; color: #7d91a6; display: flex; align-items: center; gap: 6px;">
+              <span>🛡</span> Truy cập được phân quyền theo Hub trực thuộc
+            </div>
+          </div>
+
+          <!-- Right Login Form Half -->
+          <div style="padding: 40px 48px; display: flex; flex-direction: column; justify-content: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+              <span style="font-size: 12px; color: var(--text-muted);">Hệ thống quản lý vận hành</span>
+              <span style="font-size: 12px; color: var(--text-muted);">🌐 Tiếng Việt</span>
+            </div>
+
+            <h2 style="font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 20px;">Đăng nhập hệ thống</h2>
+
+            <div style="margin-bottom: 14px;">
+              <label style="font-size: 11.5px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Chi nhánh / Bưu cục vận hành</label>
+              <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span>🏢</span>
+                  <div>
+                    <strong style="font-size: 12.5px;">Hub Q7-01</strong>
+                    <div style="font-size: 11px; color: var(--text-muted);">Khu chế xuất Tân Thuận</div>
+                  </div>
+                </div>
+                <span>▾</span>
+              </div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Chỉ truy cập dữ liệu Hub bạn trực thuộc.</div>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+              <label style="font-size: 11.5px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Tên đăng nhập / Mã nhân viên</label>
+              <input type="text" value="NV0128" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <label style="font-size: 11.5px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Mật khẩu</label>
+              <input type="password" value="••••••••••••" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px;">
+            </div>
+
+            <button class="btn-dispatch-action" style="width: 100%; justify-content: center; padding: 10px; font-size: 13px; margin-bottom: 16px;" onclick="alert('Đã xác thực tài khoản NV0128 (Điều phối viên) thành công!')">
+              Đăng nhập ➔
+            </button>
+
+            <div style="font-size: 11.5px; color: var(--text-muted); text-align: center;">
+              Tài khoản do IT / Admin cấp. Không đăng ký tự do.<br>
+              <a style="color: #007791; font-weight: 600; cursor: pointer;">🎧 Cần hỗ trợ? Liên hệ quản trị Hub</a>
+            </div>
+
+            <div style="margin-top: 24px; padding-top: 14px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+              <span>© 2026 HUB / OPS</span>
+              <span>Dành cho nhân sự nội bộ</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- VIEW 6: 18 BẢN VẼ GỐC FIGMA -->
+      <!-- ==================================================================
+           VIEW 7: 18 BẢN VẼ GỐC FIGMA
+           ================================================================== -->
       <section id="view-figma-view" class="view-section">
         <div class="screen-header-block">
           <div>
-            <div class="screen-title">
-              <span>18 Bản vẽ gốc từ Figma</span>
+            <div class="screen-title-row">
+              <h1 class="screen-title">18 Bản vẽ gốc từ Figma</h1>
               <span class="scr-tag">s771rofPZ1nPkjaQu0sa8C</span>
             </div>
-            <div class="screen-sub">Ảnh chụp màn hình 2x Retina trích xuất tự động qua API Figma</div>
+            <div class="screen-sub">Toàn bộ 18 màn hình thiết kế chuẩn Retina trích xuất tự động qua Figma REST API</div>
           </div>
         </div>
         <div class="figma-gallery" id="figma-gallery-container">
-          <!-- 18 Cards -->
+          <!-- 18 Cards populated by JS -->
         </div>
       </section>
 
     </div>
   </main>
 
-  <!-- MOBILE SIMULATOR PHONE (EXACT FIGMA SCR-07 IPHONE 15) -->
+  <!-- ========================================================================
+       MOBILE SIMULATOR PHONE (EXACT FIGMA SCR-07 & SCR-08 IPHONE 15)
+       ======================================================================== -->
   <div id="mobile-sim" class="mobile-sim-container">
-    <div style="display: flex; justify-content: space-between; align-items: center; color: #fff; margin-bottom: 10px;">
-      <span style="font-size: 12.5px; font-weight: 700;">SCR-07 · TÁC VỤ TÀI XẾ (DRIVER FIELD APP)</span>
-      <button onclick="toggleMobileSim()" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✕</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; color: #fff; margin-bottom: 8px; background: rgba(10,25,38,0.85); padding: 6px 14px; border-radius: 8px; backdrop-filter: blur(10px);">
+      <span style="font-size: 11.5px; font-weight: 700;">IPHONE 15 SIMULATOR · SCR-07 / SCR-08</span>
+      <button onclick="toggleMobileSim()" style="background: none; border: none; color: #fff; font-size: 16px; cursor: pointer;">✕</button>
     </div>
 
     <div class="sim-phone">
-      <!-- iPhone Notch -->
+      <!-- Dynamic Island & Notch -->
       <div class="sim-notch">
         <span>9:15</span>
-        <div style="width: 70px; height: 18px; background: #000; border-radius: 10px;"></div>
+        <div class="sim-notch-island"></div>
         <span>📶 🔋</span>
       </div>
 
-      <!-- App Header: Exact Figma SCR-07 -->
-      <div style="background: #ffffff; border-bottom: 1px solid var(--border-light); padding: 12px 14px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <div style="font-size: 14px; font-weight: 700; color: var(--navy);">Lộ trình hôm nay</div>
-            <div style="font-size: 11px; color: var(--text-muted);">Ca sáng · 09/11/2026</div>
+      <!-- SIMULATOR VIEW A: SCR-07 TÁC VỤ TÀI XẾ -->
+      <div id="sim-view-scr07" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+        <!-- Header -->
+        <div class="sim-app-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px; cursor: pointer;">&lt;</span>
+            <div>
+              <div class="sim-header-title">Lộ trình hôm nay</div>
+              <div class="sim-header-sub">Ca sáng · 09/11/2026</div>
+            </div>
           </div>
-          <span style="background: var(--teal-light); color: var(--teal-dark); font-size: 10px; font-weight: 700; padding: 3px 6px; border-radius: 4px;">
-            01 NHẬN HÀNG
-          </span>
+          <span style="font-size: 18px; color: #38bdf8;">🔀</span>
         </div>
 
-        <div style="margin-top: 10px;">
-          <label style="font-size: 10px; color: var(--text-muted); font-weight: 700;">CHỌN TÀI XẾ TRỰC:</label>
-          <select id="sim-driver-select" style="width: 100%; padding: 5px; border-radius: 4px; border: 1px solid var(--border-light); font-size: 12px; font-weight: 600; margin-top: 2px;" onchange="loadSimDriverTasks()">
-          </select>
+        <div class="sim-body-scroll">
+          <!-- Top Manifest Status Card -->
+          <div class="sim-manifest-card">
+            <div class="sim-manifest-top">
+              <strong style="font-size: 12px; color: #475569;">01 NHẬN HÀNG</strong>
+              <span class="sim-badge-amber">Chờ nhận hàng</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <strong style="font-size: 14.5px; color: var(--text-main);">Hub Quận 7</strong>
+              <span style="font-size: 12px; color: var(--text-muted);" id="sim-order-count-badge">8 đơn</span>
+            </div>
+
+            <div style="margin-top: 8px;">
+              <label style="font-size: 10px; color: var(--text-muted); font-weight: 700;">CHỌN TÀI XẾ:</label>
+              <select id="sim-driver-select" style="width: 100%; padding: 4px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 11.5px; font-weight: 600; margin-top: 2px;" onchange="loadSimDriverTasks()">
+                <!-- Drivers -->
+              </select>
+            </div>
+
+            <div class="sim-manifest-stats">
+              <div>
+                <div style="font-size: 10.5px; color: var(--text-muted);">Trên xe</div>
+                <strong style="font-size: 18px; color: var(--text-main);" id="sim-on-vehicle">0 / 8</strong>
+              </div>
+              <div style="border-left: 1px solid #e2e8f0; padding-left: 12px;">
+                <div style="font-size: 10.5px; color: var(--text-muted);">COD giữ</div>
+                <strong style="font-size: 18px; color: #d97706;" id="sim-cod-sum">0 ₫</strong>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 4px;">
+            <div>
+              <strong style="font-size: 14px; color: var(--text-main);">Lộ trình giao</strong>
+              <div style="font-size: 11px; color: var(--text-muted);">Đã tối ưu theo AI Heuristic</div>
+            </div>
+            <span style="font-size: 16px; color: var(--text-muted);">≡₁₂</span>
+          </div>
+
+          <!-- Manifest List -->
+          <div id="sim-tasks-container">
+            <!-- Populated by JS -->
+          </div>
         </div>
 
-        <!-- Tải và tiền đang giữ (Exact Figma SCR-07) -->
-        <div style="display: flex; justify-content: space-between; background: #f8fafc; border: 1px solid var(--border-light); border-radius: 6px; padding: 6px 10px; margin-top: 10px; font-size: 11px;">
-          <span>Trên xe: <strong id="sim-on-vehicle">0 / 8 đơn</strong></span>
-          <span>COD giữ: <strong style="color: #d97706;" id="sim-cod-sum">0 ₫</strong></span>
+        <!-- Bottom Action Bar -->
+        <div class="sim-bottom-bar">
+          <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 6px;">
+            🔒 Nhận đủ hàng để mở giao.
+          </div>
+          <button id="sim-bulk-pickup-btn" class="btn-dispatch-action" style="width: 100%; justify-content: center; padding: 12px; font-size: 13px;" onclick="simBulkPickup()">
+            📦 Nhận đủ &amp; Xuất kho ➔
+          </button>
+          <div class="sim-home-indicator"></div>
         </div>
       </div>
 
-      <!-- Manifest Task List -->
-      <div class="sim-screen-content" id="sim-tasks-container">
-        <!-- Order cards populated by JS -->
+      <!-- SIMULATOR VIEW B: SCR-08 BÁO GIAO THẤT BẠI (EXACT FIGMA 11:1955 / 11:2044 / 11:2150 / 11:2336) -->
+      <div id="sim-view-scr08" style="display: none; flex-direction: column; flex: 1; overflow: hidden; background: #ffffff;">
+        <!-- Header -->
+        <div class="sim-app-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px; cursor: pointer;" onclick="closeSimScr08()">&lt;</span>
+            <div class="sim-header-title">Báo giao thất bại</div>
+          </div>
+          <span style="font-size: 18px; color: #38bdf8;">🎧</span>
+        </div>
+
+        <div class="sim-body-scroll" style="background: #f8fafc;">
+          <!-- Order Card -->
+          <div class="figma-card" style="padding: 12px; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+              <strong style="color: var(--teal-primary);" id="scr08-tracking-title">📦 GHN • 8041 6295</strong>
+              <strong style="color: #b45309;" id="scr08-cod-title">COD 485.000₫</strong>
+            </div>
+            <div style="font-weight: 700; font-size: 13px; margin-top: 4px;" id="scr08-cust-name">Nguyễn Minh Anh · 090 ••• 6828</div>
+            <div style="font-size: 11px; color: var(--text-muted);" id="scr08-cust-addr">28/12 Nguyễn Văn Đậu, P. 6, Bình Thạnh, TP. Hồ Chí Minh</div>
+          </div>
+
+          <!-- Failure Progress Indicator (1/3, 2/3, 3/3) -->
+          <div class="figma-card" style="padding: 12px; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+              <strong id="scr08-failure-step-title">Đang báo cáo lần 1/3</strong>
+              <span style="color: var(--text-muted);" id="scr08-step-fraction">0/3</span>
+            </div>
+            <!-- 3 Bars -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 6px 0;">
+              <div id="scr08-bar-1" style="height: 4px; background: var(--teal-primary); border-radius: 2px;"></div>
+              <div id="scr08-bar-2" style="height: 4px; background: #e2e8f0; border-radius: 2px;"></div>
+              <div id="scr08-bar-3" style="height: 4px; background: #e2e8f0; border-radius: 2px;"></div>
+            </div>
+            <div style="font-size: 10.5px; color: var(--text-muted);">Ghi nhận khi báo cáo hợp lệ.</div>
+          </div>
+
+          <!-- Reason Selection Radio Cards -->
+          <div style="font-weight: 700; font-size: 13px; margin-bottom: 6px; display: flex; justify-content: space-between;">
+            <span>Lý do giao thất bại</span>
+            <span style="font-size: 11px; color: #dc2626;">Bắt buộc</span>
+          </div>
+
+          <!-- CODE_01 -->
+          <div id="card-code-01" class="figma-card" style="padding: 10px; margin-bottom: 8px; border: 1.5px solid var(--teal-primary); cursor: pointer;" onclick="selectScr08Reason('CODE_01')">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <input type="radio" name="scr08-reason" value="CODE_01" checked>
+              <div>
+                <div style="font-size: 10.5px; color: var(--teal-primary); font-weight: 700;">CODE_01</div>
+                <div style="font-size: 12px; font-weight: 600;">Khách không nghe máy</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CODE_01 Mandatory Box -->
+          <div id="box-sub-code-01" style="background: #fffbeb; border: 1px solid #fef08a; border-radius: 8px; padding: 10px; margin-bottom: 8px; font-size: 11.5px;">
+            <div style="font-weight: 700; color: #b45309; font-size: 10.5px; margin-bottom: 4px;">XÁC NHẬN BẮT BUỘC • CODE_01</div>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="checkbox" id="scr08-call-check" checked>
+              <span>Đã gọi tối thiểu 3 cuộc cách nhau 5 phút</span>
+            </label>
+            <div style="font-size: 10px; color: #92400e; margin-top: 4px;">Chưa đủ điều kiện? Liên hệ khách trước khi báo thất bại.</div>
+          </div>
+
+          <!-- CODE_02 -->
+          <div id="card-code-02" class="figma-card" style="padding: 10px; margin-bottom: 8px; cursor: pointer;" onclick="selectScr08Reason('CODE_02')">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <input type="radio" name="scr08-reason" value="CODE_02">
+              <div>
+                <div style="font-size: 10.5px; color: var(--text-muted); font-weight: 700;">CODE_02</div>
+                <div style="font-size: 12px; font-weight: 600;">Sai địa chỉ / Nhà đóng cửa / Không tìm thấy hẻm</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CODE_03 -->
+          <div id="card-code-03" class="figma-card" style="padding: 10px; margin-bottom: 8px; cursor: pointer;" onclick="selectScr08Reason('CODE_03')">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <input type="radio" name="scr08-reason" value="CODE_03">
+              <div>
+                <div style="font-size: 10.5px; color: var(--text-muted); font-weight: 700;">CODE_03</div>
+                <div style="font-size: 12px; font-weight: 600;">Khách hẹn giao lại</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CODE_03 Sub Form (Figma 11:2044) -->
+          <div id="box-sub-code-03" style="display: none; background: #ecfeff; border: 1px solid #cffafe; border-radius: 8px; padding: 10px; margin-bottom: 8px; font-size: 11.5px;">
+            <div style="font-weight: 700; color: #0e7490; font-size: 11px; margin-bottom: 4px;">LỊCH HẸN GIAO LẠI</div>
+            <label style="font-size: 10.5px; color: #155e75;">Ngày giao lại *</label>
+            <input type="text" value="10/11/2026" style="width: 100%; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11.5px; margin-bottom: 6px;">
+            <label style="font-size: 10.5px; color: #155e75;">Khung giờ giao lại *</label>
+            <select style="width: 100%; padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11.5px;">
+              <option>14:00 – 17:00</option>
+              <option>08:00 – 11:30</option>
+            </select>
+          </div>
+
+          <!-- CODE_04 -->
+          <div id="card-code-04" class="figma-card" style="padding: 10px; margin-bottom: 8px; cursor: pointer;" onclick="selectScr08Reason('CODE_04')">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <input type="radio" name="scr08-reason" value="CODE_04">
+              <div>
+                <div style="font-size: 10.5px; color: var(--text-muted); font-weight: 700;">CODE_04</div>
+                <div style="font-size: 12px; font-weight: 600;">Khách từ chối nhận (Lần 3 chuyển hoàn RTS)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proof of Delivery Section -->
+          <div style="margin-top: 10px;">
+            <div style="font-weight: 700; font-size: 13px; margin-bottom: 6px; display: flex; justify-content: space-between;">
+              <span>Bằng chứng giao hàng</span>
+              <span style="font-size: 11px; color: #dc2626;">Bắt buộc</span>
+            </div>
+
+            <div style="border: 1.5px dashed var(--teal-primary); border-radius: 8px; padding: 12px; text-align: center; background: #f0fdfa; cursor: pointer;" onclick="toggleScr08Photo()">
+              <div style="font-size: 18px;">📷</div>
+              <strong style="color: var(--teal-primary); font-size: 12px;" id="scr08-photo-label">Chụp ảnh hiện trường</strong>
+              <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">Ảnh cửa đóng hoặc lịch sử cuộc gọi. Bắt buộc có ít nhất 1 ảnh.</div>
+            </div>
+
+            <!-- Uploaded Photo Card Preview -->
+            <div id="scr08-photo-preview" style="display: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-top: 8px; align-items: center; gap: 8px;">
+              <div style="width: 48px; height: 48px; background: #334155; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px;">🚪</div>
+              <div style="flex: 1;">
+                <div style="font-weight: 700; font-size: 11.5px;">Ảnh hiện trường</div>
+                <div style="font-size: 10.5px; color: var(--text-muted);">14:32 · Địa chỉ giao</div>
+                <div style="font-size: 10.5px; color: #16a34a; font-weight: 600;">✔ Đã tải 1 ảnh</div>
+              </div>
+              <span style="color: #dc2626; cursor: pointer;" onclick="toggleScr08Photo()">🗑</span>
+            </div>
+          </div>
+
+          <!-- 3rd attempt warning box (Figma 11:2231) -->
+          <div id="scr08-3rd-warning" style="display: none; background: #fffbeb; border: 1px solid #fef08a; border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 11px; color: #92400e;">
+            🛡 <strong>Đây là lần báo cáo thứ 3.</strong> Khi xác nhận hợp lệ: hệ thống chuyển RETURNED, khóa phát lại và sinh phiếu hoàn về kho tổng. Không thể chọn phát lại.
+          </div>
+        </div>
+
+        <!-- Confirm Action Bar -->
+        <div class="sim-bottom-bar">
+          <div style="font-size: 11px; color: #b45309; text-align: center; margin-bottom: 6px;" id="scr08-footer-hint">
+            Đã đủ lý do và ảnh xác nhận.
+          </div>
+          <button class="btn-dispatch-action" style="width: 100%; justify-content: center; padding: 12px; font-size: 13px; background: #dc2626;" onclick="submitScr08Failure()">
+            Xác nhận giao thất bại
+          </button>
+          <div class="sim-home-indicator"></div>
+        </div>
       </div>
 
-      <!-- Bottom Confirm Bar (Exact Figma SCR-07) -->
-      <div style="background: #ffffff; border-top: 1px solid var(--border-light); padding: 10px 14px;">
-        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
-          <span>🔒</span> Nhận đủ hàng để mở giao.
+      <!-- SIMULATOR VIEW C: SCR-08 RETURNED RESULT (EXACT FIGMA 11:2336) -->
+      <div id="sim-view-scr08-returned" style="display: none; flex-direction: column; flex: 1; overflow: hidden; background: #ffffff;">
+        <div class="sim-app-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px; cursor: pointer;" onclick="closeSimScr08()">&lt;</span>
+            <div class="sim-header-title">Báo giao thất bại</div>
+          </div>
+          <span style="font-size: 18px; color: #38bdf8;">🎧</span>
         </div>
-        <button id="sim-bulk-pickup-btn" class="btn-dispatch-action" style="width: 100%; justify-content: center; padding: 8px; font-size: 12px; background: #0f1b2a;" onclick="simBulkPickup()">
-          📦 Nhận đủ & Xuất kho ➔
-        </button>
+
+        <div class="sim-body-scroll" style="background: #ffffff;">
+          <div style="font-size: 11.5px; color: #16a34a; font-weight: 700;">✔ Đã ghi nhận • 14:35</div>
+          <h2 style="font-size: 18px; font-weight: 800; color: var(--text-main); margin: 4px 0;">Chuyển hoàn về người gửi</h2>
+          <span class="scr-tag" style="background:#fee2e2; color:#dc2626; font-weight:700;">🔄 CHUYỂN HOÀN</span>
+          <div style="font-size: 11.5px; color: var(--text-muted); margin: 6px 0 12px 0;">
+            Báo cáo hợp lệ. Đã cộng lần thất bại và kích hoạt hoàn hàng.
+          </div>
+
+          <!-- 3/3 red progress card -->
+          <div style="background: #fffbeb; border: 1px solid #fef08a; border-radius: 8px; padding: 10px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+              <strong>3/3 lần thất bại</strong>
+              <span style="color: var(--text-muted);">Đã cập nhật</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 6px 0;">
+              <div style="height: 4px; background: #dc2626; border-radius: 2px;"></div>
+              <div style="height: 4px; background: #dc2626; border-radius: 2px;"></div>
+              <div style="height: 4px; background: #dc2626; border-radius: 2px;"></div>
+            </div>
+            <div style="font-size: 10.5px; color: var(--text-muted);">Cập nhật sau báo cáo hợp lệ.</div>
+          </div>
+
+          <!-- Phiếu hoàn hàng card -->
+          <div class="figma-card" style="padding: 12px; margin-bottom: 12px;">
+            <div style="font-size: 11px; color: var(--text-muted);">Phiếu hoàn hàng · UC-16</div>
+            <div style="background: #ecfeff; border: 1px solid #cffafe; border-radius: 8px; padding: 10px; margin-top: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: #0e7490; font-size: 15px;">RTS-261109-06295</strong>
+                <span>📋</span>
+              </div>
+              <div style="font-size: 10.5px; color: #155e75; margin-top: 2px;">Xuất trình mã khi bàn giao kho tổng</div>
+            </div>
+            <div style="font-size: 11.5px; margin-top: 8px;">
+              <div style="color: var(--text-muted);">Lý do:</div>
+              <strong>CODE_04 • Khách từ chối nhận</strong>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Hàng móp méo — góc thùng bị móp, khách từ chối nhận.</div>
+            </div>
+          </div>
+
+          <!-- Bàn giao card -->
+          <div class="figma-card" style="padding: 12px; margin-bottom: 12px; font-size: 11.5px;">
+            <strong style="display: block; margin-bottom: 6px;">Bàn giao hàng hoàn</strong>
+            <div style="margin-bottom: 6px;">
+              🏢 <strong>Chuyển hàng về kho tổng:</strong> Bàn giao tại khu RTS của kho tổng Sóng Thần theo tuyến hoàn của điều phối viên.
+            </div>
+            <div style="margin-bottom: 8px;">
+              📑 <strong>Đối soát với nhân viên kho:</strong> Giữ kiện nguyên, kèm mã RTS.
+            </div>
+            <div style="background: #fee2e2; color: #991b1b; padding: 6px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 700;">
+              🔒 Đã khóa luồng giao. Không lên lịch phát lại sau lần 3.
+            </div>
+          </div>
+        </div>
+
+        <div class="sim-bottom-bar">
+          <button class="btn-dispatch-action" style="width: 100%; justify-content: center; padding: 10px; font-size: 12px; margin-bottom: 6px;" onclick="closeSimScr08()">
+            Xem phiếu hoàn hàng
+          </button>
+          <button class="btn-outline" style="width: 100%; justify-content: center; padding: 8px; font-size: 12px;" onclick="closeSimScr08()">
+            Về danh sách giao hàng
+          </button>
+          <div class="sim-home-indicator"></div>
+        </div>
       </div>
+
     </div>
   </div>
 
-  <!-- SCR-08 FAILURE MODAL (EXACT FIGMA 4 REASON CODES) -->
-  <div id="modal-failed" style="display: none; position: fixed; inset: 0; background: rgba(15, 27, 42, 0.75); z-index: 2000; align-items: center; justify-content: center;">
-    <div style="background: #ffffff; width: 380px; border-radius: 12px; padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <h3 style="font-size: 15px; font-weight: 700; color: var(--danger);">SCR-08 · Báo Sự Cố Giao Thất Bại</h3>
-        <span class="scr-tag" style="background: var(--danger-light); color: var(--danger);">BR-05</span>
-      </div>
-      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;" id="modal-failed-order-info">Đơn: VN241109086</p>
-
-      <label style="font-size: 11.5px; font-weight: 700; color: var(--text-main); display: block; margin-bottom: 6px;">Chọn mã lý do chuẩn:</label>
-      <select id="modal-failed-reason" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-light); font-size: 12px; margin-bottom: 12px;">
-        <option value="CUSTOMER_UNREACHABLE">CODE_01 · Khách không nghe máy (đã gọi 3 cuộc)</option>
-        <option value="WRONG_ADDRESS">CODE_02 · Sai địa chỉ / Nhà đóng cửa / Không tìm thấy</option>
-        <option value="CUSTOMER_RESCHEDULED">CODE_03 · Khách hẹn giao lại vào ca sau</option>
-        <option value="CUSTOMER_REJECTED">CODE_04 · Khách từ chối nhận (Lần 3 chuyển hoàn RTS)</option>
-      </select>
-
-      <label style="font-size: 11.5px; font-weight: 700; color: var(--text-main); display: block; margin-bottom: 6px;">Ghi chú cuộc gọi của tài xế:</label>
-      <textarea id="modal-failed-note" rows="2" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-light); font-size: 12px; margin-bottom: 16px;" placeholder="Ghi chú xác minh cuộc gọi..."></textarea>
-
-      <div style="display: flex; gap: 8px; justify-content: flex-end;">
-        <button class="btn-dispatch-action" style="background: #e2e8f0; color: #475569;" onclick="closeFailedModal()">Hủy bỏ</button>
-        <button class="btn-dispatch-action" style="background: var(--danger);" onclick="confirmDeliveryFailure()">Xác nhận báo lỗi</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SCR-03 CREATE ORDER MODAL -->
-  <div id="modal-create-order" style="display: none; position: fixed; inset: 0; background: rgba(15, 27, 42, 0.75); z-index: 2000; align-items: center; justify-content: center;">
-    <div style="background: #ffffff; width: 460px; border-radius: 12px; padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-      <h3 style="font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 12px;">SCR-03 · Tạo Đơn Gửi Lẻ Thủ Công</h3>
-      
-      <div style="margin-bottom: 10px;">
-        <label style="font-size: 11.5px; font-weight: 600;">Họ tên người nhận *</label>
-        <input type="text" id="new-recipient-name" style="width: 100%; padding: 7px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 12px;" placeholder="Nguyễn Thị Mai">
-      </div>
-      <div style="margin-bottom: 10px;">
-        <label style="font-size: 11.5px; font-weight: 600;">Số điện thoại *</label>
-        <input type="text" id="new-recipient-phone" style="width: 100%; padding: 7px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 12px;" placeholder="0911223344">
-      </div>
-      <div style="margin-bottom: 10px;">
-        <label style="font-size: 11.5px; font-weight: 600;">Địa chỉ phát hàng *</label>
-        <input type="text" id="new-address" style="width: 100%; padding: 7px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 12px;" placeholder="12 Huỳnh Tấn Phát, P. Tân Thuận Đông, Q.7">
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+  <!-- ========================================================================
+       SCR-03 MODAL: TẠO ĐƠN GỬI LẺ THỦ CÔNG (EXACT FIGMA 5_5615)
+       ======================================================================== -->
+  <div id="modal-create-order" style="display: none; position: fixed; inset: 0; background: rgba(10, 25, 38, 0.75); z-index: 2000; align-items: center; justify-content: center;">
+    <div style="background: #ffffff; width: 620px; max-height: 90vh; overflow-y: auto; border-radius: 12px; padding: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.3);">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
         <div>
-          <label style="font-size: 11.5px; font-weight: 600;">Tuyến giao *</label>
-          <select id="new-area" style="width: 100%; padding: 7px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 12px;">
-            <option value="Q7_TAN_THUAN">Tân Thuận Đông, Q.7</option>
-            <option value="Q7_TAN_PHONG">Tân Phong, Q.7</option>
-            <option value="Q7_PHU_MY_HUNG">Phú Mỹ Hưng, Q.7</option>
-            <option value="NHA_BE">Huyện Nhà Bè</option>
-          </select>
+          <h2 style="font-size: 18px; font-weight: 800; color: var(--text-main);">Tạo đơn gửi lẻ thủ công</h2>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Hub Quận 7 · Điền đầy đủ thông tin để cấp vận đơn.</div>
+        </div>
+        <button onclick="closeCreateOrderModal()" style="background: none; border: none; font-size: 18px; cursor: pointer; color: #94a3b8;">✕</button>
+      </div>
+
+      <!-- Group 1: Thông tin người gửi -->
+      <div style="margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 14px;">
+        <div style="font-weight: 700; font-size: 12.5px; color: var(--text-main); margin-bottom: 8px; display: flex; justify-content: space-between;">
+          <span>👤 Thông tin người gửi</span>
+          <span style="font-size: 11px; color: var(--text-muted);">Các trường có dấu * là bắt buộc</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+          <div>
+            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Họ và tên người gửi *</label>
+            <input type="text" id="new-sender-name" value="Mai Anh" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Số điện thoại người gửi *</label>
+            <input type="text" id="new-sender-phone" value="0932 678 901" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
         </div>
         <div>
-          <label style="font-size: 11.5px; font-weight: 600;">Tiền COD (VNĐ)</label>
-          <input type="number" id="new-cod" style="width: 100%; padding: 7px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 12px;" value="250000">
+          <label style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Địa chỉ người gửi *</label>
+          <input type="text" id="new-sender-addr" value="30 Đường số 17, Phường Tân Thuận Tây, Quận 7, TP. Hồ Chí Minh" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
         </div>
       </div>
-      <div style="display: flex; gap: 8px; justify-content: flex-end;">
-        <button class="btn-dispatch-action" style="background: #e2e8f0; color: #475569;" onclick="closeCreateOrderModal()">Hủy</button>
-        <button class="btn-dispatch-action" onclick="submitCreateOrder()">Xác nhận tạo đơn</button>
+
+      <!-- Group 2: Thông tin người nhận -->
+      <div style="margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 14px;">
+        <div style="font-weight: 700; font-size: 12.5px; color: var(--text-main); margin-bottom: 8px;">
+          📍 Thông tin người nhận
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+          <div>
+            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Họ và tên người nhận *</label>
+            <input type="text" id="new-recipient-name" value="Nguyễn Thảo Vy" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Số điện thoại người nhận *</label>
+            <input type="text" id="new-recipient-phone" value="0903 456 789" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px;">
+          <div>
+            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Địa chỉ chi tiết *</label>
+            <input type="text" id="new-address" value="125 Nguyễn Thị Thập, Quận 7, TP. Hồ Chí Minh" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Tuyến / Phường *</label>
+            <select id="new-area" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+              <option value="Tân Phong">Phường Tân Phong</option>
+              <option value="Tân Thuận Đông">Phường Tân Thuận Đông</option>
+              <option value="Tân Thuận Tây">Phường Tân Thuận Tây</option>
+              <option value="Tân Phú">Phường Tân Phú</option>
+              <option value="Phú Mỹ">Phường Phú Mỹ</option>
+            </select>
+          </div>
+        </div>
+        <div style="font-size: 11px; color: #15803d; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+          <span>✔</span> Địa chỉ thuộc vùng phục vụ của Hub Quận 7 · Số điện thoại hợp lệ.
+        </div>
+      </div>
+
+      <!-- Group 3: Hàng hóa & Gói dịch vụ -->
+      <div style="margin-bottom: 16px;">
+        <div style="font-weight: 700; font-size: 12.5px; color: var(--text-main); margin-bottom: 8px;">
+          📦 Hàng hóa &amp; dịch vụ
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+          <div>
+            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Loại hàng *</label>
+            <select style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+              <option>Quần áo / Thời trang</option>
+              <option>Đồ điện tử / Phụ kiện</option>
+              <option>Tài liệu / Giấy tờ</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Tiền thu hộ COD (VNĐ) *</label>
+            <input type="number" id="new-cod" value="850000" style="width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px;">
+            <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Tối đa 10.000.000 ₫/đơn với tài xế xe máy</div>
+          </div>
+        </div>
+
+        <label style="font-size: 11px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">Gói dịch vụ *</label>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px;">
+          <div id="service-card-express" style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; cursor: pointer;" onclick="selectCreateService('EXPRESS', 2)">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <strong>⚡ Hỏa tốc</strong>
+              <input type="radio" name="create-service" value="EXPRESS">
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">SLA 2 giờ</div>
+          </div>
+
+          <div id="service-card-standard" style="border: 2px solid #007791; border-radius: 8px; padding: 10px; cursor: pointer; background: #ecfeff;" onclick="selectCreateService('STANDARD', 4)">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <strong style="color: #0e7490;">📦 Chuẩn</strong>
+              <input type="radio" name="create-service" value="STANDARD" checked>
+            </div>
+            <div style="font-size: 11px; color: #155e75; margin-top: 2px;">SLA 4 giờ</div>
+          </div>
+
+          <div id="service-card-economy" style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; cursor: pointer;" onclick="selectCreateService('ECONOMY', 8)">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <strong>🌱 Tiết kiệm</strong>
+              <input type="radio" name="create-service" value="ECONOMY">
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">SLA 8 giờ</div>
+          </div>
+        </div>
+
+        <!-- Real-time SLA Deadline computation -->
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 11.5px; display: flex; justify-content: space-between; align-items: center;">
+          <span>Thời điểm tạo: <strong>09:20 · 09/11/2026</strong> ➔</span>
+          <span>Hạn chót SLA: <strong style="color: var(--teal-primary);" id="create-sla-computed">13:20 · 09/11/2026</strong></span>
+        </div>
+      </div>
+
+      <!-- Eligibility Check Box -->
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 11.5px; color: #166534;">
+        <strong>🛡 Đủ điều kiện tạo đơn:</strong> Đúng vùng phục vụ · Đủ thông tin liên hệ · COD trong giới hạn
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 14px;">
+        <div style="font-size: 11px; color: var(--text-muted);">
+          Lưu hợp lệ ➔ Sẵn sàng phát<br>Tự sinh mã vận đơn, ví dụ MNX000105.
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-outline" onclick="closeCreateOrderModal()">Hủy</button>
+          <button class="btn-dispatch-action" onclick="submitCreateOrder()">Lưu &amp; tạo vận đơn</button>
+        </div>
       </div>
     </div>
   </div>
