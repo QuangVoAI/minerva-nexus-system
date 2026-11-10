@@ -79,12 +79,24 @@ public class WebServer {
         public void handle(HttpExchange exchange) throws IOException {
             String path = exchange.getRequestURI().getPath();
             if (path.equals("/")) {
-                path = "/index.html";
+                // The React build is generated directly from the supplied
+                // Figma code exports.  Make it the canonical application so
+                // users do not land on the previous handcrafted prototype.
+                exchange.getResponseHeaders().set("Location", "/react/?embed=1#dashboard");
+                exchange.sendResponseHeaders(302, -1);
+                exchange.close();
+                return;
             }
 
             File file = new File("web" + path);
-            if (!file.exists() || file.isDirectory()) {
+            if (!file.exists()) {
                 file = new File("minerva-nexus-system/web" + path);
+            }
+
+            // React production builds are mounted beneath /react/.  A request
+            // to the folder itself must resolve to its Vite entry point.
+            if (file.isDirectory()) {
+                file = new File(file, "index.html");
             }
 
             if (file.exists() && !file.isDirectory()) {

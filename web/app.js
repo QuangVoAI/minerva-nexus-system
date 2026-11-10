@@ -182,10 +182,44 @@ function switchView(viewName) {
   };
   document.getElementById('topbar-crumb').textContent = crumbMap[viewName] || viewName;
 
+  const topbar = document.querySelector('.topbar');
+  const profileContext = ['orders', 'shifts', 'dispatch', 'detail'].includes(viewName);
+  topbar?.classList.toggle('profile-context', profileContext);
+  const profileName = document.getElementById('topbar-profile-name');
+  const profileRole = document.getElementById('topbar-profile-role');
+  const avatar = document.getElementById('topbar-avatar-badge');
+  if (profileContext) {
+    if (profileName) profileName.textContent = 'An Lê';
+    if (profileRole) profileRole.textContent = 'Điều phối viên';
+    if (avatar) avatar.textContent = 'AL';
+  } else {
+    if (profileName) profileName.textContent = 'Trần Văn Bình';
+    if (profileRole) profileRole.textContent = 'Điều phối viên';
+    if (avatar) avatar.textContent = 'TB';
+  }
+
   if (viewName === 'orders') loadAllOrders();
   if (viewName === 'shifts') loadDrivers();
   if (viewName === 'dispatch') renderDispatchProposals();
   if (viewName === 'dashboard') loadDashboard();
+}
+
+function focusSlaQueue() {
+  switchView('dashboard');
+  requestAnimationFrame(() => {
+    const queue = document.querySelector('.urgent-queue-panel');
+    if (queue) queue.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
+function setOrderStatusFilter(status) {
+  const select = document.getElementById('filter-status-select');
+  if (select) select.value = status;
+  document.querySelectorAll('.order-status-filters .filter-chip').forEach(chip => chip.classList.remove('active'));
+  const matching = [...document.querySelectorAll('.order-status-filters .filter-chip')]
+    .find(chip => (status === '' && chip.textContent.trim() === 'Tất cả') || chip.getAttribute('onclick')?.includes(`'${status}'`));
+  if (matching) matching.classList.add('active');
+  filterOrdersTable();
 }
 
 // ==========================================================================
@@ -1064,24 +1098,24 @@ function loadFigmaGallery() {
   container.innerHTML = '';
 
   const figmaScreens = [
-    { title: "SCR-01 · Đăng nhập Desktop", file: "2_1889_SCR-01_Đăng_nhập_desktop.png", meta: "Frame 2:1889 · 1440 × 960 px" },
-    { title: "SCR-01 · Đăng nhập Mobile Tài xế", file: "2_1957_SCR-01_Đăng_nhập_mobile_tài_xế.png", meta: "Frame 2:1957 · 390 × 844 px" },
-    { title: "SCR-01 · Các trạng thái đăng nhập", file: "2_2010_SCR-01_Các_trạng_thái_đăng_nhập.png", meta: "Frame 2:2010 · 1440 × 1200 px" },
-    { title: "SCR-01 · Chú giải phân quyền", file: "2_2148_SCR-01_Chú_giải_phân_quyền_và_chuyển_tiếp.png", meta: "Frame 2:2148 · 1440 × 900 px" },
-    { title: "SCR-02 · Bàn điều hành trung tâm Hub", file: "4_769_SCR-02_Bàn_điều_hành_trung_tâm_Hub.png", meta: "Frame 4:769 · 1600 × 1171 px" },
-    { title: "SCR-03 · Tiếp nhận và phân loại đơn", file: "5_5034_SCR-03_Tiếp_nhận_và_phân_loại_đơn.png", meta: "Frame 5:5034 · 1600 × 1360 px" },
-    { title: "SCR-03 · Kết quả nhập & xử lý đơn lỗi", file: "5_5357_SCR-03_Kết_quả_nhập_và_xử_lý_đơn_lỗi.png", meta: "Frame 5:5357 · 1600 × 1360 px" },
-    { title: "SCR-03 · Tạo đơn gửi lẻ thủ công", file: "5_5615_SCR-03_Tạo_đơn_gửi_lẻ_thủ_công.png", meta: "Frame 5:5615 · 1600 × 1360 px" },
-    { title: "SCR-04 · Lập ca & Điểm danh tài xế", file: "6_1044_Lập_ca_giao_&_điểm_danh_tài_xế.png", meta: "Frame 6:1044 · 1600 × 1234 px" },
-    { title: "SCR-05 · Gợi ý phân công tối ưu (AI)", file: "7_1728_SCR-05_Gợi_ý_phân_công_tối_ưu.png", meta: "Frame 7:1728 · 1600 × 1287 px" },
-    { title: "SCR-06 · Hồ sơ chi tiết đơn hàng", file: "8_1341_SCR-06_Hồ_sơ_chi_tiết_đơn_hàng.png", meta: "Frame 8:1341 · 1600 × 1212 px" },
-    { title: "SCR-06 · Ngoại lệ giao thất bại", file: "8_1593_Ngoại_lệ_Kịch_bản_thay_thế.png", meta: "Frame 8:1593 · 1600 × 1100 px" },
-    { title: "SCR-07 · Tác vụ tài xế (Mobile App)", file: "9_374_SCR-07_Tác_vụ_tài_xế.png", meta: "Frame 9:374 · 393 × 852 px" },
-    { title: "SCR-08 · Báo thất bại lần đầu", file: "11_1955_SCR-08_Báo_thất_bại_lần_đầu.png", meta: "Frame 11:1955 · 430 × 1301 px" },
-    { title: "SCR-08 · Khách hẹn giao lại", file: "11_2044_SCR-08_Khách_hẹn_giao_lại.png", meta: "Frame 11:2044 · 430 × 1533 px" },
-    { title: "SCR-08 · FAILED Chờ phát lại", file: "11_2150_SCR-08_FAILED_Chờ_phát_lại.png", meta: "Frame 11:2150 · 430 × 1200 px" },
-    { title: "SCR-08 · Từ chối nhận lần 3", file: "11_2231_SCR-08_Từ_chối_nhận_Lần_thứ_ba.png", meta: "Frame 11:2231 · 430 × 1350 px" },
-    { title: "SCR-08 · RETURNED Chuyển hoàn RTS", file: "11_2336_SCR-08_RETURNED_Chuyển_hoàn.png", meta: "Frame 11:2336 · 430 × 1331 px" }
+    { title: "SCR-01 · Đăng nhập Desktop", file: "2_1889_SCR-01_Đăng_nhập_desktop.png", meta: "Frame 2:1889 · 1440 × 960 px", action: "login-view" },
+    { title: "SCR-01 · Đăng nhập Mobile Tài xế", file: "2_1957_SCR-01_Đăng_nhập_mobile_tài_xế.png", meta: "Frame 2:1957 · 390 × 844 px", action: "login-view" },
+    { title: "SCR-01 · Các trạng thái đăng nhập", file: "2_2010_SCR-01_Các_trạng_thái_đăng_nhập.png", meta: "Frame 2:2010 · 1440 × 1200 px", action: "login-view" },
+    { title: "SCR-01 · Chú giải phân quyền", file: "2_2148_SCR-01_Chú_giải_phân_quyền_và_chuyển_tiếp.png", meta: "Frame 2:2148 · 1440 × 900 px", action: "login-view" },
+    { title: "SCR-02 · Bàn điều hành trung tâm Hub", file: "4_769_SCR-02_Bàn_điều_hành_trung_tâm_Hub.png", meta: "Frame 4:769 · 1600 × 1171 px", action: "dashboard" },
+    { title: "SCR-03 · Tiếp nhận và phân loại đơn", file: "5_5034_SCR-03_Tiếp_nhận_và_phân_loại_đơn.png", meta: "Frame 5:5034 · 1600 × 1360 px", action: "orders" },
+    { title: "SCR-03 · Kết quả nhập & xử lý đơn lỗi", file: "5_5357_SCR-03_Kết_quả_nhập_và_xử_lý_đơn_lỗi.png", meta: "Frame 5:5357 · 1600 × 1360 px", action: "orders" },
+    { title: "SCR-03 · Tạo đơn gửi lẻ thủ công", file: "5_5615_SCR-03_Tạo_đơn_gửi_lẻ_thủ_công.png", meta: "Frame 5:5615 · 1600 × 1360 px", action: "orders" },
+    { title: "SCR-04 · Lập ca & Điểm danh tài xế", file: "6_1044_Lập_ca_giao_&_điểm_danh_tài_xế.png", meta: "Frame 6:1044 · 1600 × 1234 px", action: "shifts" },
+    { title: "SCR-05 · Gợi ý phân công tối ưu (AI)", file: "7_1728_SCR-05_Gợi_ý_phân_công_tối_ưu.png", meta: "Frame 7:1728 · 1600 × 1287 px", action: "dispatch" },
+    { title: "SCR-06 · Hồ sơ chi tiết đơn hàng", file: "8_1341_SCR-06_Hồ_sơ_chi_tiết_đơn_hàng.png", meta: "Frame 8:1341 · 1600 × 1212 px", action: "detail" },
+    { title: "SCR-06 · Ngoại lệ giao thất bại", file: "8_1593_Ngoại_lệ_Kịch_bản_thay_thế.png", meta: "Frame 8:1593 · 1600 × 1100 px", action: "detail" },
+    { title: "SCR-07 · Tác vụ tài xế (Mobile App)", file: "9_374_SCR-07_Tác_vụ_tài_xế.png", meta: "Frame 9:374 · 393 × 852 px", action: "driver" },
+    { title: "SCR-08 · Báo thất bại lần đầu", file: "11_1955_SCR-08_Báo_thất_bại_lần_đầu.png", meta: "Frame 11:1955 · 430 × 1301 px", action: "driver" },
+    { title: "SCR-08 · Khách hẹn giao lại", file: "11_2044_SCR-08_Khách_hẹn_giao_lại.png", meta: "Frame 11:2044 · 430 × 1533 px", action: "driver" },
+    { title: "SCR-08 · FAILED Chờ phát lại", file: "11_2150_SCR-08_FAILED_Chờ_phát_lại.png", meta: "Frame 11:2150 · 430 × 1200 px", action: "driver" },
+    { title: "SCR-08 · Từ chối nhận lần 3", file: "11_2231_SCR-08_Từ_chối_nhận_Lần_thứ_ba.png", meta: "Frame 11:2231 · 430 × 1350 px", action: "driver" },
+    { title: "SCR-08 · RETURNED Chuyển hoàn RTS", file: "11_2336_SCR-08_RETURNED_Chuyển_hoàn.png", meta: "Frame 11:2336 · 430 × 1331 px", action: "driver" }
   ];
 
   figmaScreens.forEach(s => {
@@ -1093,10 +1127,19 @@ function loadFigmaGallery() {
         <div style="padding: 12px 14px;">
           <div style="font-weight: 700; font-size: 13px; color: var(--text-main);">${s.title}</div>
           <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">${s.meta}</div>
+          <button class="figma-open-btn" onclick="openFigmaImplementation('${s.action}')">Mở bản dựng tương ứng <span>→</span></button>
         </div>
       </div>
     `;
   });
+}
+
+function openFigmaImplementation(action) {
+  if (action === 'driver') {
+    toggleMobileSim();
+    return;
+  }
+  switchView(action);
 }
 
 // --- UTILS ---
