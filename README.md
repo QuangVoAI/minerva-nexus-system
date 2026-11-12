@@ -57,7 +57,7 @@ mvn spring-boot:run
 
 Sau khi chạy, kiểm tra kết nối tại `GET http://localhost:8081/api/health`.
 
-Tài liệu cấu trúc MongoDB và quy tắc trạng thái nằm tại [docs/DATA_STRUCTURE.md](docs/DATA_STRUCTURE.md).
+Tài liệu cấu trúc MongoDB và quy tắc trạng thái nằm tại [docs/DATA_STRUCTURE.md](docs/DATA_STRUCTURE.md). Phân công, ownership thư mục và quy ước merge của nhóm nằm tại [docs/TEAM_TASKS.md](docs/TEAM_TASKS.md).
 
 ---
 
