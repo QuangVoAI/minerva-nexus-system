@@ -44,7 +44,7 @@ public class DispatcherPanel extends JPanel {
         topPanel.add(lblTitle, BorderLayout.WEST);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton btnScanAI = new JButton("⚡ Chạy gợi ý phân công AI (Dispatch Engine)");
+        JButton btnScanAI = new JButton("⚡ Chạy gợi ý phân công theo quy tắc");
         btnScanAI.setBackground(new Color(13, 110, 253));
         btnScanAI.setForeground(Color.WHITE);
         btnScanAI.setOpaque(true);

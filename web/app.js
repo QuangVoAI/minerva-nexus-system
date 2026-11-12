@@ -9,7 +9,7 @@ let currentFailedOrderId = null;
 let currentFailedTracking = null;
 let currentFailureStep = 1;
 
-// SCR-05 Heuristic Proposals State (Exact Figma 7_1728)
+// SCR-05 Rule-based proposals state (Exact Figma 7_1728)
 let dispatchProposals = [
   {
     id: 'MNX000001',
@@ -63,7 +63,7 @@ let dispatchProposals = [
     w1: 50,
     w2: 24,
     w3: 20,
-    intervention: 'AI',
+    intervention: 'Theo quy tắc',
     isUrgent: false,
     checked: true,
     note: 'Trùng 100% tuyến Tân Kiểng. Phân bổ cân bằng theo dung lượng ca.'
@@ -82,7 +82,7 @@ let dispatchProposals = [
     w1: 50,
     w2: 25,
     w3: 20,
-    intervention: 'AI',
+    intervention: 'Theo quy tắc',
     isUrgent: false,
     checked: true,
     note: 'Cùng khu vực Huỳnh Tấn Phát - Bùi Văn Ba, tối ưu hóa lộ trình gom tuyến.'
@@ -101,7 +101,7 @@ let dispatchProposals = [
     w1: 45,
     w2: 23,
     w3: 20,
-    intervention: 'AI',
+    intervention: 'Theo quy tắc',
     isUrgent: false,
     checked: false,
     note: 'Tài xế DRV-04 gần đạt định mức ca trực (11/15 đơn).'
@@ -120,7 +120,7 @@ let dispatchProposals = [
     w1: 50,
     w2: 22,
     w3: 20,
-    intervention: 'AI',
+    intervention: 'Theo quy tắc',
     isUrgent: false,
     checked: false,
     note: 'Đơn giao ca trưa, tài xế sẵn sàng tiếp nhận.'
@@ -175,7 +175,7 @@ function switchView(viewName) {
     'dashboard': 'Bàn điều hành',
     'orders': 'Tiếp nhận & phân loại đơn',
     'shifts': 'Ca giao & điểm danh',
-    'dispatch': 'Gợi ý phân công tối ưu (AI)',
+    'dispatch': 'Gợi ý phân công theo quy tắc',
     'detail': 'Hồ sơ đơn hàng (Audit Trail)',
     'login-view': 'Đăng nhập hệ thống (SCR-01)',
     'figma-view': '18 Bản vẽ gốc Figma'
@@ -498,7 +498,7 @@ async function submitCreateOrder() {
 }
 
 // ==========================================================================
-// SCR-05: GỢI Ý PHÂN CÔNG TỐI ƯU (AI DISPATCH ENGINE)
+// SCR-05: GỢI Ý PHÂN CÔNG THEO QUY TẮC NGHIỆP VỤ
 // ==========================================================================
 function renderDispatchProposals() {
   const tbody = document.getElementById('dispatch-table-body');
@@ -544,7 +544,7 @@ function renderDispatchProposals() {
             `<span class="scr-tag" style="background:#fef3c7; color:#b45309; font-size:10px;">${p.intervention}</span>` :
             (p.intervention.includes('Đang xem') ?
               `<span style="color:#0284c7; font-weight:600; font-size:11.5px;">Đang xem chi tiết</span>` :
-              `<span class="scr-tag" style="background:#e2e8f0; color:#475569; font-size:10px;">AI</span>`
+              `<span class="scr-tag" style="background:#e2e8f0; color:#475569; font-size:10px;">Theo quy tắc</span>`
             )
           }
         </td>
@@ -559,7 +559,7 @@ function renderDispatchProposals() {
 function selectProposal(idx) {
   selectedProposalIdx = idx;
   dispatchProposals.forEach((p, i) => {
-    if (p.intervention === 'Đang xem chi tiết') p.intervention = 'AI';
+    if (p.intervention === 'Đang xem chi tiết') p.intervention = 'Theo quy tắc';
   });
   dispatchProposals[idx].intervention = 'Đang xem chi tiết';
   renderDispatchProposals();
@@ -584,7 +584,7 @@ function updateInspectorView() {
   document.getElementById('bar-w3-fill').style.width = `${(p.w3 / 20) * 100}%`;
 
   document.getElementById('inspector-note-text').innerHTML = `
-    <strong>Heuristic Analysis:</strong> ${p.note}
+    <strong>Giải thích theo quy tắc:</strong> ${p.note}
   `;
 
   const select = document.getElementById('inspector-driver-select');
@@ -646,7 +646,7 @@ function filterDispatchList() {
 
 function runAIDispatch() {
   renderDispatchProposals();
-  alert('⚡ Đã tái tính toán thuật toán Heuristic Dispatch v2.4!\nĐiểm khớp đã tối ưu hóa theo 3 trọng số w1=0.5, w2=0.3, w3=0.2.');
+  alert('⚡ Đã áp dụng lại các quy tắc phân công nghiệp vụ cho ca giao.');
 }
 
 async function approveSelectedSuggestions() {
@@ -881,7 +881,7 @@ function loadOrderHistoryDetail(orderId) {
         <div style="font-size: 10.5px; color: var(--text-muted); font-family: ui-monospace, monospace;">08:25:40 GMT+7</div>
         <div style="font-weight: 700; color: var(--text-main); font-size: 13px;">READY_TO_DISPATCH ➔ ASSIGNED</div>
         <div style="font-size: 11.5px; color: #475569;">👤 Bởi: DISPATCHER_01 (Trần Bình) · Điều phối</div>
-        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">📄 Duyệt đề xuất từ AI Engine.</div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">📄 Duyệt đề xuất theo quy tắc nghiệp vụ.</div>
       </div>
 
       <!-- Event 3 (Current) -->
@@ -1082,9 +1082,9 @@ function submitScr08Failure() {
     closeSimScr08();
     loadDashboard();
   } else {
-    // 3rd time -> RETURNED (Exact Figma 11:2336)
-    document.getElementById('sim-view-scr08').style.display = 'none';
-    document.getElementById('sim-view-scr08-returned').style.display = 'flex';
+    // Third failure -> RETURN_PENDING; Hub confirms physical return before RETURNED.
+    alert('✓ Đã ghi nhận báo cáo giao thất bại lần 3/3! Đơn chuyển sang RETURN_PENDING (Chờ hoàn hàng). Quản lý Hub cần xác nhận hàng đã về kho trước khi chuyển RETURNED.');
+    closeSimScr08();
     currentFailureStep = 1;
     loadDashboard();
   }
@@ -1107,7 +1107,7 @@ function loadFigmaGallery() {
     { title: "SCR-03 · Kết quả nhập & xử lý đơn lỗi", file: "5_5357_SCR-03_Kết_quả_nhập_và_xử_lý_đơn_lỗi.png", meta: "Frame 5:5357 · 1600 × 1360 px", action: "orders" },
     { title: "SCR-03 · Tạo đơn gửi lẻ thủ công", file: "5_5615_SCR-03_Tạo_đơn_gửi_lẻ_thủ_công.png", meta: "Frame 5:5615 · 1600 × 1360 px", action: "orders" },
     { title: "SCR-04 · Lập ca & Điểm danh tài xế", file: "6_1044_Lập_ca_giao_&_điểm_danh_tài_xế.png", meta: "Frame 6:1044 · 1600 × 1234 px", action: "shifts" },
-    { title: "SCR-05 · Gợi ý phân công tối ưu (AI)", file: "7_1728_SCR-05_Gợi_ý_phân_công_tối_ưu.png", meta: "Frame 7:1728 · 1600 × 1287 px", action: "dispatch" },
+    { title: "SCR-05 · Gợi ý phân công theo quy tắc", file: "7_1728_SCR-05_Gợi_ý_phân_công_tối_ưu.png", meta: "Frame 7:1728 · 1600 × 1287 px", action: "dispatch" },
     { title: "SCR-06 · Hồ sơ chi tiết đơn hàng", file: "8_1341_SCR-06_Hồ_sơ_chi_tiết_đơn_hàng.png", meta: "Frame 8:1341 · 1600 × 1212 px", action: "detail" },
     { title: "SCR-06 · Ngoại lệ giao thất bại", file: "8_1593_Ngoại_lệ_Kịch_bản_thay_thế.png", meta: "Frame 8:1593 · 1600 × 1100 px", action: "detail" },
     { title: "SCR-07 · Tác vụ tài xế (Mobile App)", file: "9_374_SCR-07_Tác_vụ_tài_xế.png", meta: "Frame 9:374 · 393 × 852 px", action: "driver" },

@@ -60,7 +60,7 @@ public class DispatchEngineImpl implements IDispatchEngine {
 
         prob = Math.min(0.99, prob);
         String predId = "PRED-" + UUID.randomUUID().toString().substring(0, 8);
-        return new RiskPrediction(predId, order.getOrderId(), "Minerva-AI-Heuristic-v1.0", prob, label, explanation);
+        return new RiskPrediction(predId, order.getOrderId(), "Minerva-Rule-Based-v1.0", prob, label, explanation);
     }
 
     @Override

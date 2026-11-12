@@ -1,0 +1,6 @@
+package vn.edu.tdtu.minervanexus.common;
+
+public enum OrderStatus {
+    PENDING, READY_TO_DISPATCH, ASSIGNED, DRIVER_ACCEPTED, IN_TRANSIT,
+    DELIVERED, FAILED, READY_FOR_REDELIVERY, RETURN_PENDING, RETURNED, CANCELLED
+}

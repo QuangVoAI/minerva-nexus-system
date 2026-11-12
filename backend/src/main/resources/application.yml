@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: minerva-nexus-backend
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: minerva_nexus
+server:
+  port: ${SERVER_PORT:8081}
+  error:
+    include-message: always

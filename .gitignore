@@ -16,3 +16,11 @@ bin/
 # Temp logs
 *.log
 
+# Local environment secrets
+.env
+.env.*
+!.env.example
+
+# Spring Boot build output
+backend/target/
+

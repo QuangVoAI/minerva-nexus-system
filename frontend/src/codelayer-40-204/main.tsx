@@ -1051,7 +1051,7 @@ function LyDoVaGhiChu1() {
   return (
     <div className="bg-[#f8fafb] content-stretch flex gap-[8px] items-center overflow-clip px-[12px] py-[10px] relative rounded-[5px] shrink-0 w-full" data-name="Lý do và ghi chú">
       <MessageSquareText1 />
-      <p className="[word-break:break-word] flex-[1_0_0] font-['Inter:Regular',sans-serif] font-normal leading-[normal] min-w-px not-italic relative text-[#5f7180] text-[12px]">Duyệt đề xuất từ AI Engine.</p>
+      <p className="[word-break:break-word] flex-[1_0_0] font-['Inter:Regular',sans-serif] font-normal leading-[normal] min-w-px not-italic relative text-[#5f7180] text-[12px]">Duyệt đề xuất theo quy tắc nghiệp vụ.</p>
     </div>
   );
 }

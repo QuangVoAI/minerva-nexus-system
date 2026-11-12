@@ -573,7 +573,7 @@ function ThongBaoQuyTc() {
     <div className="bg-[#fff6e5] relative rounded-[8px] shrink-0 w-full" data-name="Thông báo quy tắc">
       <div className="content-stretch flex gap-[10px] items-start overflow-clip p-[12px] relative rounded-[inherit] size-full">
         <ShieldAlert />
-        <p className="[word-break:break-word] flex-[1_0_0] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-px not-italic relative text-[#946218] text-[13px]">Đây là lần báo cáo thứ 3. Khi xác nhận hợp lệ: hệ thống chuyển RETURNED, khóa phát lại và sinh phiếu hoàn về kho tổng. Không thể chọn phát lại.</p>
+        <p className="[word-break:break-word] flex-[1_0_0] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-px not-italic relative text-[#946218] text-[13px]">Đây là lần báo cáo thứ 3. Khi xác nhận hợp lệ: hệ thống chuyển RETURN_PENDING, khóa phát lại và tạo yêu cầu hoàn. Chỉ khi Hub xác nhận hàng đã về kho mới chuyển RETURNED.</p>
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[8px]" />
     </div>

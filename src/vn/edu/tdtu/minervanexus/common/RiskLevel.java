@@ -1,7 +1,7 @@
 package vn.edu.tdtu.minervanexus.common;
 
 /**
- * Mức độ rủi ro trễ hạn SLA dự báo bởi Dispatch Engine / AI
+ * Mức độ cảnh báo SLA được xác định bằng các ngưỡng quy tắc nghiệp vụ.
  */
 public enum RiskLevel {
     LOW("Thấp", "#28A745"),       // Xanh lá

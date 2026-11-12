@@ -495,7 +495,7 @@ function NhanTrngThai() {
   return (
     <div className="relative rounded-[4px] shrink-0" data-name="Nhãn trạng thái">
       <div className="content-stretch flex items-start overflow-clip px-[7px] py-[4px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">AI / Heuristic</p>
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">Theo quy tắc</p>
       </div>
       <div aria-hidden className="absolute border border-[#dfe6ed] border-solid inset-0 pointer-events-none rounded-[4px]" />
     </div>
@@ -1436,7 +1436,7 @@ function DimKhp2() {
 function TrngThaiCanThip2() {
   return (
     <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[128px]" data-name="Trạng thái can thiệp">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">AI</p>
+      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Theo quy tắc</p>
     </div>
   );
 }
@@ -1584,7 +1584,7 @@ function DimKhp3() {
 function TrngThaiCanThip3() {
   return (
     <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[128px]" data-name="Trạng thái can thiệp">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">AI</p>
+      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Theo quy tắc</p>
     </div>
   );
 }
@@ -1717,7 +1717,7 @@ function DimKhp4() {
 function TrngThaiCanThip4() {
   return (
     <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[128px]" data-name="Trạng thái can thiệp">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">AI</p>
+      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Theo quy tắc</p>
     </div>
   );
 }
@@ -1850,7 +1850,7 @@ function DimKhp5() {
 function TrngThaiCanThip5() {
   return (
     <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[128px]" data-name="Trạng thái can thiệp">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">AI</p>
+      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Theo quy tắc</p>
     </div>
   );
 }

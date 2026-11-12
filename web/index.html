@@ -593,14 +593,14 @@
       </section>
 
       <!-- ==================================================================
-           VIEW 3: SCR-05 GỢI Ý PHÂN CÔNG TỐI ƯU (AI DISPATCH)
+           VIEW 3: SCR-05 GỢI Ý PHÂN CÔNG THEO QUY TẮC
            ================================================================== -->
       <section id="view-dispatch" class="view-section">
         <div class="screen-header-block">
           <div>
             <div class="screen-title-row">
               <h1 class="screen-title">Gợi ý phân công tối ưu</h1>
-              <span class="scr-tag" style="background:#e0f2fe; color:#0369a1;">AI / Heuristic</span>
+              <span class="scr-tag" style="background:#e0f2fe; color:#0369a1;">Theo quy tắc nghiệp vụ</span>
             </div>
             <div class="screen-sub">
               Ưu tiên đơn khẩn cấp, khớp tuyến và cân bằng tải trước khi xuất Hub.
@@ -749,7 +749,7 @@
               </div>
             </div>
 
-            <!-- Cyan Heuristic Note -->
+            <!-- Note explaining the applied business rules -->
             <div class="inspector-note-box" id="inspector-note-text">
               Trùng 100% tuyến + Tải còn trống nhiều + Gần vị trí giao.<br>
               <span style="font-size: 10.5px; opacity: 0.85;">Vị trí gần hỗ trợ; không cộng thêm vào 3 trọng số.</span>
@@ -1358,7 +1358,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 4px;">
             <div>
               <strong style="font-size: 14px; color: var(--text-main);">Lộ trình giao</strong>
-              <div style="font-size: 11px; color: var(--text-muted);">Đã tối ưu theo AI Heuristic</div>
+              <div style="font-size: 11px; color: var(--text-muted);">Đề xuất theo quy tắc nghiệp vụ</div>
             </div>
             <span style="font-size: 16px; color: var(--text-muted);">≡₁₂</span>
           </div>
@@ -1517,7 +1517,7 @@
 
           <!-- 3rd attempt warning box (Figma 11:2231) -->
           <div id="scr08-3rd-warning" style="display: none; background: #fffbeb; border: 1px solid #fef08a; border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 11px; color: #92400e;">
-            🛡 <strong>Đây là lần báo cáo thứ 3.</strong> Khi xác nhận hợp lệ: hệ thống chuyển RETURNED, khóa phát lại và sinh phiếu hoàn về kho tổng. Không thể chọn phát lại.
+            🛡 <strong>Đây là lần báo cáo thứ 3.</strong> Khi xác nhận hợp lệ: hệ thống chuyển RETURN_PENDING, khóa phát lại và tạo yêu cầu hoàn. Chỉ khi Hub xác nhận hàng đã về kho mới chuyển RETURNED.
           </div>
         </div>
 
