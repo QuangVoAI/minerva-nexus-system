@@ -2,6 +2,25 @@
 
 Mục tiêu của nhóm là làm chắc một luồng có thể demo: **tạo/tiếp nhận đơn → đánh giá SLA theo quy tắc → gợi ý và duyệt phân công → tài xế cập nhật kết quả → lịch sử/KPI**. Không bổ sung AI/ML, tối ưu lộ trình, GPS hay chức năng ngoài BRS/SRS chốt.
 
+## Milestone hiện tại
+
+| Mốc | Trạng thái | Kết quả cần có | Owner |
+| --- | --- | --- | --- |
+| M0 — Chốt phạm vi và nền tảng | **Hoàn thành** | BRS/SRS chốt trong repo; React/Figma có sẵn; MongoDB `minerva_nexus` đã khởi tạo; backend Spring Boot có khung kết nối, đơn hàng và SLA | Võ Xuân Quang |
+| M1 — Luồng đơn hàng và SLA | **Sẵn sàng thực hiện** | Tạo/tiếp nhận/hủy hợp lệ, cảnh báo SLA có lý do, timeline/audit, failure count, tra cứu công khai đã che dữ liệu | Nguyễn Gia Nhật Khánh |
+| M2 — Ca giao và điều phối | **Chờ M1 chốt contract** | Tài xế, ca/điểm danh, kiểm tra sức chứa 15 đơn, đề xuất theo quy tắc, duyệt/chỉnh/gán lại | Phạm Trung Nghĩa |
+| M3 — Nối giao diện có sẵn với API | **Chờ API M1/M2** | Giữ nguyên Figma; thay đúng các dữ liệu mẫu trong luồng demo bằng dữ liệu API, hiển thị loading/lỗi | Hoàng Xuân Thành |
+| M4 — Tích hợp và kiểm thử luồng demo | **Chờ M1–M3** | Một kịch bản chạy thật từ tạo đơn đến KPI/lịch sử; seed demo; kiểm thử API và build React | Võ Xuân Quang + cả nhóm |
+| M5 — Đóng gói bảo vệ | **Chờ M4** | README chạy được, video/kịch bản demo, dữ liệu mô phỏng, bản trình bày và rà soát BRS/SRS–code | Võ Xuân Quang + cả nhóm |
+
+### Điều kiện chuyển mốc
+
+- **M0 → M1:** Đã xong. Không thay Figma/React export; frontend hiện có là nền giao diện chuẩn.
+- **M1 → M2:** Khánh gửi PR kèm contract cho API order/SLA và xác nhận state machine không đổi.
+- **M2 → M3:** Nghĩa gửi PR kèm contract cho API driver/shift/dispatch; Thành chỉ bắt đầu nối API sau khi các endpoint đã ổn định.
+- **M3 → M4:** Thành demo được đúng một đơn chạy qua API; phần nào chưa có API phải hiển thị rõ là chưa khả dụng, không dùng kết quả giả.
+- **M4 → M5:** Cả nhóm cùng duyệt kịch bản 3–5 phút và kiểm tra dữ liệu demo không chứa dữ liệu cá nhân thật.
+
 ## Quy ước chung bắt buộc
 
 1. Mỗi người tạo nhánh từ `main` mới nhất theo mẫu `feature/<ten>-<nhom-chuc-nang>`; không commit trực tiếp lên `main`.
@@ -23,13 +42,14 @@ Mục tiêu của nhóm là làm chắc một luồng có thể demo: **tạo/ti
 | Luồng thất bại | `IN_TRANSIT → FAILED`; dưới 3 lần Hub quyết định `READY_FOR_REDELIVERY` hoặc `RETURN_PENDING`; từ lần 3 bắt buộc `RETURN_PENDING`; Hub xác nhận hàng về kho mới `RETURNED` |
 | Điều phối | Gợi ý theo quy tắc nghiệp vụ, có lý do; nhân viên Hub duyệt/chỉnh; không gọi là AI/ML/heuristic |
 
-## Hoàng Xuân Thành — Frontend và luồng thao tác
+## Hoàng Xuân Thành — Tích hợp frontend có sẵn với API
 
 **Nhánh:** `feature/thanh-frontend-flow`
 **Chỉ sở hữu:** `frontend/src/features/**`, `frontend/src/services/**`, `frontend/src/hooks/**`, `frontend/src/types/**`, `frontend/src/components/**`.
 
 ### Việc cần làm
 
+- Frontend React/Figma đã có sẵn; **không làm lại, không convert lại và không redesign giao diện**.
 - Tạo lớp gọi REST API và type dùng chung trong các thư mục mới thuộc `frontend/src/`; không sửa trực tiếp các file export Figma `codelayer-*` trừ khi cần gắn event tối thiểu.
 - Kết nối các thao tác UI cốt lõi: tạo/tiếp nhận đơn, danh sách/chi tiết đơn, cập nhật trạng thái, báo thất bại và xem timeline.
 - Khi backend chưa có endpoint, hiển thị trạng thái loading/lỗi rõ ràng; không giả báo thành công.
