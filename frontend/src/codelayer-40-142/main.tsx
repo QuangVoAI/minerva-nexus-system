@@ -1,4 +1,6 @@
+import { useState } from "react";
 import svgPaths from "./svg-10wz5514xz";
+import { LiveOrderIntake } from "../features/orders/LiveOrderIntake";
 
 function Boxes() {
   return (
@@ -1707,14 +1709,51 @@ function ThongTinCpNht() {
 }
 
 function NiDungNghipV() {
+  const [showLiveApi, setShowLiveApi] = useState(true);
+
   return (
     <div className="content-stretch flex flex-col gap-[20px] items-start overflow-clip px-[28px] py-[24px] relative shrink-0 w-full" data-name="Nội dung nghiệp vụ">
-      <TieuDVaThaoTac />
-      <ThongBaoLuThanhCong />
-      <TngQuanTrngThai />
-      <QuyTcThmDnh />
-      <DanhSachDnHang />
-      <ThongTinCpNht />
+      <div className="w-full flex items-center justify-between bg-white p-3 rounded-lg border border-[#cbd5e1] shadow-2xs">
+        <div className="flex items-center gap-2">
+          <span className="text-[13px] font-bold text-[#1e3a8a]">Chế độ dữ liệu SCR-03:</span>
+          <span className="text-[12px] text-[#64748b]">Tiếp nhận & phân loại đơn hàng</span>
+        </div>
+        <div className="inline-flex rounded-md border border-[#cbd5e1] bg-[#f8fafc] p-0.5 text-[12px]">
+          <button
+            type="button"
+            onClick={() => setShowLiveApi(true)}
+            className={`px-3 py-1 font-bold rounded cursor-pointer transition-colors ${
+              showLiveApi ? "bg-[#2563eb] text-white shadow-xs" : "text-[#64748b] hover:text-[#0f172a]"
+            }`}
+          >
+            ⚡ Dữ liệu REST API thực (Java 8080)
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowLiveApi(false)}
+            className={`px-3 py-1 font-bold rounded cursor-pointer transition-colors ${
+              !showLiveApi ? "bg-[#2563eb] text-white shadow-xs" : "text-[#64748b] hover:text-[#0f172a]"
+            }`}
+          >
+            🖼 Bản vẽ tĩnh Figma gốc
+          </button>
+        </div>
+      </div>
+
+      {showLiveApi ? (
+        <div className="w-full">
+          <LiveOrderIntake />
+        </div>
+      ) : (
+        <>
+          <TieuDVaThaoTac />
+          <ThongBaoLuThanhCong />
+          <TngQuanTrngThai />
+          <QuyTcThmDnh />
+          <DanhSachDnHang />
+          <ThongTinCpNht />
+        </>
+      )}
     </div>
   );
 }

@@ -1,4 +1,7 @@
+import { useState } from "react";
 import svgPaths from "./svg-fotlugvvbo";
+import { orderService } from "../services";
+import { LiveCreateOrderForm } from "../features/orders/LiveCreateOrderForm";
 
 function Boxes() {
   return (
@@ -2342,55 +2345,136 @@ function NutThaoTac2() {
   );
 }
 
-function NutThaoTac3() {
+function NutThaoTac3({ onClick, isLoading }: { onClick?: () => void; isLoading?: boolean }) {
   return (
-    <div className="bg-[#087f8c] h-[42px] relative rounded-[8px] shrink-0" data-name="Nút thao tác">
+    <div
+      onClick={onClick}
+      className="bg-[#087f8c] hover:bg-[#066570] h-[42px] relative rounded-[8px] shrink-0 cursor-pointer transition-colors"
+      data-name="Nút thao tác"
+    >
       <div className="content-stretch flex items-center justify-center overflow-clip px-[16px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[13px] text-white whitespace-nowrap">{`Lưu & tạo vận đơn`}</p>
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[13px] text-white whitespace-nowrap">
+          {isLoading ? "Đang gửi API..." : "Lưu & tạo vận đơn"}
+        </p>
       </div>
       <div aria-hidden className="absolute border border-[#087f8c] border-solid inset-0 pointer-events-none rounded-[8px]" />
     </div>
   );
 }
 
-function ThaoTacBiuMu() {
+function ThaoTacBiuMu({ onSave, isLoading }: { onSave?: () => void; isLoading?: boolean }) {
   return (
     <div className="content-stretch flex gap-[10px] items-start overflow-clip relative shrink-0" data-name="Thao tác biểu mẫu">
       <NutThaoTac2 />
-      <NutThaoTac3 />
+      <NutThaoTac3 onClick={onSave} isLoading={isLoading} />
     </div>
   );
 }
 
-function LuDn() {
+function LuDn({ onSave, isLoading }: { onSave?: () => void; isLoading?: boolean }) {
   return (
     <div className="bg-[#fafbfd] relative shrink-0 w-full" data-name="Lưu đơn">
       <div className="content-stretch flex items-center justify-between overflow-clip px-[28px] py-[20px] relative rounded-[inherit] size-full">
         <KtQuSauKhiLu />
-        <ThaoTacBiuMu />
+        <ThaoTacBiuMu onSave={onSave} isLoading={isLoading} />
       </div>
       <div aria-hidden className="absolute border-[#dce4ea] border-solid border-t inset-0 pointer-events-none" />
     </div>
   );
 }
 
-function HpThoiToDnGiL() {
+function HpThoiToDnGiL({ onSave, isLoading, useLiveForm, onToggleLiveForm }: { onSave?: () => void; isLoading?: boolean; useLiveForm?: boolean; onToggleLiveForm?: (val: boolean) => void }) {
   return (
     <div className="absolute bg-white content-stretch flex flex-col items-start left-[350px] overflow-clip rounded-[12px] shadow-[0px_24px_80px_0px_rgba(12,36,74,0.22)] top-[65px] w-[900px]" data-name="Hộp thoại tạo đơn gửi lẻ">
-      <TieuDHpThoi />
-      <ThongTinDnGiL />
-      <LuDn />
+      <div className="w-full bg-[#eff6ff] border-b border-[#bfdbfe] px-6 py-2.5 flex items-center justify-between">
+        <span className="text-[12px] font-bold text-[#1e3a8a]">Chế độ tạo đơn (SCR-03):</span>
+        <div className="inline-flex rounded-md border border-[#cbd5e1] bg-white p-0.5 text-[11.5px]">
+          <button
+            type="button"
+            onClick={() => onToggleLiveForm && onToggleLiveForm(false)}
+            className={`px-3 py-1 font-semibold rounded cursor-pointer transition-colors ${
+              !useLiveForm ? "bg-[#2563eb] text-white" : "text-[#64748b] hover:text-[#0f172a]"
+            }`}
+          >
+            Figma tĩnh (Gắn nút API)
+          </button>
+          <button
+            type="button"
+            onClick={() => onToggleLiveForm && onToggleLiveForm(true)}
+            className={`px-3 py-1 font-semibold rounded cursor-pointer transition-colors ${
+              useLiveForm ? "bg-[#2563eb] text-white" : "text-[#64748b] hover:text-[#0f172a]"
+            }`}
+          >
+            Biểu mẫu nhập liệu thực (Live API)
+          </button>
+        </div>
+      </div>
+
+      {useLiveForm ? (
+        <div className="p-6 w-full">
+          <LiveCreateOrderForm
+            onSuccess={(_id, tracking) => {
+              alert(`Tạo đơn thành công với mã: ${tracking}`);
+              window.location.hash = "orders";
+            }}
+          />
+        </div>
+      ) : (
+        <>
+          <TieuDHpThoi />
+          <ThongTinDnGiL />
+          <LuDn onSave={onSave} isLoading={isLoading} />
+        </>
+      )}
     </div>
   );
 }
 
 export default function Scr03ToDnGiLThCong() {
+  const [useLiveForm, setUseLiveForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successToast, setSuccessToast] = useState<string | null>(null);
+
+  const handleQuickCreate = async () => {
+    setIsSubmitting(true);
+    try {
+      const rand = Math.floor(1000 + Math.random() * 9000);
+      const res = await orderService.createOrder({
+        recipientName: `Nguyễn Văn Demo ${rand}`,
+        phone: `0912${rand}`,
+        address: `${(rand % 200) + 1} Huỳnh Tấn Phát, P. Tân Thuận Đông, Q7`,
+        areaId: "Q7_TAN_THUAN",
+        serviceLevel: "STANDARD",
+        codAmount: 320000,
+      });
+      setSuccessToast(`Tạo đơn thành công! Mã vận đơn: ${res.trackingCode}`);
+      setTimeout(() => {
+        window.location.hash = "orders";
+      }, 1500);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Tạo đơn thất bại.";
+      alert(`Lỗi: ${msg}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="bg-[#f0f4f7] content-stretch flex items-start relative size-full" data-name="SCR-03 · Tạo đơn gửi lẻ thủ công">
+      {successToast && (
+        <div className="fixed top-16 right-8 z-50 bg-[#15803d] text-white px-5 py-3 rounded-lg shadow-xl font-bold text-[13px] animate-bounce">
+          ✓ {successToast}
+        </div>
+      )}
       <DiuHngHub />
       <KhongGianLamVic />
       <div className="absolute bg-[rgba(13,32,62,0.52)] h-[1360px] left-0 top-0 w-[1600px]" data-name="Lớp phủ nền" />
-      <HpThoiToDnGiL />
+      <HpThoiToDnGiL
+        onSave={handleQuickCreate}
+        isLoading={isSubmitting}
+        useLiveForm={useLiveForm}
+        onToggleLiveForm={setUseLiveForm}
+      />
     </div>
   );
 }

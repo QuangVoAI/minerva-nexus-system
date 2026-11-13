@@ -1,4 +1,6 @@
+import { useState } from "react";
 import svgPaths from "./svg-lzvjgarkuc";
+import { LiveDriverActionCard } from "../features/driver/LiveDriverActionCard";
 
 function IosSignal() {
   return (
@@ -1709,11 +1711,45 @@ function XacNhnNhnHang() {
 }
 
 export default function Scr07TacVTaiX() {
+  const [showLiveApi, setShowLiveApi] = useState(true);
+
   return (
     <div className="bg-[#f0f4f7] content-stretch flex flex-col items-start relative size-full" data-name="SCR-07 · Tác vụ tài xế">
-      <ThongTinLTrinh />
-      <DanhSachDnCunDc />
-      <XacNhnNhnHang />
+      <div className="w-full bg-white p-3 border-b border-[#cbd5e1] flex items-center justify-between z-10 shadow-2xs">
+        <span className="text-[12px] font-bold text-[#1e3a8a]">SCR-07 Tác vụ tài xế</span>
+        <div className="inline-flex rounded border border-[#cbd5e1] bg-[#f8fafc] p-0.5 text-[11px]">
+          <button
+            type="button"
+            onClick={() => setShowLiveApi(true)}
+            className={`px-2.5 py-1 font-bold rounded cursor-pointer transition-colors ${
+              showLiveApi ? "bg-[#2563eb] text-white" : "text-[#64748b]"
+            }`}
+          >
+            ⚡ Thao tác REST API thực
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowLiveApi(false)}
+            className={`px-2.5 py-1 font-bold rounded cursor-pointer transition-colors ${
+              !showLiveApi ? "bg-[#2563eb] text-white" : "text-[#64748b]"
+            }`}
+          >
+            🖼 Figma tĩnh
+          </button>
+        </div>
+      </div>
+
+      {showLiveApi ? (
+        <div className="w-full p-4 flex justify-center">
+          <LiveDriverActionCard orderId="ORD-001" />
+        </div>
+      ) : (
+        <>
+          <ThongTinLTrinh />
+          <DanhSachDnCunDc />
+          <XacNhnNhnHang />
+        </>
+      )}
     </div>
   );
 }

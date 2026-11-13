@@ -17,6 +17,7 @@ import FailedPending from "./codelayer-40-335/main";
 import RefusedThird from "./codelayer-40-365/main";
 import Returned from "./codelayer-40-398/main";
 import Dispatch from "./codelayer-40-432/main";
+import { DemoFlowBar } from "./components/DemoFlowBar";
 import "./styles/globals.css";
 
 type Screen = { id: string; title: string; group: string; Component: () => JSX.Element };
@@ -80,6 +81,7 @@ export default function App() {
       </aside>
       <section className="figma-runtime__stage" aria-label={active.title}>
         <div className="figma-runtime__toolbar"><strong>{active.title}</strong><span>Render từ Figma code export gốc</span></div>
+        <DemoFlowBar apiStatus={apiStatus} onNavigateToScreen={selectScreen} />
         <div className="figma-runtime__canvas"><ScreenComponent /></div>
       </section>
     </main>
