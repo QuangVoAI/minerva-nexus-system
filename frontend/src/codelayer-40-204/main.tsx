@@ -1,6 +1,4 @@
-import { useState } from "react";
 import svgPaths from "./svg-2auud66ghj";
-import { LiveOrderDetailTimeline } from "../features/detail/LiveOrderDetailTimeline";
 
 function Boxes() {
   return (
@@ -1524,60 +1522,10 @@ function NhtKyVaDiSoat() {
 }
 
 function NiDungHS() {
-  const [showLiveApi, setShowLiveApi] = useState(true);
-  const [targetOrderId, setTargetOrderId] = useState("ORD-001");
-
   return (
     <div className="content-stretch flex flex-col gap-[24px] items-start overflow-clip p-[32px] relative shrink-0 w-full" data-name="Nội dung hồ sơ">
-      <div className="w-full flex items-center justify-between bg-white p-3 rounded-lg border border-[#cbd5e1] shadow-2xs">
-        <div className="flex items-center gap-3">
-          <span className="text-[13px] font-bold text-[#1e3a8a]">Chế độ dữ liệu SCR-06:</span>
-          <span className="text-[12px] text-[#64748b]">Hồ sơ chi tiết & Audit Trail</span>
-          {showLiveApi && (
-            <div className="flex items-center gap-1.5 ml-2">
-              <span className="text-[11px] text-[#475569]">Tra cứu mã:</span>
-              <input
-                type="text"
-                value={targetOrderId}
-                onChange={(e) => setTargetOrderId(e.target.value)}
-                placeholder="Nhập mã đơn..."
-                className="px-2 py-0.5 border border-[#cbd5e1] rounded text-[11.5px] font-mono w-[110px]"
-              />
-            </div>
-          )}
-        </div>
-        <div className="inline-flex rounded-md border border-[#cbd5e1] bg-[#f8fafc] p-0.5 text-[12px]">
-          <button
-            type="button"
-            onClick={() => setShowLiveApi(true)}
-            className={`px-3 py-1 font-bold rounded cursor-pointer transition-colors ${
-              showLiveApi ? "bg-[#2563eb] text-white shadow-xs" : "text-[#64748b] hover:text-[#0f172a]"
-            }`}
-          >
-            ⚡ Lịch sử Audit Trail thực (Java 8080)
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowLiveApi(false)}
-            className={`px-3 py-1 font-bold rounded cursor-pointer transition-colors ${
-              !showLiveApi ? "bg-[#2563eb] text-white shadow-xs" : "text-[#64748b] hover:text-[#0f172a]"
-            }`}
-          >
-            🖼 Bản vẽ tĩnh Figma gốc
-          </button>
-        </div>
-      </div>
-
-      {showLiveApi ? (
-        <div className="w-full">
-          <LiveOrderDetailTimeline orderId={targetOrderId} />
-        </div>
-      ) : (
-        <>
-          <ThongTinVnDn />
-          <NhtKyVaDiSoat />
-        </>
-      )}
+      <ThongTinVnDn />
+      <NhtKyVaDiSoat />
     </div>
   );
 }

@@ -2383,55 +2383,17 @@ function LuDn({ onSave, isLoading }: { onSave?: () => void; isLoading?: boolean 
   );
 }
 
-function HpThoiToDnGiL({ onSave, isLoading, useLiveForm, onToggleLiveForm }: { onSave?: () => void; isLoading?: boolean; useLiveForm?: boolean; onToggleLiveForm?: (val: boolean) => void }) {
+function HpThoiToDnGiL({ onSave, isLoading }: { onSave?: () => void; isLoading?: boolean }) {
   return (
     <div className="absolute bg-white content-stretch flex flex-col items-start left-[350px] overflow-clip rounded-[12px] shadow-[0px_24px_80px_0px_rgba(12,36,74,0.22)] top-[65px] w-[900px]" data-name="Hộp thoại tạo đơn gửi lẻ">
-      <div className="w-full bg-[#eff6ff] border-b border-[#bfdbfe] px-6 py-2.5 flex items-center justify-between">
-        <span className="text-[12px] font-bold text-[#1e3a8a]">Chế độ tạo đơn (SCR-03):</span>
-        <div className="inline-flex rounded-md border border-[#cbd5e1] bg-white p-0.5 text-[11.5px]">
-          <button
-            type="button"
-            onClick={() => onToggleLiveForm && onToggleLiveForm(false)}
-            className={`px-3 py-1 font-semibold rounded cursor-pointer transition-colors ${
-              !useLiveForm ? "bg-[#2563eb] text-white" : "text-[#64748b] hover:text-[#0f172a]"
-            }`}
-          >
-            Figma tĩnh (Gắn nút API)
-          </button>
-          <button
-            type="button"
-            onClick={() => onToggleLiveForm && onToggleLiveForm(true)}
-            className={`px-3 py-1 font-semibold rounded cursor-pointer transition-colors ${
-              useLiveForm ? "bg-[#2563eb] text-white" : "text-[#64748b] hover:text-[#0f172a]"
-            }`}
-          >
-            Biểu mẫu nhập liệu thực (Live API)
-          </button>
-        </div>
-      </div>
-
-      {useLiveForm ? (
-        <div className="p-6 w-full">
-          <LiveCreateOrderForm
-            onSuccess={(_id, tracking) => {
-              alert(`Tạo đơn thành công với mã: ${tracking}`);
-              window.location.hash = "orders";
-            }}
-          />
-        </div>
-      ) : (
-        <>
-          <TieuDHpThoi />
-          <ThongTinDnGiL />
-          <LuDn onSave={onSave} isLoading={isLoading} />
-        </>
-      )}
+      <TieuDHpThoi />
+      <ThongTinDnGiL />
+      <LuDn onSave={onSave} isLoading={isLoading} />
     </div>
   );
 }
 
 export default function Scr03ToDnGiLThCong() {
-  const [useLiveForm, setUseLiveForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
@@ -2472,8 +2434,6 @@ export default function Scr03ToDnGiLThCong() {
       <HpThoiToDnGiL
         onSave={handleQuickCreate}
         isLoading={isSubmitting}
-        useLiveForm={useLiveForm}
-        onToggleLiveForm={setUseLiveForm}
       />
     </div>
   );

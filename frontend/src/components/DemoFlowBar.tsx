@@ -51,7 +51,7 @@ export const DemoFlowBar: React.FC<DemoFlowBarProps> = ({
   ];
 
   return (
-    <div className="w-full bg-white border-b border-[#bfdbfe] shadow-xs select-none font-sans sticky top-0 z-50">
+    <div className="w-full bg-white select-none font-sans">
       {/* Top Header Bar */}
       <div className="max-w-[1600px] mx-auto px-4 py-2.5 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
