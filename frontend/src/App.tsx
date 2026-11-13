@@ -17,7 +17,6 @@ import FailedPending from "./codelayer-40-335/main";
 import RefusedThird from "./codelayer-40-365/main";
 import Returned from "./codelayer-40-398/main";
 import Dispatch from "./codelayer-40-432/main";
-import { DemoFlowBar } from "./components/DemoFlowBar";
 import "./styles/globals.css";
 
 type Screen = { id: string; title: string; group: string; Component: () => JSX.Element };
@@ -51,7 +50,6 @@ function getScreenFromHash() {
 export default function App() {
   const [screenId, setScreenId] = useState(getScreenFromHash);
   const [apiStatus, setApiStatus] = useState<"checking" | "online" | "offline">("checking");
-  const [showDemoModal, setShowDemoModal] = useState<boolean>(false);
   const embed = new URLSearchParams(window.location.search).get("embed") === "1";
   const active = useMemo(() => screens.find((screen) => screen.id === screenId) ?? screens[4], [screenId]);
 
@@ -79,94 +77,11 @@ export default function App() {
           </section>
         ))}
         <div className={`figma-runtime__api figma-runtime__api--${apiStatus}`}>API Java: {apiStatus === "checking" ? "đang kiểm tra" : apiStatus === "online" ? "đã kết nối" : "chưa chạy"}</div>
-        <button
-          type="button"
-          onClick={() => setShowDemoModal(true)}
-          style={{
-            marginTop: "12px",
-            width: "100%",
-            padding: "8px 10px",
-            background: "#2563eb",
-            color: "white",
-            borderRadius: "6px",
-            border: "none",
-            fontSize: "11px",
-            fontWeight: 700,
-            cursor: "pointer",
-            textAlign: "center",
-          }}
-        >
-          ⚡ Công cụ Test API (M3)
-        </button>
       </aside>
       <section className="figma-runtime__stage" aria-label={active.title}>
         <div className="figma-runtime__toolbar"><strong>{active.title}</strong><span>Render từ Figma code export gốc</span></div>
         <div className="figma-runtime__canvas"><ScreenComponent /></div>
       </section>
-
-      {showDemoModal && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
-            zIndex: 9999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "16px",
-          }}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: "12px",
-              boxShadow: "0 20px 25px -5px rgba(0,0,0,0.2)",
-              maxWidth: "1100px",
-              width: "100%",
-              maxHeight: "90vh",
-              overflowY: "auto",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "14px 20px",
-                borderBottom: "1px solid #e2e8f0",
-              }}
-            >
-              <strong style={{ fontSize: "14px", color: "#1e3a8a" }}>
-                Bảng điều khiển kiểm thử REST API (M3 · Luồng Demo E2E)
-              </strong>
-              <button
-                type="button"
-                onClick={() => setShowDemoModal(false)}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  fontSize: "18px",
-                  cursor: "pointer",
-                  color: "#64748b",
-                  padding: "4px 8px",
-                }}
-              >
-                ✕
-              </button>
-            </div>
-            <div>
-              <DemoFlowBar
-                apiStatus={apiStatus}
-                onNavigateToScreen={(id) => {
-                  selectScreen(id);
-                  setShowDemoModal(false);
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </main>
   );
 }

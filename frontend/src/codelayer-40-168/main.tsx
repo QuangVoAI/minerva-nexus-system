@@ -1,7 +1,6 @@
 import { useState } from "react";
 import svgPaths from "./svg-fotlugvvbo";
 import { orderService } from "../services";
-import { LiveCreateOrderForm } from "../features/orders/LiveCreateOrderForm";
 
 function Boxes() {
   return (
