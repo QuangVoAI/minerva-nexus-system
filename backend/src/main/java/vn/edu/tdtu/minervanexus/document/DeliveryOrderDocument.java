@@ -13,7 +13,13 @@ import java.util.List;
 @Document("delivery_orders")
 public class DeliveryOrderDocument {
     @Id private String id;
+    @org.springframework.data.annotation.Version private Long version;
+    private List<AuditEvent> auditEvents = new ArrayList<>();
+    public Long getVersion() { return version; }
+    public List<AuditEvent> getAuditEvents() { return auditEvents; }
+    public static class AuditEvent { public String action; public String actorId; public Instant occurredAt; public OrderStatus fromStatus; public OrderStatus toStatus; public String reasonCode; public String note; }
     private String orderCode;
+    @org.springframework.data.mongodb.core.index.Indexed(unique = true)
     private String trackingCode;
     private String hubId;
     private String areaId;
