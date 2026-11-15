@@ -20,15 +20,27 @@ public class SlaRuleService {
             assessment.reasons.add("Đơn chưa có hạn SLA hợp lệ.");
             return assessment;
         }
-        assessment.remainingMinutes = Duration.between(now, order.getSlaDeadline()).toMinutes();
-        if (assessment.remainingMinutes < 0 && order.getStatus() != OrderStatus.DELIVERED) {
+        Instant reference = now;
+        if (order.getStatus() == OrderStatus.DELIVERED) {
+            reference = order.getStatusHistory().stream()
+                    .filter(e -> e.toStatus == OrderStatus.DELIVERED && e.changedAt != null)
+                    .map(e -> e.changedAt).min(Instant::compareTo).orElse(null);
+            if (reference == null) {
+                assessment.riskLevel = SlaRiskLevel.UNKNOWN;
+                assessment.reasons.add("Thiếu mốc giao thành công để đánh giá SLA.");
+                return assessment;
+            }
+        }
+        Duration remaining = Duration.between(reference, order.getSlaDeadline());
+        assessment.remainingMinutes = remaining.toMinutes();
+        if (remaining.isNegative() && order.getStatus() != OrderStatus.DELIVERED) {
             assessment.riskLevel = SlaRiskLevel.BREACHED;
             assessment.overdue = true;
             assessment.reasons.add("Đơn đã quá hạn SLA nhưng chưa giao thành công.");
-        } else if (assessment.remainingMinutes < 60) {
+        } else if (remaining.compareTo(Duration.ofMinutes(60)) < 0) {
             assessment.riskLevel = SlaRiskLevel.HIGH_RISK;
             assessment.reasons.add("Đơn còn dưới 60 phút đến hạn SLA.");
-        } else if (assessment.remainingMinutes <= 120) {
+        } else if (remaining.compareTo(Duration.ofMinutes(120)) <= 0) {
             assessment.riskLevel = SlaRiskLevel.AT_RISK;
             assessment.reasons.add("Đơn còn từ 60 đến 120 phút đến hạn SLA.");
         } else {
