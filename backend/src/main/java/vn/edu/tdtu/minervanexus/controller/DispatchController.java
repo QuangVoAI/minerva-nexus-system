@@ -238,6 +238,24 @@ public class DispatchController {
   @GetMapping("/dispatch/suggestions")
   public List<Suggestion> suggestions() {
     var state = store.read(hub());
+    // For the demo path, place eligible queued orders into the first active shift
+    // when the operator has not explicitly selected a shift yet. The explicit
+    // move/propose endpoints remain available for normal operations.
+    if (state.proposals.values().stream().noneMatch(p -> "DRAFT".equals(p.decision()))
+        && !state.shifts.isEmpty()) {
+      var shift = state.shifts.values().stream().filter(s -> s.end().isAfter(Instant.now())).findFirst().orElse(null);
+      if (shift != null) {
+        store.write(hub(), "DISPATCHER_WEB", h -> {
+          h.orders.values().stream()
+              .filter(o -> (o.status() == vn.edu.tdtu.minervanexus.common.OrderStatus.READY_TO_DISPATCH
+                  || o.status() == vn.edu.tdtu.minervanexus.common.OrderStatus.READY_FOR_REDELIVERY)
+                  && o.shiftId() == null && shift.area().equals(o.area()))
+              .forEach(o -> h.membership.put(o.id(), shift.id()));
+          return new DispatchPlan(h, Instant.now(), "DISPATCHER_WEB").propose(shift.id());
+        });
+        state = store.read(hub());
+      }
+    }
     return state.proposals.values().stream()
         .filter(p -> "DRAFT".equals(p.decision()) && state.orders.containsKey(p.orderId()))
         .map(

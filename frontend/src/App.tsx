@@ -25,10 +25,16 @@ import {
   LiveDriverActionCard,
   LiveOrderDetailTimeline,
   LiveOrderIntake,
+  LiveTracking,
+  LiveCancelOrder,
+  LiveAuditLog,
+  LiveReports,
+  LiveDriverManagement,
 } from "./features";
 import "./styles/globals.css";
 
 type Screen = { id: string; title: string; group: string; Component: () => JSX.Element };
+const EmptyScreen = () => <div />;
 
 const screens: Screen[] = [
   { id: "login", title: "SCR-01 · Đăng nhập desktop", group: "Xác thực", Component: LoginDesktop },
@@ -49,6 +55,11 @@ const screens: Screen[] = [
   { id: "failed", title: "SCR-08 · FAILED chờ phát lại", group: "Mobile", Component: FailedPending },
   { id: "refused", title: "SCR-08 · Từ chối nhận lần ba", group: "Mobile", Component: RefusedThird },
   { id: "returned", title: "SCR-08 · RETURNED chuyển hoàn", group: "Mobile", Component: Returned }
+  ,{ id: "tracking", title: "UC-24 · Tra cứu hành trình công khai", group: "Công khai", Component: EmptyScreen }
+  ,{ id: "cancel", title: "UC-23 · Hủy đơn hàng", group: "Đơn hàng", Component: EmptyScreen }
+  ,{ id: "audit", title: "UC-22 · Nhật ký hệ thống", group: "Hệ thống", Component: EmptyScreen }
+  ,{ id: "reports", title: "UC-20 · Báo cáo vận hành", group: "Báo cáo", Component: EmptyScreen }
+  ,{ id: "drivers", title: "UC-03 · Tài xế và khu vực", group: "Tài xế", Component: EmptyScreen }
 ];
 
 function getScreenFromHash() {
@@ -70,6 +81,11 @@ function LiveScreen({ id }: { id: string }): JSX.Element | null {
       return <LiveOrderDetailTimeline orderId={new URLSearchParams(window.location.search).get("orderId")} />;
     case "driver":
       return <LiveDriverActionCard />;
+    case "tracking": return <LiveTracking />;
+    case "cancel": return <LiveCancelOrder />;
+    case "audit": return <LiveAuditLog />;
+    case "reports": return <LiveReports />;
+    case "drivers": return <LiveDriverManagement />;
     default:
       return null;
   }
@@ -92,7 +108,8 @@ export default function App() {
   const selectScreen = (id: string) => { window.location.hash = id; };
   const groups = [...new Set(screens.map((screen) => screen.group))];
   const ScreenComponent = active.Component;
-  const liveScreen = liveMode ? <LiveScreen id={active.id} /> : null;
+  const liveOnlyIds = new Set(["tracking", "cancel", "audit", "reports", "drivers"]);
+  const liveScreen = (liveMode || liveOnlyIds.has(active.id)) ? <LiveScreen id={active.id} /> : null;
 
   return (
     <main className={embed ? "figma-runtime figma-runtime--embed" : "figma-runtime"}>

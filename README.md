@@ -61,6 +61,8 @@ Tài liệu cấu trúc MongoDB và quy tắc trạng thái nằm tại [docs/DA
 
 Để chạy các panel API đã tích hợp mà vẫn giữ nguyên màn hình Figma, mở frontend với query `?mode=live`, ví dụ `/react/?mode=live#orders`. Không có query này, runtime hiển thị đúng các frame Figma gốc.
 
+Các panel live bổ sung dùng cho nghiệm thu MVP: `#tracking`, `#cancel`, `#audit`, `#reports`, `#drivers`. Sau `bootstrap.js`, có thể chạy thêm `docs/mongodb/seed-demo.js` để tạo tài xế và ca giao mẫu cho luồng điều phối.
+
 ---
 
 ## 4. KỊCH BẢN DEMO LIVE 5 BƯỚC CHO HỘI ĐỒNG BẢO VỆ
