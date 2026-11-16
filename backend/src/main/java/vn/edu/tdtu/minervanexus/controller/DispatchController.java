@@ -256,17 +256,18 @@ public class DispatchController {
         state = store.read(hub());
       }
     }
-    return state.proposals.values().stream()
-        .filter(p -> "DRAFT".equals(p.decision()) && state.orders.containsKey(p.orderId()))
+    final var currentState = state;
+    return currentState.proposals.values().stream()
+        .filter(p -> "DRAFT".equals(p.decision()) && currentState.orders.containsKey(p.orderId()))
         .map(
             p ->
                 new Suggestion(
                     p.id(),
                     p.orderId(),
-                    state.tracking.get(p.orderId()),
-                    state.orders.get(p.orderId()).area(),
+                    currentState.tracking.get(p.orderId()),
+                    currentState.orders.get(p.orderId()).area(),
                     p.suggested(),
-                    state.drivers.get(p.suggested()).name(),
+                    currentState.drivers.get(p.suggested()).name(),
                     "",
                     p.score().total(),
                     p.score().reason(),

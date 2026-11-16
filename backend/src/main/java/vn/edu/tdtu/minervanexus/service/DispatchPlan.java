@@ -233,4 +233,18 @@ public class DispatchPlan {
         order,
         o.status() + " → " + next + " · " + Objects.toString(reason, ""));
   }
+
+  /** Cancel before driver acceptance.  Keeping this inside the dispatch aggregate makes
+   * the order state, manifest and driver load change together. */
+  public void cancel(String order, String reason) {
+    Order o = get(h.orders, order);
+    require(
+        o.status() == OrderStatus.PENDING
+            || o.status() == OrderStatus.READY_TO_DISPATCH
+            || o.status() == OrderStatus.ASSIGNED,
+        "Chỉ được hủy đơn trước khi tài xế xác nhận nhận đơn");
+    require(filled(reason), "Cần nêu lý do hủy đơn");
+    h.orders.put(order, o.move(o.shiftId(), null, OrderStatus.CANCELLED));
+    log("Hủy đơn", order, o.status() + " → CANCELLED · " + reason);
+  }
 }

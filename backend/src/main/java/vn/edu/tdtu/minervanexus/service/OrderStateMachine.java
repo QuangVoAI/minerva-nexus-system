@@ -14,7 +14,10 @@ public class OrderStateMachine {
     public OrderStateMachine() {
         allowed.put(OrderStatus.PENDING, EnumSet.of(OrderStatus.READY_TO_DISPATCH, OrderStatus.CANCELLED));
         allowed.put(OrderStatus.READY_TO_DISPATCH, EnumSet.of(OrderStatus.ASSIGNED, OrderStatus.CANCELLED));
-        allowed.put(OrderStatus.ASSIGNED, EnumSet.of(OrderStatus.DRIVER_ACCEPTED, OrderStatus.READY_TO_DISPATCH));
+        // A hub operator may cancel an order until the driver has accepted it.  When the
+        // order is ASSIGNED, DispatchStore also removes the assignment so that the
+        // driver's capacity is released atomically with this transition.
+        allowed.put(OrderStatus.ASSIGNED, EnumSet.of(OrderStatus.DRIVER_ACCEPTED, OrderStatus.READY_TO_DISPATCH, OrderStatus.CANCELLED));
         allowed.put(OrderStatus.DRIVER_ACCEPTED, EnumSet.of(OrderStatus.IN_TRANSIT));
         allowed.put(OrderStatus.IN_TRANSIT, EnumSet.of(OrderStatus.DELIVERED, OrderStatus.FAILED));
         allowed.put(OrderStatus.FAILED, EnumSet.of(OrderStatus.READY_FOR_REDELIVERY, OrderStatus.RETURN_PENDING));

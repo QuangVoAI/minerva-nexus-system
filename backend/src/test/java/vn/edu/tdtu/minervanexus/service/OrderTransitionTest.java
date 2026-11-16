@@ -14,7 +14,7 @@ class OrderTransitionTest {
         Map<OrderStatus,Set<OrderStatus>> edges=Map.of(
             OrderStatus.PENDING,Set.of(OrderStatus.READY_TO_DISPATCH,OrderStatus.CANCELLED),
             OrderStatus.READY_TO_DISPATCH,Set.of(OrderStatus.ASSIGNED,OrderStatus.CANCELLED),
-            OrderStatus.ASSIGNED,Set.of(OrderStatus.DRIVER_ACCEPTED,OrderStatus.READY_TO_DISPATCH),
+            OrderStatus.ASSIGNED,Set.of(OrderStatus.DRIVER_ACCEPTED,OrderStatus.READY_TO_DISPATCH,OrderStatus.CANCELLED),
             OrderStatus.DRIVER_ACCEPTED,Set.of(OrderStatus.IN_TRANSIT),
             OrderStatus.IN_TRANSIT,Set.of(OrderStatus.DELIVERED,OrderStatus.FAILED),
             OrderStatus.FAILED,Set.of(OrderStatus.READY_FOR_REDELIVERY,OrderStatus.RETURN_PENDING),
