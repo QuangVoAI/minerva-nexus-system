@@ -13,7 +13,7 @@ Minerva Nexus là phần mềm mô phỏng hệ thống điều hành tại mộ
 * Đánh giá và cảnh báo nguy cơ vi phạm thời gian cam kết giao hàng bằng **quy tắc SLA**.
 * Đề xuất tài xế theo khu vực, trạng thái ca, sức chứa, mức dịch vụ và hạn SLA; Nhân viên vận hành Hub là người duyệt cuối.
 * Cho phép tài xế nhận đơn, xác nhận phát thành công hoặc ghi nhận sự cố giao thất bại theo đúng chuẩn nghiệp vụ.
-* Dashboard thống kê các chỉ số vận hành then chốt (KPI) theo thời gian thực.
+* Dashboard thống kê các chỉ số vận hành then chốt (KPI) theo lần cập nhật dữ liệu.
 
 ---
 
@@ -82,7 +82,7 @@ Khi lên bục thuyết trình trước giảng viên, thực hiện đúng 5 b�
   * Nhấn **"✔ Xác nhận Giao thành công"** (chuyển sang `DELIVERED`).
   * Với đơn khác, bấm **"✖ Báo Giao thất bại"** $\rightarrow$ Chọn lý do *"Khách không nghe máy"* $\rightarrow$ Hệ thống tự động ghi nhận ngoại lệ và tăng số lần thất bại (`failureCount`).
 * **Bước 5 (Tab 4 - Dashboard KPI):**
-  * Chuyển sang Tab 4 để giảng viên xem các thẻ chỉ số KPI: Tỷ lệ giao thành công (%), Tỷ lệ đúng hạn SLA (%), và Biểu đồ tải của từng tài xế tự động cập nhật theo thời gian thực!
+  * Chuyển sang Tab 4 để giảng viên xem các thẻ chỉ số KPI: Tỷ lệ giao thành công (%), Tỷ lệ đúng hạn SLA (%), và biểu đồ tải của từng tài xế theo dữ liệu vừa cập nhật.
 
 ---
 
