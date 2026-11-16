@@ -112,7 +112,7 @@ export const LiveDriverActionCard: React.FC<LiveDriverActionCardProps> = ({
             className="w-full bg-[#16a34a] hover:bg-[#15803d] disabled:opacity-50 text-white text-[13px] font-bold py-2.5 px-4 rounded-lg cursor-pointer transition-colors shadow-2xs flex items-center justify-center gap-2"
           >
             <span>✓</span>
-            <span>2. Giao thành công & Thu tiền COD (DELIVERED)</span>
+            <span>2. Xác nhận giao thành công (DELIVERED)</span>
           </button>
 
           <button

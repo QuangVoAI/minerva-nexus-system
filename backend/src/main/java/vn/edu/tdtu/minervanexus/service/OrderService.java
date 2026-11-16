@@ -52,6 +52,9 @@ public class OrderService {
         if(o.getFailureCount()==2) allowed(OrderStatus.FAILED,OrderStatus.RETURN_PENDING);
         Instant now=clock.instant();int count=o.getFailureCount()+1;var failure=new DeliveryOrderDocument.DeliveryException();failure.attemptNumber=count;failure.driverId=o.getCurrentAssignment()==null?null:o.getCurrentAssignment().driverId;failure.reasonCode=reasonCode;failure.note=note;failure.reportedAt=now;o.getExceptions().add(failure);o.setFailureCount(count);
         event(o,OrderStatus.FAILED,actorId,reasonCode,note,now);
+        // Preserve the attempting driver in exception/audit history, but clear the current
+        // assignment so a failed order is never shown as active work for that driver.
+        o.setCurrentAssignment(null);
         if(count==3) {event(o,OrderStatus.RETURN_PENDING,actorId,"MAX_FAILURES","",now);var r=new DeliveryOrderDocument.ReturnInfo();r.returnRequestedAt=now;r.reason="MAX_FAILURES";o.setReturnInfo(r);}
         return save(o,actorId,"DELIVERY_FAILURE",now);
     }
