@@ -382,7 +382,7 @@ export function useDemoFlow() {
         hist
       );
 
-      addLog('Bước 6: Cập nhật KPI', '/api/analytics', 'GET', 'pending', 'Đang đồng bộ bảng điều hành thời gian thực...');
+      addLog('Bước 6: Cập nhật KPI', '/api/analytics', 'GET', 'pending', 'Đang tải lại bảng điều hành theo dữ liệu hiện tại...');
       const metrics = await analyticsService.getAnalytics();
       setAnalytics(metrics);
       setActiveStep(6);

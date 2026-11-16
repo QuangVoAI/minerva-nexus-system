@@ -3,7 +3,7 @@ import type { AnalyticsMetrics } from '../types';
 
 export const analyticsService = {
   /**
-   * Lấy các chỉ số KPI vận hành thời gian thực của Hub
+   * Lấy các chỉ số KPI vận hành theo lần cập nhật của Hub
    * GET /api/analytics
    */
   async getAnalytics(): Promise<AnalyticsMetrics> {

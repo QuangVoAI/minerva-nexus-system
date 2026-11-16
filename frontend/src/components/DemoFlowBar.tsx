@@ -369,7 +369,7 @@ export const DemoFlowBar: React.FC<DemoFlowBarProps> = ({
         <div className="border-t border-[#cbd5e1] bg-[#0f172a] text-[#f8fafc] p-4 max-h-[300px] overflow-y-auto font-mono text-[11.5px]">
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#334155]">
             <strong className="text-[#38bdf8] text-[12px]">
-              NHẬT KÝ GIAO TIẾP REST API THỜI GIAN THỰC (Java Backend :8080)
+              NHẬT KÝ GIAO TIẾP REST API (Java Backend :8081)
             </strong>
             <button
               type="button"

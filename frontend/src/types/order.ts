@@ -40,7 +40,8 @@ export interface DeliveryOrder {
   failureCount: number;
   riskLevel: SlaRiskLevel;
   riskExplanation: string;
-  riskProbability: number;
+  /** Kept optional for compatibility with older mock payloads; MVP does not use probability. */
+  riskProbability?: number;
 }
 
 export interface CreateOrderPayload {

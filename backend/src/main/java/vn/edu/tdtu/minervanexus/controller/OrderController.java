@@ -30,4 +30,5 @@ public class OrderController {
     @PatchMapping("/{id}/status") public DeliveryOrderDocument transition(@PathVariable String id,@RequestParam OrderStatus target,@RequestHeader(value="X-Actor-Id",defaultValue="SYSTEM") String actor,@RequestParam(defaultValue="") String note) {return orderService.transition(id,target,actor,note);}
     @PostMapping("/{id}/failures") public DeliveryOrderDocument failure(@PathVariable String id,@RequestParam String reasonCode,@RequestParam(defaultValue="") String note,@RequestHeader(value="X-Actor-Id",defaultValue="SYSTEM") String actor) {return orderService.reportFailure(id,actor,reasonCode,note);}
     @PostMapping("/{id}/sla-assessment") public DeliveryOrderDocument assess(@PathVariable String id,@RequestHeader(value="X-Actor-Id",defaultValue="SYSTEM") String actor) {return orderService.assessSla(id,actor);}
+    @PostMapping("/{id}/return/confirm") public DeliveryOrderDocument confirmReturn(@PathVariable String id,@RequestParam(defaultValue="") String note,@RequestHeader(value="X-Actor-Id",defaultValue="DISPATCHER_WEB") String actor) {return orderService.confirmReturn(id,actor,note);}
 }

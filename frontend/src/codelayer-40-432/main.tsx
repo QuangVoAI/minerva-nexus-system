@@ -664,7 +664,7 @@ function CongThc() {
     <div className="content-stretch flex gap-[10px] items-center overflow-clip relative shrink-0" data-name="Công thức">
       <Workflow />
       <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">Điểm khớp</p>
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">w1 × tuyến + w2 × SLA + w3 × tải</p>
+      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Khu vực + SLA + sức chứa + tải</p>
     </div>
   );
 }
@@ -672,7 +672,7 @@ function CongThc() {
 function CuHinh() {
   return (
     <div className="[word-break:break-word] content-stretch flex gap-[16px] items-center leading-[1.45] overflow-clip relative shrink-0 text-[12px] whitespace-nowrap" data-name="Cấu hình">
-      <p className="font-['Roboto_Mono:Regular',sans-serif] font-normal relative shrink-0 text-[#657684]">w1 = 0.5 · w2 = 0.3 · w3 = 0.2</p>
+      <p className="font-['Roboto_Mono:Regular',sans-serif] font-normal relative shrink-0 text-[#657684]">Quy tắc cấu hình · có thể giải thích</p>
       <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold not-italic relative shrink-0 text-[#087f8c]">Cấu hình ↗</p>
     </div>
   );
@@ -1970,7 +1970,7 @@ function DimVaDn() {
 function ChSVaDim() {
   return (
     <div className="[word-break:break-word] content-stretch flex items-start justify-between leading-[1.45] overflow-clip relative shrink-0 text-[12px] w-full whitespace-nowrap" data-name="Chỉ số và điểm">
-      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Trùng tuyến địa bàn · w1</p>
+      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Đúng khu vực phục vụ</p>
       <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold relative shrink-0 text-[#18252f]">50 / 50</p>
     </div>
   );
@@ -1996,7 +1996,7 @@ function ThanhPhnDim() {
 function ChSVaDim1() {
   return (
     <div className="[word-break:break-word] content-stretch flex items-start justify-between leading-[1.45] overflow-clip relative shrink-0 text-[12px] w-full whitespace-nowrap" data-name="Chỉ số và điểm">
-      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Độ cấp bách SLA · w2</p>
+      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Mức ưu tiên và SLA</p>
       <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold relative shrink-0 text-[#18252f]">30 / 30</p>
     </div>
   );
@@ -2022,7 +2022,7 @@ function ThanhPhnDim1() {
 function ChSVaDim2() {
   return (
     <div className="[word-break:break-word] content-stretch flex items-start justify-between leading-[1.45] overflow-clip relative shrink-0 text-[12px] w-full whitespace-nowrap" data-name="Chỉ số và điểm">
-      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Cân bằng tải · w3</p>
+      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Sức chứa và tải đang xử lý</p>
       <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold relative shrink-0 text-[#18252f]">16 / 20</p>
     </div>
   );

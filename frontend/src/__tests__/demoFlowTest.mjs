@@ -1,7 +1,7 @@
 // Automated E2E verification test for Minerva Nexus M3 Issue #3
 // Tests the full order lifecycle from creation to delivery, audit history, and KPI updates.
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = 'http://localhost:8081';
 
 async function runTest() {
   console.log('====================================================');

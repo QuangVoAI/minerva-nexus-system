@@ -59,6 +59,8 @@ Sau khi chạy, kiểm tra kết nối tại `GET http://localhost:8081/api/heal
 
 Tài liệu cấu trúc MongoDB và quy tắc trạng thái nằm tại [docs/DATA_STRUCTURE.md](docs/DATA_STRUCTURE.md). Phân công, ownership thư mục và quy ước merge của nhóm nằm tại [docs/TEAM_TASKS.md](docs/TEAM_TASKS.md).
 
+Để chạy các panel API đã tích hợp mà vẫn giữ nguyên màn hình Figma, mở frontend với query `?mode=live`, ví dụ `/react/?mode=live#orders`. Không có query này, runtime hiển thị đúng các frame Figma gốc.
+
 ---
 
 ## 4. KỊCH BẢN DEMO LIVE 5 BƯỚC CHO HỘI ĐỒNG BẢO VỆ

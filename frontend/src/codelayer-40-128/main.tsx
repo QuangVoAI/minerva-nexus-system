@@ -451,7 +451,7 @@ function GiamSatThiGianThc() {
     <div className="bg-[#e7f4f3] relative rounded-[8px] shrink-0" data-name="Giám sát thời gian thực">
       <div className="content-stretch flex gap-[7px] items-center overflow-clip px-[13px] py-[9px] relative rounded-[inherit] size-full">
         <Radio1 />
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">Giám sát thời gian thực</p>
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">Theo dõi dữ liệu hiện tại</p>
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[8px]" />
     </div>
@@ -587,7 +587,7 @@ function CongSutHub() {
 function NiDung() {
   return (
     <div className="[word-break:break-word] content-stretch flex flex-col gap-[5px] items-start not-italic overflow-clip relative shrink-0 whitespace-nowrap" data-name="Nội dung">
-      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] relative shrink-0 text-[#142b3b] text-[17px]">Giám sát SLA thời gian thực</p>
+      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] relative shrink-0 text-[#142b3b] text-[17px]">Giám sát SLA theo lần cập nhật</p>
       <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] relative shrink-0 text-[#657684] text-[12px]">95 đơn đã tiếp nhận</p>
     </div>
   );

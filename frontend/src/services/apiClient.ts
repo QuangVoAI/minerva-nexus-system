@@ -1,9 +1,9 @@
 /**
  * Minerva Nexus API Client
- * Cung cấp kết nối REST API tới backend Java (port 8080) qua endpoint chuẩn /api.
+ * Cung cấp kết nối REST API tới backend Java (port 8081 mặc định) qua endpoint chuẩn /api.
  */
 
-const API_BASE = ''; // Rỗng để tận dụng Vite proxy /api -> http://localhost:8080 trong dev và cùng origin trong build
+const API_BASE = ''; // Rỗng để tận dụng Vite proxy /api -> http://localhost:8081 trong dev và cùng origin trong build
 
 export class ApiError extends Error {
   public statusCode?: number;
@@ -79,7 +79,7 @@ export const apiClient = {
     } catch (err: unknown) {
       if (err instanceof ApiError) throw err;
       throw new ApiError(
-        'Không thể kết nối đến máy chủ backend Minerva Nexus. Vui lòng kiểm tra dịch vụ Java trên cổng 8080.',
+        'Không thể kết nối đến máy chủ backend Minerva Nexus. Vui lòng kiểm tra dịch vụ Java trên cổng 8081.',
         0,
         err
       );

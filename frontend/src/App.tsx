@@ -17,6 +17,15 @@ import FailedPending from "./codelayer-40-335/main";
 import RefusedThird from "./codelayer-40-365/main";
 import Returned from "./codelayer-40-398/main";
 import Dispatch from "./codelayer-40-432/main";
+import { DemoFlowBar } from "./components";
+import {
+  LiveCreateOrderForm,
+  LiveDashboardKpi,
+  LiveDispatchView,
+  LiveDriverActionCard,
+  LiveOrderDetailTimeline,
+  LiveOrderIntake,
+} from "./features";
 import "./styles/globals.css";
 
 type Screen = { id: string; title: string; group: string; Component: () => JSX.Element };
@@ -47,10 +56,30 @@ function getScreenFromHash() {
   return screens.some((screen) => screen.id === value) ? value : "dashboard";
 }
 
+function LiveScreen({ id }: { id: string }): JSX.Element | null {
+  switch (id) {
+    case "dashboard":
+      return <LiveDashboardKpi />;
+    case "orders":
+      return <LiveOrderIntake />;
+    case "create-order":
+      return <LiveCreateOrderForm />;
+    case "dispatch":
+      return <LiveDispatchView />;
+    case "order-detail":
+      return <LiveOrderDetailTimeline orderId={new URLSearchParams(window.location.search).get("orderId")} />;
+    case "driver":
+      return <LiveDriverActionCard />;
+    default:
+      return null;
+  }
+}
+
 export default function App() {
   const [screenId, setScreenId] = useState(getScreenFromHash);
   const [apiStatus, setApiStatus] = useState<"checking" | "online" | "offline">("checking");
   const embed = new URLSearchParams(window.location.search).get("embed") === "1";
+  const liveMode = new URLSearchParams(window.location.search).get("mode") === "live";
   const active = useMemo(() => screens.find((screen) => screen.id === screenId) ?? screens[4], [screenId]);
 
   useEffect(() => {
@@ -63,6 +92,7 @@ export default function App() {
   const selectScreen = (id: string) => { window.location.hash = id; };
   const groups = [...new Set(screens.map((screen) => screen.group))];
   const ScreenComponent = active.Component;
+  const liveScreen = liveMode ? <LiveScreen id={active.id} /> : null;
 
   return (
     <main className={embed ? "figma-runtime figma-runtime--embed" : "figma-runtime"}>
@@ -79,8 +109,12 @@ export default function App() {
         <div className={`figma-runtime__api figma-runtime__api--${apiStatus}`}>API Java: {apiStatus === "checking" ? "đang kiểm tra" : apiStatus === "online" ? "đã kết nối" : "chưa chạy"}</div>
       </aside>
       <section className="figma-runtime__stage" aria-label={active.title}>
-        <div className="figma-runtime__toolbar"><strong>{active.title}</strong><span>Render từ Figma code export gốc</span></div>
-        <div className="figma-runtime__canvas"><ScreenComponent /></div>
+        <div className="figma-runtime__toolbar">
+          <strong>{active.title}</strong>
+          <span>{liveMode ? "Luồng API Java + MongoDB" : "Render từ Figma code export gốc"}</span>
+        </div>
+        {liveMode && <DemoFlowBar apiStatus={apiStatus} onNavigateToScreen={selectScreen} />}
+        <div className="figma-runtime__canvas">{liveScreen ?? <ScreenComponent />}</div>
       </section>
     </main>
   );
