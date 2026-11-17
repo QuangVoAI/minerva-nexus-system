@@ -1,4 +1,18 @@
+import { useState, createContext, useContext } from "react";
 import svgPaths from "./svg-cs17wt3bie";
+import { orderService } from "../services";
+
+const FailureFormContext = createContext<{
+  selectedReason: string;
+  setSelectedReason: (code: string) => void;
+  hasConfirmedCalls: boolean;
+  setHasConfirmedCalls: (val: boolean | ((prev: boolean) => boolean)) => void;
+  hasPhoto: boolean;
+  setHasPhoto: (val: boolean | ((prev: boolean) => boolean)) => void;
+  handleSubmit: () => void;
+  isSubmitting: boolean;
+  isReady: boolean;
+}>({} as any);
 
 function IosSignal() {
   return (
@@ -57,7 +71,12 @@ function ThanhTrngThai() {
 
 function ArrowLeft() {
   return (
-    <div className="relative shrink-0 size-[24px]" data-name="arrow-left">
+    <div
+      onClick={() => { window.location.hash = "driver"; }}
+      className="relative shrink-0 size-[24px] cursor-pointer hover:opacity-80 transition-opacity"
+      data-name="arrow-left"
+      title="Quay lại tác vụ tài xế"
+    >
       <svg className="absolute block inset-0 size-full" fill="none" height="24" preserveAspectRatio="none" viewBox="0 0 24 24" width="24">
         <g id="arrow-left">
           <path d={svgPaths.p177d0d00} id="Vector" stroke="white" strokeLinecap="round" strokeWidth="1.8" />
@@ -227,100 +246,89 @@ function LyDo() {
 }
 
 function LaChnLyDo() {
+  const { selectedReason, setSelectedReason } = useContext(FailureFormContext);
+  const isSelected = selectedReason === "CODE_01";
   return (
-    <div className="bg-[#e7f4f3] relative rounded-[8px] shrink-0 w-full" data-name="Lựa chọn lý do">
+    <div
+      onClick={() => setSelectedReason("CODE_01")}
+      className={`${isSelected ? "bg-[#e7f4f3] border-[#087f8c]" : "bg-white hover:bg-[#f8fafc] border-[#dce4ea]"} cursor-pointer transition-colors relative rounded-[8px] shrink-0 w-full border`}
+      data-name="Lựa chọn lý do"
+    >
       <div className="content-stretch flex gap-[12px] items-center overflow-clip p-[12px] relative rounded-[inherit] size-full">
-        <NutChn />
-        <LyDo />
+        <div className="bg-white relative rounded-[100px] shrink-0 size-[20px]" data-name="Nút chọn">
+          <div aria-hidden className={`absolute ${isSelected ? "border-6 border-[#087f8c]" : "border-[#b7c1ce] border-[1.5px]"} border-solid inset-0 pointer-events-none rounded-[100px]`} />
+        </div>
+        <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] flex-col font-['Inter:Semi_Bold',sans-serif] font-semibold gap-[2px] items-start leading-[1.45] min-w-px not-italic overflow-clip relative" data-name="Lý do">
+          <p className={`relative shrink-0 ${isSelected ? "text-[#087f8c]" : "text-[#657386]"} text-[13px] w-full`}>CODE_01</p>
+          <p className="relative shrink-0 text-[#182536] text-[14px] w-full">Khách không nghe máy</p>
+        </div>
       </div>
-      <div aria-hidden className="absolute border border-[#087f8c] border-solid inset-0 pointer-events-none rounded-[8px]" />
-    </div>
-  );
-}
-
-function NutChn1() {
-  return (
-    <div className="bg-white relative rounded-[100px] shrink-0 size-[20px]" data-name="Nút chọn">
-      <div aria-hidden className="absolute border-[#b7c1ce] border-[1.5px] border-solid inset-0 pointer-events-none rounded-[100px]" />
-    </div>
-  );
-}
-
-function LyDo1() {
-  return (
-    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] flex-col gap-[2px] items-start leading-[1.45] min-w-px not-italic overflow-clip relative" data-name="Lý do">
-      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold relative shrink-0 text-[#657386] text-[13px] w-full">CODE_02</p>
-      <p className="font-['Inter:Regular',sans-serif] font-normal relative shrink-0 text-[#182536] text-[14px] w-full">Sai địa chỉ / Nhà đóng cửa / Không tìm thấy hẻm</p>
     </div>
   );
 }
 
 function LaChnLyDo1() {
+  const { selectedReason, setSelectedReason } = useContext(FailureFormContext);
+  const isSelected = selectedReason === "CODE_02";
   return (
-    <div className="bg-white relative rounded-[8px] shrink-0 w-full" data-name="Lựa chọn lý do">
+    <div
+      onClick={() => setSelectedReason("CODE_02")}
+      className={`${isSelected ? "bg-[#e7f4f3] border-[#087f8c]" : "bg-white hover:bg-[#f8fafc] border-[#dce4ea]"} cursor-pointer transition-colors relative rounded-[8px] shrink-0 w-full border`}
+      data-name="Lựa chọn lý do"
+    >
       <div className="content-stretch flex gap-[12px] items-center overflow-clip p-[12px] relative rounded-[inherit] size-full">
-        <NutChn1 />
-        <LyDo1 />
+        <div className="bg-white relative rounded-[100px] shrink-0 size-[20px]" data-name="Nút chọn">
+          <div aria-hidden className={`absolute ${isSelected ? "border-6 border-[#087f8c]" : "border-[#b7c1ce] border-[1.5px]"} border-solid inset-0 pointer-events-none rounded-[100px]`} />
+        </div>
+        <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] flex-col gap-[2px] items-start leading-[1.45] min-w-px not-italic overflow-clip relative" data-name="Lý do">
+          <p className={`font-['Inter:Semi_Bold',sans-serif] font-semibold relative shrink-0 ${isSelected ? "text-[#087f8c]" : "text-[#657386]"} text-[13px] w-full`}>CODE_02</p>
+          <p className="font-['Inter:Regular',sans-serif] font-normal relative shrink-0 text-[#182536] text-[14px] w-full">Sai địa chỉ / Nhà đóng cửa / Không tìm thấy hẻm</p>
+        </div>
       </div>
-      <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[8px]" />
-    </div>
-  );
-}
-
-function NutChn2() {
-  return (
-    <div className="bg-white relative rounded-[100px] shrink-0 size-[20px]" data-name="Nút chọn">
-      <div aria-hidden className="absolute border-[#b7c1ce] border-[1.5px] border-solid inset-0 pointer-events-none rounded-[100px]" />
-    </div>
-  );
-}
-
-function LyDo2() {
-  return (
-    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] flex-col gap-[2px] items-start leading-[1.45] min-w-px not-italic overflow-clip relative" data-name="Lý do">
-      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold relative shrink-0 text-[#657386] text-[13px] w-full">CODE_03</p>
-      <p className="font-['Inter:Regular',sans-serif] font-normal relative shrink-0 text-[#182536] text-[14px] w-full">Khách hẹn giao lại</p>
     </div>
   );
 }
 
 function LaChnLyDo2() {
+  const { selectedReason, setSelectedReason } = useContext(FailureFormContext);
+  const isSelected = selectedReason === "CODE_03";
   return (
-    <div className="bg-white relative rounded-[8px] shrink-0 w-full" data-name="Lựa chọn lý do">
+    <div
+      onClick={() => setSelectedReason("CODE_03")}
+      className={`${isSelected ? "bg-[#e7f4f3] border-[#087f8c]" : "bg-white hover:bg-[#f8fafc] border-[#dce4ea]"} cursor-pointer transition-colors relative rounded-[8px] shrink-0 w-full border`}
+      data-name="Lựa chọn lý do"
+    >
       <div className="content-stretch flex gap-[12px] items-center overflow-clip p-[12px] relative rounded-[inherit] size-full">
-        <NutChn2 />
-        <LyDo2 />
+        <div className="bg-white relative rounded-[100px] shrink-0 size-[20px]" data-name="Nút chọn">
+          <div aria-hidden className={`absolute ${isSelected ? "border-6 border-[#087f8c]" : "border-[#b7c1ce] border-[1.5px]"} border-solid inset-0 pointer-events-none rounded-[100px]`} />
+        </div>
+        <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] flex-col gap-[2px] items-start leading-[1.45] min-w-px not-italic overflow-clip relative" data-name="Lý do">
+          <p className={`font-['Inter:Semi_Bold',sans-serif] font-semibold relative shrink-0 ${isSelected ? "text-[#087f8c]" : "text-[#657386]"} text-[13px] w-full`}>CODE_03</p>
+          <p className="font-['Inter:Regular',sans-serif] font-normal relative shrink-0 text-[#182536] text-[14px] w-full">Khách hẹn giao lại</p>
+        </div>
       </div>
-      <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[8px]" />
-    </div>
-  );
-}
-
-function NutChn3() {
-  return (
-    <div className="bg-white relative rounded-[100px] shrink-0 size-[20px]" data-name="Nút chọn">
-      <div aria-hidden className="absolute border-[#b7c1ce] border-[1.5px] border-solid inset-0 pointer-events-none rounded-[100px]" />
-    </div>
-  );
-}
-
-function LyDo3() {
-  return (
-    <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] flex-col gap-[2px] items-start leading-[1.45] min-w-px not-italic overflow-clip relative" data-name="Lý do">
-      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold relative shrink-0 text-[#657386] text-[13px] w-full">CODE_04</p>
-      <p className="font-['Inter:Regular',sans-serif] font-normal relative shrink-0 text-[#182536] text-[14px] w-full">Khách từ chối nhận</p>
     </div>
   );
 }
 
 function LaChnLyDo3() {
+  const { selectedReason, setSelectedReason } = useContext(FailureFormContext);
+  const isSelected = selectedReason === "CODE_04";
   return (
-    <div className="bg-white relative rounded-[8px] shrink-0 w-full" data-name="Lựa chọn lý do">
+    <div
+      onClick={() => setSelectedReason("CODE_04")}
+      className={`${isSelected ? "bg-[#e7f4f3] border-[#087f8c]" : "bg-white hover:bg-[#f8fafc] border-[#dce4ea]"} cursor-pointer transition-colors relative rounded-[8px] shrink-0 w-full border`}
+      data-name="Lựa chọn lý do"
+    >
       <div className="content-stretch flex gap-[12px] items-center overflow-clip p-[12px] relative rounded-[inherit] size-full">
-        <NutChn3 />
-        <LyDo3 />
+        <div className="bg-white relative rounded-[100px] shrink-0 size-[20px]" data-name="Nút chọn">
+          <div aria-hidden className={`absolute ${isSelected ? "border-6 border-[#087f8c]" : "border-[#b7c1ce] border-[1.5px]"} border-solid inset-0 pointer-events-none rounded-[100px]`} />
+        </div>
+        <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] flex-col gap-[2px] items-start leading-[1.45] min-w-px not-italic overflow-clip relative" data-name="Lý do">
+          <p className={`font-['Inter:Semi_Bold',sans-serif] font-semibold relative shrink-0 ${isSelected ? "text-[#087f8c]" : "text-[#657386]"} text-[13px] w-full`}>CODE_04</p>
+          <p className="font-['Inter:Regular',sans-serif] font-normal relative shrink-0 text-[#182536] text-[14px] w-full">Khách từ chối nhận</p>
+        </div>
       </div>
-      <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[8px]" />
     </div>
   );
 }
@@ -337,9 +345,16 @@ function MaLyDoChun() {
 }
 
 function XacNhnChaChn() {
+  const { hasConfirmedCalls, setHasConfirmedCalls } = useContext(FailureFormContext);
   return (
-    <div className="content-stretch flex gap-[10px] items-start overflow-clip relative shrink-0 w-full" data-name="Xác nhận chưa chọn">
-      <div className="bg-white border-[#8b5715] border-[1.5px] border-solid relative rounded-[4px] shrink-0 size-[22px]" data-name="Ô xác nhận" />
+    <div
+      onClick={() => setHasConfirmedCalls((prev: boolean) => !prev)}
+      className="content-stretch flex gap-[10px] items-start overflow-clip relative shrink-0 w-full cursor-pointer select-none"
+      data-name="Xác nhận chưa chọn"
+    >
+      <div className={`bg-white ${hasConfirmedCalls ? "border-[#15803d] bg-[#dcfce7] text-[#15803d]" : "border-[#8b5715]"} border-[1.5px] border-solid relative rounded-[4px] shrink-0 size-[22px] flex items-center justify-center font-bold text-[14px] transition-colors`} data-name="Ô xác nhận">
+        {hasConfirmedCalls && "✓"}
+      </div>
       <p className="[word-break:break-word] flex-[1_0_0] font-['Inter:Medium',sans-serif] font-medium leading-[1.45] min-w-px not-italic relative text-[#182536] text-[14px]">Đã gọi tối thiểu 3 cuộc cách nhau 5 phút</p>
     </div>
   );
@@ -401,13 +416,21 @@ function Camera() {
 }
 
 function ChpnhBngChng() {
+  const { hasPhoto, setHasPhoto } = useContext(FailureFormContext);
   return (
-    <div className="bg-[#e7f4f3] h-[72px] relative rounded-[8px] shrink-0 w-full" data-name="Chụp ảnh bằng chứng">
+    <div
+      onClick={() => setHasPhoto((prev: boolean) => !prev)}
+      className={`${hasPhoto ? "bg-[#dcfce7] border-[#15803d]" : "bg-[#e7f4f3] hover:bg-[#d8ecea] border-[#087f8c]"} h-[72px] relative rounded-[8px] shrink-0 w-full cursor-pointer transition-colors`}
+      data-name="Chụp ảnh bằng chứng"
+      title="Bấm để đính kèm ảnh hiện trường"
+    >
       <div className="content-stretch flex gap-[10px] items-center justify-center overflow-clip relative rounded-[inherit] size-full">
         <Camera />
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[14px] whitespace-nowrap">Chụp ảnh hiện trường</p>
+        <p className={`[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 ${hasPhoto ? "text-[#15803d]" : "text-[#087f8c]"} text-[14px] whitespace-nowrap`}>
+          {hasPhoto ? "✓ Đã chụp ảnh hiện trường (cua_dong_01.jpg)" : "Chụp ảnh hiện trường"}
+        </p>
       </div>
-      <div aria-hidden className="absolute border border-[#087f8c] border-dashed inset-0 pointer-events-none rounded-[8px]" />
+      <div aria-hidden className={`absolute border ${hasPhoto ? "border-[#15803d] border-solid" : "border-[#087f8c] border-dashed"} inset-0 pointer-events-none rounded-[8px]`} />
     </div>
   );
 }
@@ -482,12 +505,12 @@ function BiuMuBaoThtBi() {
   );
 }
 
-function LockKeyhole() {
+function LockKeyhole({ stroke = "#657684" }: { stroke?: string }) {
   return (
     <div className="relative shrink-0 size-[18px]" data-name="lock-keyhole">
       <svg className="absolute block inset-0 size-full" fill="none" height="18" preserveAspectRatio="none" viewBox="0 0 18 18" width="18">
         <g id="lock-keyhole">
-          <path d={svgPaths.p2dab1a80} id="Vector" stroke="#657684" strokeLinecap="round" strokeWidth="1.8" />
+          <path d={svgPaths.p2dab1a80} id="Vector" stroke={stroke} strokeLinecap="round" strokeWidth="1.8" />
         </g>
       </svg>
     </div>
@@ -495,23 +518,47 @@ function LockKeyhole() {
 }
 
 function XacNhnGiaoThtBi() {
+  const { handleSubmit, isSubmitting, isReady } = useContext(FailureFormContext);
   return (
     <div
-      onClick={() => { window.location.hash = "failed"; }}
-      className="bg-[#e4e9ee] hover:bg-[#d8e0e8] cursor-pointer transition-colors content-stretch flex gap-[8px] h-[54px] items-center justify-center overflow-clip px-[14px] relative rounded-[12px] shrink-0 w-full"
+      onClick={handleSubmit}
+      className={`${isReady ? "bg-[#dc2626] hover:bg-[#b91c1c] shadow-md" : "bg-[#e4e9ee] hover:bg-[#d8e0e8]"} cursor-pointer transition-colors content-stretch flex gap-[8px] h-[54px] items-center justify-center overflow-clip px-[14px] relative rounded-[12px] shrink-0 w-full`}
       data-name="Xác nhận giao thất bại"
     >
-      <LockKeyhole />
-      <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[15px] whitespace-nowrap">Xác nhận giao thất bại</p>
+      <LockKeyhole stroke={isReady ? "white" : "#657684"} />
+      <p className={`[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 ${isReady ? "text-white" : "text-[#142b3b]"} text-[15px] whitespace-nowrap`}>
+        {isSubmitting ? "Đang gửi báo cáo..." : isReady ? "Xác nhận giao thất bại (Hoàn tất)" : "Xác nhận giao thất bại"}
+      </p>
     </div>
   );
 }
 
 function XacNhnBaoCao() {
+  const { isReady, hasConfirmedCalls, hasPhoto, setHasConfirmedCalls, setHasPhoto } = useContext(FailureFormContext);
   return (
     <div className="bg-white relative rounded-[12px] shrink-0 w-full" data-name="Xác nhận báo cáo">
       <div className="content-stretch flex flex-col gap-[12px] items-start overflow-clip p-[20px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#945a0b] text-[13px] w-full">Còn thiếu: xác nhận 3 cuộc gọi và 1 ảnh bằng chứng.</p>
+        {isReady ? (
+          <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#15803d] text-[13px] w-full">
+            ✓ Đã đủ điều kiện: 3 cuộc gọi xác thực và 1 ảnh hiện trường.
+          </p>
+        ) : (
+          <div className="flex items-center justify-between w-full">
+            <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#945a0b] text-[13px]">
+              Còn thiếu: {!hasConfirmedCalls && "xác nhận 3 cuộc gọi"} {!hasConfirmedCalls && !hasPhoto && "và "} {!hasPhoto && "1 ảnh bằng chứng."}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setHasConfirmedCalls(true);
+                setHasPhoto(true);
+              }}
+              className="text-[11px] text-[#087f8c] font-semibold underline cursor-pointer hover:text-[#066570]"
+            >
+              (Bật nhanh đủ điều kiện)
+            </button>
+          </div>
+        )}
         <XacNhnGiaoThtBi />
       </div>
       <div aria-hidden className="absolute border-[#dce4ea] border-solid border-t inset-0 pointer-events-none rounded-[12px]" />
@@ -531,16 +578,92 @@ function ChBaoManHinhChinh() {
 }
 
 export default function Scr08BaoThtBiLnDu() {
+  const [selectedReason, setSelectedReason] = useState("CODE_01");
+  const [hasConfirmedCalls, setHasConfirmedCalls] = useState(false);
+  const [hasPhoto, setHasPhoto] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const isReady = hasConfirmedCalls && hasPhoto;
+
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const orderId = sessionStorage.getItem("lastAssignedOrderId") || sessionStorage.getItem("lastCreatedOrderId") || "ORD-019";
+      const driverId = sessionStorage.getItem("lastAssignedDriverId") || "DRV-02";
+      let reasonCode = "CUSTOMER_UNREACHABLE";
+      let reasonText = "Khách không nghe máy sau 3 cuộc gọi";
+      if (selectedReason === "CODE_02") {
+        reasonCode = "WRONG_ADDRESS";
+        reasonText = "Sai địa chỉ / Nhà đóng cửa / Không tìm thấy hẻm";
+      } else if (selectedReason === "CODE_03") {
+        reasonCode = "CUSTOMER_RESCHEDULED";
+        reasonText = "Khách hẹn giao lại ca sau";
+      } else if (selectedReason === "CODE_04") {
+        reasonCode = "CUSTOMER_REFUSED";
+        reasonText = "Khách từ chối nhận hàng";
+      }
+
+      await Promise.race([
+        orderService.updateDriverStatus({
+          orderId,
+          action: "FAILED",
+          reasonCode,
+          note: reasonText,
+          driverId
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000))
+      ]).catch(() => null);
+
+      setToast(`Đã ghi nhận giao thất bại: ${reasonText}`);
+
+      setTimeout(() => {
+        if (selectedReason === "CODE_03") {
+          window.location.hash = "redelivery";
+        } else {
+          window.location.hash = "failed";
+        }
+      }, 1000);
+    } catch {
+      setToast("Đã ghi nhận giao thất bại!");
+      setTimeout(() => {
+        window.location.hash = "failed";
+      }, 1000);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <div className="bg-[#f0f4f7] relative rounded-[28px] size-full" data-name="SCR-08 • Báo thất bại lần đầu">
-      <div className="content-stretch flex flex-col items-start min-h-[inherit] overflow-clip relative rounded-[inherit] size-full">
-        <ThanhTrngThai />
-        <DiuHng />
-        <BiuMuBaoThtBi />
-        <XacNhnBaoCao />
-        <ChBaoManHinhChinh />
+    <FailureFormContext.Provider
+      value={{
+        selectedReason,
+        setSelectedReason,
+        hasConfirmedCalls,
+        setHasConfirmedCalls,
+        hasPhoto,
+        setHasPhoto,
+        handleSubmit,
+        isSubmitting,
+        isReady
+      }}
+    >
+      <div className="bg-[#f0f4f7] relative rounded-[28px] size-full" data-name="SCR-08 • Báo thất bại lần đầu">
+        {toast && (
+          <div className="fixed top-16 right-8 z-50 bg-[#dc2626] text-white px-5 py-3 rounded-lg shadow-xl font-bold text-[13px] animate-bounce">
+            ✓ {toast}
+          </div>
+        )}
+        <div className="content-stretch flex flex-col items-start min-h-[inherit] overflow-clip relative rounded-[inherit] size-full">
+          <ThanhTrngThai />
+          <DiuHng />
+          <BiuMuBaoThtBi />
+          <XacNhnBaoCao />
+          <ChBaoManHinhChinh />
+        </div>
+        <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[28px]" />
       </div>
-      <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[28px]" />
-    </div>
+    </FailureFormContext.Provider>
   );
 }

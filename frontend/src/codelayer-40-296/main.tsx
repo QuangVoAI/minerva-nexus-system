@@ -58,7 +58,12 @@ function ThanhTrngThai() {
 
 function ArrowLeft() {
   return (
-    <div className="relative shrink-0 size-[24px]" data-name="arrow-left">
+    <div
+      onClick={() => { window.location.hash = "failed-1"; }}
+      className="relative shrink-0 size-[24px] cursor-pointer hover:opacity-80 transition-opacity"
+      data-name="arrow-left"
+      title="Quay lại"
+    >
       <svg className="absolute block inset-0 size-full" fill="none" height="24" preserveAspectRatio="none" viewBox="0 0 24 24" width="24">
         <g id="arrow-left">
           <path d={svgPaths.p177d0d00} id="Vector" stroke="white" strokeLinecap="round" strokeWidth="1.8" />
@@ -644,7 +649,11 @@ function BiuMuHnGiaoLi() {
 
 function XacNhnGiaoThtBi() {
   return (
-    <div className="bg-[#087f8c] content-stretch flex h-[54px] items-center justify-center overflow-clip px-[14px] relative rounded-[12px] shrink-0 w-full" data-name="Xác nhận giao thất bại">
+    <div
+      onClick={() => { window.location.hash = "failed"; }}
+      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex h-[54px] items-center justify-center overflow-clip px-[14px] relative rounded-[12px] shrink-0 w-full"
+      data-name="Xác nhận giao thất bại"
+    >
       <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[15px] text-white whitespace-nowrap">Xác nhận giao thất bại</p>
     </div>
   );
