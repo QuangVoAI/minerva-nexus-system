@@ -266,10 +266,18 @@ function FormDangNhp() {
   const [username, setUsername] = useState("NV0128");
   const [password, setPassword] = useState("password123");
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedHub, setSelectedHub] = useState("Hub Q7-01");
+  const [selectedHub, setSelectedHub] = useState(() => localStorage.getItem("minerva_current_hub") || "Hub Quận 7");
+
+  const handleHubChange = (val: string) => {
+    setSelectedHub(val);
+    localStorage.setItem("minerva_current_hub", val);
+    window.dispatchEvent(new Event("minerva_hub_changed"));
+  };
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    localStorage.setItem("minerva_current_hub", selectedHub);
+    window.dispatchEvent(new Event("minerva_hub_changed"));
     const uname = username.trim().toUpperCase();
     if (uname.startsWith("TX") || uname.includes("DRIVER")) {
       window.location.hash = "driver";
@@ -287,12 +295,13 @@ function FormDangNhp() {
             <Warehouse />
             <select
               value={selectedHub}
-              onChange={(e) => setSelectedHub(e.target.value)}
+              onChange={(e) => handleHubChange(e.target.value)}
               className="flex-1 bg-transparent font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#142b3b] text-[15px] outline-none cursor-pointer"
             >
-              <option value="Hub Q7-01">Hub Q7-01 — Khu chế xuất Tân Thuận</option>
-              <option value="Hub Q1-01">Hub Q1-01 — Trung tâm Bến Nghé</option>
-              <option value="Hub BT-02">Hub BT-02 — Bình Thạnh Phước Long</option>
+              <option value="Hub Quận 7">Hub Q7-01 — Hub Quận 7 (KCX Tân Thuận - Mặc định)</option>
+              <option value="Hub Quận 1">Hub Q1-01 — Hub Quận 1 (Bến Nghé)</option>
+              <option value="Hub Bình Thạnh">Hub BT-02 — Hub Bình Thạnh (Hàng Xanh)</option>
+              <option value="Hub Cầu Giấy">Hub CG-01 — Hub Cầu Giấy (Hà Nội)</option>
             </select>
           </div>
           <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[12px]" />

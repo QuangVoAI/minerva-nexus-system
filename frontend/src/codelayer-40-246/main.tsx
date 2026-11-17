@@ -148,9 +148,17 @@ function TinTrinhNhnHang() {
 }
 
 function DimNhn() {
+  const [hubName, setHubName] = useState(() => localStorage.getItem("minerva_current_hub") || "Hub Quận 7");
+
+  useEffect(() => {
+    const handleHubChange = () => setHubName(localStorage.getItem("minerva_current_hub") || "Hub Quận 7");
+    window.addEventListener("minerva_hub_changed", handleHubChange);
+    return () => window.removeEventListener("minerva_hub_changed", handleHubChange);
+  }, []);
+
   return (
     <div className="[word-break:break-word] content-stretch flex items-center justify-between leading-[1.45] not-italic overflow-clip relative shrink-0 w-full whitespace-nowrap" data-name="Điểm nhận">
-      <p className="font-['Inter:Regular',sans-serif] font-normal relative shrink-0 text-[#142b3b] text-[15px]">Hub Cầu Giấy</p>
+      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold relative shrink-0 text-[#142b3b] text-[15px]">{hubName}</p>
       <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold relative shrink-0 text-[#657684] text-[13px]">8 đơn</p>
     </div>
   );
@@ -1801,7 +1809,7 @@ export default function Scr07TacVTaiX() {
       const driverId = getDriverId();
       await Promise.race([
         orderService.updateDriverStatus({ orderId, action: "TRANSIT", driverId }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3500))
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1200))
       ]);
       setHasTransited(true);
       sessionStorage.setItem("driver_has_transited", "true");
@@ -1824,21 +1832,21 @@ export default function Scr07TacVTaiX() {
       const driverId = getDriverId();
       await Promise.race([
         orderService.updateDriverStatus({ orderId, action: "DELIVERED", driverId }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3500))
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1200))
       ]);
       setIsDelivered(true);
       sessionStorage.setItem("driver_has_delivered", "true");
       setToast(`Đã giao thành công đơn ${orderId}! Thu tiền COD hoàn tất.`);
       setTimeout(() => {
         window.location.hash = "dashboard";
-      }, 1000);
+      }, 800);
     } catch {
       setIsDelivered(true);
       sessionStorage.setItem("driver_has_delivered", "true");
-      setToast(`Đã xác nhận giao thành công (Offline sync)`);
+      setToast(`Đã xác nhận giao thành công`);
       setTimeout(() => {
         window.location.hash = "dashboard";
-      }, 1000);
+      }, 800);
     } finally {
       setIsDelivering(false);
     }
@@ -1858,17 +1866,17 @@ export default function Scr07TacVTaiX() {
           note: "Khách không nghe máy sau 3 cuộc gọi",
           driverId
         }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3500))
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1200))
       ]);
       setToast(`Đã ghi nhận sự cố đơn ${orderId}: Khách không nghe máy`);
       setTimeout(() => {
         window.location.hash = "failed-1";
-      }, 1000);
+      }, 800);
     } catch {
       setToast(`Đã ghi nhận sự cố giao hàng`);
       setTimeout(() => {
         window.location.hash = "failed-1";
-      }, 1000);
+      }, 800);
     } finally {
       setIsFailing(false);
     }
