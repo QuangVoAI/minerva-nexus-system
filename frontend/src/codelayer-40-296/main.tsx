@@ -59,10 +59,10 @@ function ThanhTrngThai() {
 function ArrowLeft() {
   return (
     <div
-      onClick={() => { window.location.hash = "failed-1"; }}
+      onClick={() => { window.location.hash = "driver"; }}
       className="relative shrink-0 size-[24px] cursor-pointer hover:opacity-80 transition-opacity"
       data-name="arrow-left"
-      title="Quay lại"
+      title="Quay lại tác vụ tài xế"
     >
       <svg className="absolute block inset-0 size-full" fill="none" height="24" preserveAspectRatio="none" viewBox="0 0 24 24" width="24">
         <g id="arrow-left">

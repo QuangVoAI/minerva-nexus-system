@@ -1803,11 +1803,20 @@ export default function Scr05GiYPhanCongTiu() {
 
       sessionStorage.setItem("lastAssignedOrderId", primary.id);
       sessionStorage.setItem("lastAssignedDriverId", primary.driverId);
+      sessionStorage.setItem("minerva_approved_dispatch_orders", JSON.stringify(checkedList));
+      sessionStorage.removeItem("driver_orders_state");
+      sessionStorage.removeItem("driver_has_transited");
+      sessionStorage.removeItem("driver_has_delivered");
       setToast(`Đã duyệt phân công thành công ${checkedCount} đơn hàng!`);
       setTimeout(() => {
         window.location.hash = "driver";
       }, 900);
     } catch {
+      const checkedList = orders.filter((o) => o.checked);
+      sessionStorage.setItem("minerva_approved_dispatch_orders", JSON.stringify(checkedList));
+      sessionStorage.removeItem("driver_orders_state");
+      sessionStorage.removeItem("driver_has_transited");
+      sessionStorage.removeItem("driver_has_delivered");
       setToast(`Đã duyệt phân công thành công ${checkedCount} đơn!`);
       setTimeout(() => {
         window.location.hash = "driver";

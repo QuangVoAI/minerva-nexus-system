@@ -131,39 +131,43 @@ function Package() {
   );
 }
 
-function DnHang() {
-  return (
-    <div className="content-stretch flex gap-[8px] items-center overflow-clip relative shrink-0" data-name="Đơn hàng">
-      <Package />
-      <p className="[word-break:break-word] font-['Inter:Bold',sans-serif] font-bold leading-[1.45] not-italic relative shrink-0 text-[#182536] text-[16px] whitespace-nowrap">GHN • 8041 6295</p>
-    </div>
-  );
-}
-
-function MaVnDn() {
-  return (
-    <div className="content-stretch flex items-center justify-between overflow-clip relative shrink-0 w-full" data-name="Mã vận đơn">
-      <DnHang />
-      <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#182536] text-[13px] whitespace-nowrap">COD 485.000đ</p>
-    </div>
-  );
-}
-
-function NgiNhn() {
-  return (
-    <div className="[word-break:break-word] content-stretch flex flex-col gap-[4px] items-start leading-[1.45] not-italic overflow-clip relative shrink-0 w-full" data-name="Người nhận">
-      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold relative shrink-0 text-[#182536] text-[14px] w-full">Nguyễn Minh Anh • 090 ••• 6828</p>
-      <p className="font-['Inter:Regular',sans-serif] font-normal relative shrink-0 text-[#657386] text-[13px] w-full">28/12 Nguyễn Văn Đậu, P. 6, Bình Thạnh, TP. Hồ Chí Minh</p>
-    </div>
-  );
-}
-
 function ThongTinDnHang() {
+  const [info] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem("lastIncidentOrder");
+      if (saved) {
+        const item = JSON.parse(saved);
+        return {
+          id: item.id || "MNX000001",
+          cod: item.codAmount != null ? `COD ${(item.codAmount).toLocaleString('vi-VN')}đ` : "COD 450.000đ",
+          customer: `${item.customerName || "Nguyễn Thị Lan"} • ${item.phone || "0903 456 789"}`,
+          address: item.address || "12 Huỳnh Tấn Phát, P. Tân Thuận Đông, Q. 7"
+        };
+      }
+    } catch {}
+    const orderId = sessionStorage.getItem("lastAssignedOrderId") || "VN241109086";
+    return {
+      id: orderId,
+      cod: "COD 450.000đ",
+      customer: "Nguyễn Thị Lan • 0903 456 789",
+      address: "Số 18, ngõ 68 Cầu Giấy, P. Quan Hoa, Q. Cầu Giấy"
+    };
+  });
+
   return (
     <div className="bg-white relative rounded-[12px] shrink-0 w-full" data-name="Thông tin đơn hàng">
       <div className="content-stretch flex flex-col gap-[12px] items-start overflow-clip p-[20px] relative rounded-[inherit] size-full">
-        <MaVnDn />
-        <NgiNhn />
+        <div className="content-stretch flex items-center justify-between overflow-clip relative shrink-0 w-full" data-name="Mã vận đơn">
+          <div className="content-stretch flex gap-[8px] items-center overflow-clip relative shrink-0" data-name="Đơn hàng">
+            <Package />
+            <p className="[word-break:break-word] font-['Inter:Bold',sans-serif] font-bold leading-[1.45] not-italic relative shrink-0 text-[#182536] text-[16px] whitespace-nowrap">{info.id}</p>
+          </div>
+          <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#182536] text-[13px] whitespace-nowrap">{info.cod}</p>
+        </div>
+        <div className="[word-break:break-word] content-stretch flex flex-col gap-[4px] items-start leading-[1.45] not-italic overflow-clip relative shrink-0 w-full" data-name="Người nhận">
+          <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold relative shrink-0 text-[#182536] text-[14px] w-full">{info.customer}</p>
+          <p className="font-['Inter:Regular',sans-serif] font-normal relative shrink-0 text-[#657386] text-[13px] w-full">{info.address}</p>
+        </div>
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[12px]" />
     </div>
@@ -615,6 +619,14 @@ export default function Scr08BaoThtBiLnDu() {
         }),
         new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000))
       ]).catch(() => null);
+
+      try {
+        const failedIds = JSON.parse(sessionStorage.getItem("driver_failed_order_ids") || "[]");
+        if (!failedIds.includes(orderId)) {
+          failedIds.push(orderId);
+          sessionStorage.setItem("driver_failed_order_ids", JSON.stringify(failedIds));
+        }
+      } catch {}
 
       setToast(`Đã ghi nhận giao thất bại: ${reasonText}`);
 
