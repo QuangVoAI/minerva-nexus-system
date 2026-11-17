@@ -471,7 +471,11 @@ function ChiTitXLy() {
 
 function VDanhSachGiaoHang() {
   return (
-    <div className="bg-[#087f8c] content-stretch flex h-[54px] items-center justify-center overflow-clip px-[14px] relative rounded-[12px] shrink-0 w-full" data-name="Về danh sách giao hàng">
+    <div
+      onClick={() => { window.location.hash = "driver"; }}
+      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex h-[54px] items-center justify-center overflow-clip px-[14px] relative rounded-[12px] shrink-0 w-full"
+      data-name="Về danh sách giao hàng"
+    >
       <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[15px] text-white whitespace-nowrap">Về danh sách giao hàng</p>
     </div>
   );

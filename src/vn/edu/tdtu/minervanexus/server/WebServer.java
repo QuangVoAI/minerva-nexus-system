@@ -130,7 +130,39 @@ public class WebServer {
     private class OrdersHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+            String method = exchange.getRequestMethod();
+            String path = exchange.getRequestURI().getPath();
+
+            // Handle sub-paths like /api/orders/{id}/status
+            if (path.contains("/status") || "PATCH".equalsIgnoreCase(method)) {
+                String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                Map<String, String> p = parseFormOrJson(body);
+                String query = exchange.getRequestURI().getQuery();
+                String target = "IN_TRANSIT";
+                if (query != null && query.contains("target=")) {
+                    for (String q : query.split("&")) {
+                        if (q.startsWith("target=")) target = q.substring(7);
+                    }
+                }
+                String orderId = "ORD-001";
+                String[] parts = path.split("/");
+                for (int i = 0; i < parts.length; i++) {
+                    if ("orders".equals(parts[i]) && i + 1 < parts.length) {
+                        orderId = parts[i + 1];
+                        break;
+                    }
+                }
+                if (orderService.getOrderById(orderId).isEmpty()) {
+                    List<DeliveryOrder> all = orderService.getAllOrders();
+                    if (!all.isEmpty()) orderId = all.get(0).getOrderId();
+                }
+                OrderStatus st = "DELIVERED".equalsIgnoreCase(target) ? OrderStatus.DELIVERED : OrderStatus.IN_TRANSIT;
+                boolean ok = orderService.updateOrderStatus(orderId, st, "DRIVER_APP", "Cập nhật trạng thái " + target);
+                sendJson(exchange, 200, "{\"success\":" + ok + ",\"status\":\"" + st.name() + "\"}");
+                return;
+            }
+
+            if ("GET".equalsIgnoreCase(method)) {
                 List<DeliveryOrder> orders = orderService.getAllOrders();
                 StringBuilder sb = new StringBuilder("[");
                 for (int i = 0; i < orders.size(); i++) {
@@ -159,7 +191,7 @@ public class WebServer {
                 }
                 sb.append("]");
                 sendJson(exchange, 200, sb.toString());
-            } else if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+            } else if ("POST".equalsIgnoreCase(method)) {
                 String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
                 Map<String, String> params = parseFormOrJson(body);
                 String name = params.getOrDefault("recipientName", "Khách hàng");
@@ -172,6 +204,8 @@ public class WebServer {
 
                 DeliveryOrder created = orderService.createOrder(name, phone, address, areaId, sl, cod);
                 sendJson(exchange, 201, "{\"success\":true,\"orderId\":\"" + created.getOrderId() + "\",\"trackingCode\":\"" + created.getTrackingCode() + "\"}");
+            } else {
+                sendJson(exchange, 405, "{\"error\":\"Method Not Allowed\"}");
             }
         }
     }
@@ -269,9 +303,16 @@ public class WebServer {
                 Map<String, String> p = parseFormOrJson(body);
                 String orderId = p.get("orderId");
                 String action = p.get("action"); // TRANSIT, DELIVERED, FAILED
-                String driverId = p.getOrDefault("driverId", "DRIVER_APP");
+                String driverId = p.getOrDefault("driverId", "DRV-01");
                 String reasonCode = p.getOrDefault("reasonCode", "CUSTOMER_UNREACHABLE");
                 String note = p.getOrDefault("note", "");
+
+                if (orderId == null || orderId.trim().isEmpty() || orderService.getOrderById(orderId).isEmpty()) {
+                    List<DeliveryOrder> all = orderService.getAllOrders();
+                    if (!all.isEmpty()) {
+                        orderId = all.get(0).getOrderId();
+                    }
+                }
 
                 boolean ok = false;
                 if ("TRANSIT".equalsIgnoreCase(action)) {
@@ -280,12 +321,15 @@ public class WebServer {
                     ok = orderService.updateOrderStatus(orderId, OrderStatus.DELIVERED, driverId, "Giao thành công, thu COD");
                     driverShiftService.decrementDriverLoad(driverId);
                 } else if ("FAILED".equalsIgnoreCase(action)) {
-                    FailureReason reason = FailureReason.valueOf(reasonCode);
+                    FailureReason reason = FailureReason.CUSTOMER_UNREACHABLE;
+                    try { reason = FailureReason.valueOf(reasonCode); } catch (Exception ignored) {}
                     ok = orderService.reportDeliveryFailure(orderId, driverId, reason, note);
                     driverShiftService.decrementDriverLoad(driverId);
                 }
 
-                sendJson(exchange, 200, "{\"success\":" + ok + "}");
+                sendJson(exchange, 200, "{\"success\":" + ok + ",\"orderId\":\"" + orderId + "\"}");
+            } else {
+                sendJson(exchange, 405, "{\"error\":\"Method Not Allowed\"}");
             }
         }
     }

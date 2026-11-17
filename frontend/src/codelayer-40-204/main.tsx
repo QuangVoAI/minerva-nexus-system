@@ -1461,7 +1461,12 @@ function KhongCoNgoiL() {
 
 function NgoiLCaVnDn() {
   return (
-    <div className="bg-white relative rounded-[10px] shrink-0 w-full" data-name="Ngoại lệ của vận đơn">
+    <div
+      onClick={() => { window.location.hash = "exceptions"; }}
+      className="bg-white hover:border-[#087f8c] cursor-pointer transition-colors relative rounded-[10px] shrink-0 w-full"
+      data-name="Ngoại lệ của vận đơn"
+      title="Bấm để xem màn hình ngoại lệ SCR-06"
+    >
       <div className="content-stretch flex flex-col gap-[18px] items-start overflow-clip p-[22px] relative rounded-[inherit] size-full">
         <TieuDKhi2 />
         <SLnThtBi />

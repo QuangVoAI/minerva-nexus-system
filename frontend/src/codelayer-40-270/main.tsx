@@ -496,9 +496,13 @@ function LockKeyhole() {
 
 function XacNhnGiaoThtBi() {
   return (
-    <div className="bg-[#e4e9ee] content-stretch flex gap-[8px] h-[54px] items-center justify-center overflow-clip px-[14px] relative rounded-[12px] shrink-0 w-full" data-name="Xác nhận giao thất bại">
+    <div
+      onClick={() => { window.location.hash = "failed"; }}
+      className="bg-[#e4e9ee] hover:bg-[#d8e0e8] cursor-pointer transition-colors content-stretch flex gap-[8px] h-[54px] items-center justify-center overflow-clip px-[14px] relative rounded-[12px] shrink-0 w-full"
+      data-name="Xác nhận giao thất bại"
+    >
       <LockKeyhole />
-      <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[15px] whitespace-nowrap">Xác nhận giao thất bại</p>
+      <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[15px] whitespace-nowrap">Xác nhận giao thất bại</p>
     </div>
   );
 }
