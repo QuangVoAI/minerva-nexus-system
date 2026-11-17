@@ -491,18 +491,10 @@ export default function Scr07TacVTaiX() {
 
   // Initialize dynamic order list from approved dispatch or defaults
   const [orders, setOrders] = useState<DeliveryOrderItem[]>(() => {
-    // 1. Check if user already has an active trip state in sessionStorage
-    try {
-      const savedState = sessionStorage.getItem("driver_orders_state");
-      if (savedState) {
-        const parsed = JSON.parse(savedState);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
-      }
-    } catch {}
+    const currentHub = localStorage.getItem("minerva_current_hub") || "Hub Quận 7";
+    const isQ7 = !currentHub.includes("Cầu Giấy");
 
-    // 2. Check if user approved orders from #dispatch
+    // 1. Check if user approved orders from #dispatch (Prioritize approved dispatch)
     try {
       const approvedStr = sessionStorage.getItem("minerva_approved_dispatch_orders");
       if (approvedStr) {
@@ -513,13 +505,13 @@ export default function Scr07TacVTaiX() {
           const codAmounts = [450000, 280000, 350000, 190000, 520000, 310000, 220000, 400000];
 
           return approved.map((item: any, idx: number) => ({
-            id: item.id || `VN24110908${idx}`,
+            id: item.id || `MNX00000${idx + 1}`,
             stopIndex: idx + 1,
             slaTime: item.slaDeadline ? item.slaDeadline.replace("Hạn ", "") : (item.slaTime || "10:00"),
             isUrgent: !!item.isUrgent,
             customerName: item.customerName || names[idx % names.length],
             phone: item.phone || phones[idx % phones.length],
-            address: item.address ? `${item.address}, ${item.ward || ""}` : "Số 18, ngõ 68 Cầu Giấy, P. Quan Hoa, Q. Cầu Giấy",
+            address: item.address ? (item.address.includes("P.") ? item.address : `${item.address}, ${item.ward || ""}`) : (DEFAULT_ORDERS_Q7[idx]?.address || "Quận 7, TP.HCM"),
             codAmount: item.codAmount || codAmounts[idx % codAmounts.length],
             status: "PENDING",
           }));
@@ -527,19 +519,81 @@ export default function Scr07TacVTaiX() {
       }
     } catch {}
 
+    // 2. Check if user already has an active trip state in sessionStorage
+    try {
+      const savedState = sessionStorage.getItem("driver_orders_state");
+      if (savedState) {
+        const parsed = JSON.parse(savedState);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // If hub is Q7, ensure saved orders are not stale Cau Giay mock orders
+          const isSavedCauGiay = parsed.some((o: any) => (o.address && o.address.includes("Cầu Giấy")) || (o.id && o.id.startsWith("VN2411")));
+          if ((isQ7 && !isSavedCauGiay) || (!isQ7 && isSavedCauGiay)) {
+            return parsed;
+          }
+        }
+      }
+    } catch {}
+
     // 3. Fallback based on selected Hub
-    const currentHub = localStorage.getItem("minerva_current_hub") || "Hub Quận 7";
-    if (currentHub.includes("Cầu Giấy")) {
+    if (!isQ7) {
       return DEFAULT_ORDERS_CAUGIAY;
     }
     return DEFAULT_ORDERS_Q7;
   });
+
+  // Action: Đồng bộ / Đặt lại danh sách đơn hàng
+  const handleResetTrip = () => {
+    sessionStorage.removeItem("driver_orders_state");
+    sessionStorage.removeItem("driver_has_transited");
+    sessionStorage.removeItem("driver_has_delivered");
+    setHasTransited(false);
+
+    const approvedStr = sessionStorage.getItem("minerva_approved_dispatch_orders");
+    if (approvedStr) {
+      try {
+        const approved = JSON.parse(approvedStr);
+        if (Array.isArray(approved) && approved.length > 0) {
+          const names = ["Nguyễn Thị Lan", "Trần Minh Đức", "Lê Thị Mai", "Phạm Hoàng Long", "Vũ Quốc Tuấn", "Đỗ Bích Ngọc", "Hoàng Đức Hải", "Bùi Thị Thu"];
+          const phones = ["0903 456 789", "0988 217 540", "0912 345 678", "0977 888 999", "0934 567 890", "0965 432 109", "0918 765 432", "0909 112 233"];
+          const codAmounts = [450000, 280000, 350000, 190000, 520000, 310000, 220000, 400000];
+          const mapped = approved.map((item: any, idx: number) => ({
+            id: item.id || `MNX00000${idx + 1}`,
+            stopIndex: idx + 1,
+            slaTime: item.slaDeadline ? item.slaDeadline.replace("Hạn ", "") : (item.slaTime || "10:00"),
+            isUrgent: !!item.isUrgent,
+            customerName: item.customerName || names[idx % names.length],
+            phone: item.phone || phones[idx % phones.length],
+            address: item.address ? (item.address.includes("P.") ? item.address : `${item.address}, ${item.ward || ""}`) : (DEFAULT_ORDERS_Q7[idx]?.address || "Quận 7, TP.HCM"),
+            codAmount: item.codAmount || codAmounts[idx % codAmounts.length],
+            status: "PENDING" as const,
+          }));
+          setOrders(mapped);
+          sessionStorage.setItem("driver_orders_state", JSON.stringify(mapped));
+          setToast(`✓ Đã đồng bộ lại ${mapped.length} đơn hàng từ Điều phối!`);
+          return;
+        }
+      } catch {}
+    }
+
+    const currentHub = localStorage.getItem("minerva_current_hub") || "Hub Quận 7";
+    const defaults = currentHub.includes("Cầu Giấy") ? DEFAULT_ORDERS_CAUGIAY : DEFAULT_ORDERS_Q7;
+    setOrders(defaults);
+    sessionStorage.setItem("driver_orders_state", JSON.stringify(defaults));
+    setToast(`✓ Đã đặt lại lộ trình ${defaults.length} đơn hàng theo ${currentHub}!`);
+  };
 
   // Sync hub change
   useEffect(() => {
     const handleHubChange = () => {
       const newHub = localStorage.getItem("minerva_current_hub") || "Hub Quận 7";
       setHubName(newHub);
+      if (newHub.includes("Cầu Giấy")) {
+        setOrders(DEFAULT_ORDERS_CAUGIAY);
+        sessionStorage.setItem("driver_orders_state", JSON.stringify(DEFAULT_ORDERS_CAUGIAY));
+      } else {
+        setOrders(DEFAULT_ORDERS_Q7);
+        sessionStorage.setItem("driver_orders_state", JSON.stringify(DEFAULT_ORDERS_Q7));
+      }
     };
     window.addEventListener("minerva_hub_changed", handleHubChange);
     return () => window.removeEventListener("minerva_hub_changed", handleHubChange);
@@ -723,9 +777,19 @@ export default function Scr07TacVTaiX() {
         <div className="px-4 pb-2 w-full">
           <div className="bg-[#f6f8fa] content-stretch flex h-[52px] items-center justify-between overflow-clip px-[16px] relative rounded-[12px] shrink-0 w-full">
             <div className="content-stretch flex flex-col gap-[3px] items-start leading-[1.45] not-italic overflow-clip relative shrink-0 whitespace-nowrap">
-              <p className="font-['Inter:Bold',sans-serif] font-bold relative shrink-0 text-[#142b3b] text-[15px]">Lộ trình giao ({totalOrders} đơn)</p>
+              <div className="flex items-center gap-2">
+                <p className="font-['Inter:Bold',sans-serif] font-bold relative shrink-0 text-[#142b3b] text-[15px]">Lộ trình giao ({totalOrders} đơn)</p>
+                <button
+                  type="button"
+                  onClick={handleResetTrip}
+                  className="text-[11px] font-semibold bg-[#e2e8f0] hover:bg-[#cbd5e1] text-[#087f8c] px-2 py-0.5 rounded cursor-pointer transition-colors"
+                  title="Đồng bộ lại 6 đơn hàng đã phê duyệt từ Điều phối"
+                >
+                  🔄 Đồng bộ lại
+                </button>
+              </div>
               <p className="font-['Inter:Regular',sans-serif] font-normal relative shrink-0 text-[#657684] text-[13px]">
-                {deliveredCount > 0 ? `Đã giao ${deliveredCount}/${totalOrders} đơn` : "Đã tối ưu thứ tự giao"}
+                {deliveredCount > 0 ? `Đã giao ${deliveredCount}/${totalOrders} đơn` : "Đã tối ưu thứ tự giao · Cuộn để xem tất cả"}
               </p>
             </div>
             <ListOrderedIcon />
@@ -734,7 +798,10 @@ export default function Scr07TacVTaiX() {
       </div>
 
       {/* 2. Danh sách cuộn chứa TOÀN BỘ đơn hàng, hỗ trợ thao tác trên mọi đơn */}
-      <div className="content-stretch flex flex-col gap-[12px] items-start overflow-y-auto max-h-[calc(100vh-420px)] px-[16px] py-[4px] relative shrink-0 w-full pb-6 scrollbar-thin">
+      <div
+        className="content-stretch flex flex-col gap-[12px] items-start overflow-y-auto px-[16px] py-[6px] relative shrink-0 w-full flex-1 max-h-[calc(100vh-320px)] min-h-[440px] pb-8 scrollbar-thin"
+        style={{ scrollbarWidth: "thin", scrollbarColor: "#087f8c #e2e8f0" }}
+      >
         {orders.map((order) => (
           <DeliveryOrderCard
             key={order.id}

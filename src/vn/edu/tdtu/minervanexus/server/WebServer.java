@@ -104,6 +104,9 @@ public class WebServer {
             if (file.exists() && !file.isDirectory()) {
                 String mime = getMimeType(file.getName());
                 exchange.getResponseHeaders().set("Content-Type", mime);
+                exchange.getResponseHeaders().set("Cache-Control", "no-cache, no-store, must-revalidate");
+                exchange.getResponseHeaders().set("Pragma", "no-cache");
+                exchange.getResponseHeaders().set("Expires", "0");
                 exchange.sendResponseHeaders(200, file.length());
                 try (OutputStream os = exchange.getResponseBody(); FileInputStream fis = new FileInputStream(file)) {
                     fis.transferTo(os);

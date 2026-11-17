@@ -1,6 +1,16 @@
-import { useState } from "react";
+import { useState, createContext, useContext } from "react";
 import svgPaths from "./svg-10wz5514xz";
 import { DiuHngHub as DiuHngHubShared } from "../components/DiuHngHub";
+
+export const OrderIntakeContext = createContext<{
+  isVerified: boolean;
+  onVerify: () => void;
+  toast: string | null;
+}>({
+  isVerified: false,
+  onVerify: () => {},
+  toast: null,
+});
 
 function Boxes() {
   return (
@@ -667,9 +677,10 @@ function TenChS() {
 }
 
 function SLngVaMa() {
+  const { isVerified } = useContext(OrderIntakeContext);
   return (
     <div className="[word-break:break-word] content-stretch flex font-['Inter:Semi_Bold',sans-serif] font-semibold gap-[12px] items-baseline not-italic overflow-clip relative shrink-0 whitespace-nowrap" data-name="Số lượng và mã">
-      <p className="leading-[normal] relative shrink-0 text-[#142b3b] text-[30px]">12</p>
+      <p className="leading-[normal] relative shrink-0 text-[#142b3b] text-[30px]">{isVerified ? 11 : 12}</p>
       <p className="leading-[1.45] relative shrink-0 text-[#f59e0b] text-[12px]">PENDING</p>
     </div>
   );
@@ -710,9 +721,10 @@ function TenChS1() {
 }
 
 function SLngVaMa1() {
+  const { isVerified } = useContext(OrderIntakeContext);
   return (
     <div className="[word-break:break-word] content-stretch flex font-['Inter:Semi_Bold',sans-serif] font-semibold gap-[12px] items-baseline not-italic overflow-clip relative shrink-0 whitespace-nowrap" data-name="Số lượng và mã">
-      <p className="leading-[normal] relative shrink-0 text-[#142b3b] text-[30px]">58</p>
+      <p className="leading-[normal] relative shrink-0 text-[#142b3b] text-[30px]">{isVerified ? 59 : 58}</p>
       <p className="leading-[1.45] relative shrink-0 text-[#0f766e] text-[12px]">READY_TO_DISPATCH</p>
     </div>
   );
@@ -1459,15 +1471,26 @@ function TrngThai3() {
 }
 
 function TrngThaiVnDn2() {
+  const { isVerified } = useContext(OrderIntakeContext);
   return (
     <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[178px]" data-name="Trạng thái vận đơn">
-      <TrngThai3 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">PENDING</p>
+      {isVerified ? (
+        <div className="bg-[#eaf5ef] content-stretch flex gap-[6px] items-center overflow-clip px-[8px] py-[4px] relative rounded-[6px] shrink-0" data-name="Trạng thái">
+          <div className="bg-[#0f766e] relative rounded-[3px] shrink-0 size-[5px]" data-name="Dấu trạng thái" />
+          <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#0f766e] text-[12px] whitespace-nowrap">Sẵn sàng phát</p>
+        </div>
+      ) : (
+        <TrngThai3 />
+      )}
+      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">
+        {isVerified ? "READY_TO_DISPATCH" : "PENDING"}
+      </p>
     </div>
   );
 }
 
 function DnHang2() {
+  const { isVerified, onVerify } = useContext(OrderIntakeContext);
   return (
     <div className="bg-white h-[82px] relative shrink-0 w-full" data-name="Đơn hàng">
       <div className="content-stretch flex items-center overflow-clip px-[16px] relative rounded-[inherit] size-full">
@@ -1479,7 +1502,26 @@ function DnHang2() {
         <DchVVaSla2 />
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#142b3b] text-[12px] w-[112px]">420.000 ₫</p>
         <TrngThaiVnDn2 />
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] w-[84px]">Thẩm định</p>
+        <div className="w-[84px] shrink-0">
+          {isVerified ? (
+            <p
+              onClick={() => { window.location.hash = "order-detail"; }}
+              className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] hover:underline cursor-pointer text-[12px]"
+              title="Xem hồ sơ chi tiết đơn hàng (SCR-06)"
+            >
+              Chi tiết
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={onVerify}
+              className="bg-[#087f8c] hover:bg-[#066570] text-white px-2.5 py-1 rounded-[5px] font-['Inter:Semi_Bold',sans-serif] font-semibold text-[12px] shadow-sm transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1"
+              title="Thẩm định đơn hàng theo quy tắc BR-01"
+            >
+              <span>Thẩm định</span>
+            </button>
+          )}
+        </div>
       </div>
       <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid inset-0 pointer-events-none" />
     </div>
@@ -1784,10 +1826,31 @@ function KhongGianLamVic() {
 }
 
 export default function Scr03TipNhnVaPhanLoiDn() {
+  const [isVerified, setIsVerified] = useState(() => {
+    return sessionStorage.getItem("minerva_verified_MNX000098") === "true";
+  });
+  const [toast, setToast] = useState<string | null>(null);
+
+  const handleVerify = () => {
+    setIsVerified(true);
+    sessionStorage.setItem("minerva_verified_MNX000098", "true");
+    setToast("✓ Đã thẩm định đạt chuẩn BR-01: Tiếp nhận đơn MNX000098 thành công! Đơn đã chuyển sang trạng thái Sẵn sàng phát.");
+    setTimeout(() => {
+      setToast(null);
+    }, 4500);
+  };
+
   return (
-    <div className="bg-[#f3f6fa] content-stretch flex items-start relative size-full" data-name="SCR-03 · Tiếp nhận và phân loại đơn">
-      <DiuHngHub />
-      <KhongGianLamVic />
-    </div>
+    <OrderIntakeContext.Provider value={{ isVerified, onVerify: handleVerify, toast }}>
+      <div className="bg-[#f3f6fa] content-stretch flex items-start relative size-full" data-name="SCR-03 · Tiếp nhận và phân loại đơn">
+        {toast && (
+          <div className="fixed top-16 right-8 z-50 bg-[#15803d] text-white px-5 py-3 rounded-lg shadow-xl font-bold text-[13px] animate-bounce">
+            {toast}
+          </div>
+        )}
+        <DiuHngHub />
+        <KhongGianLamVic />
+      </div>
+    </OrderIntakeContext.Provider>
   );
 }
