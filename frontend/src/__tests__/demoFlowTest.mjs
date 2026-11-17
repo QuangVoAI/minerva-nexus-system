@@ -1,130 +1,52 @@
-// Automated E2E verification test for Minerva Nexus M3 Issue #3
-// Tests the full order lifecycle from creation to delivery, audit history, and KPI updates.
+// Live acceptance check. Start Spring Boot and connect it to a demo MongoDB first.
+// Run: npm run test:e2e
+const baseUrl = process.env.MINERVA_API_URL || 'http://localhost:8081';
+const hubId = 'HUB01';
+const operator = 'DISPATCHER_WEB';
+const stamp = `${Date.now()}`.slice(-8);
 
-const BASE_URL = 'http://localhost:8080';
-
-async function runTest() {
-  console.log('====================================================');
-  console.log('MINERVA NEXUS - E2E API VERIFICATION TEST (ISSUE #3)');
-  console.log('====================================================');
-
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-  // 1. Health & Initial Analytics Check
-  console.log('\n[1/7] Kiểm tra kết nối ban đầu & Analytics...');
-  const initAnalyticsRes = await fetch(`${BASE_URL}/api/analytics`);
-  if (!initAnalyticsRes.ok) throw new Error(`Analytics API failed: ${initAnalyticsRes.status}`);
-  const initialAnalytics = await initAnalyticsRes.json();
-  console.log('✓ Initial Analytics:', initialAnalytics);
-
-  // 2. Step 1: Create Order via POST /api/orders
-  console.log('\n[2/7] Bước 1: Tiếp nhận đơn hàng mới (POST /api/orders)...');
-  const uniqueId = Date.now().toString().slice(-5);
-  const createPayload = {
-    recipientName: `Trần Thị Demo ${uniqueId}`,
-    phone: `0987${uniqueId}`,
-    address: `156 Nguyễn Thị Thập, P. Tân Phú, Quận 7`,
-    areaId: 'Q7_TAN_PHU',
-    serviceLevel: 'EXPRESS',
-    codAmount: '450000',
-  };
-
-  const createRes = await fetch(`${BASE_URL}/api/orders`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Actor-Id': 'DISPATCHER_WEB' },
-    body: JSON.stringify(createPayload),
+async function request(path, options = {}) {
+  const response = await fetch(`${baseUrl}${path}`, {
+    ...options,
+    headers: {'Content-Type': 'application/json', 'X-Hub-Id': hubId, ...(options.headers || {})},
   });
-  if (!createRes.ok) throw new Error(`Create order failed: ${createRes.status}`);
-  const createResult = await createRes.json();
-  console.log('✓ Kết quả tạo đơn:', createResult);
-  if (!createResult.success || !createResult.orderId) throw new Error('Invalid create response');
-  const orderId = createResult.orderId;
-  const trackingCode = createResult.trackingCode;
-
-  // 3. Step 2: Verify Order & SLA Assessment in GET /api/orders
-  console.log('\n[3/7] Bước 2: Kiểm tra đơn hàng & Đánh giá SLA (GET /api/orders)...');
-  const ordersRes = await fetch(`${BASE_URL}/api/orders`);
-  if (!ordersRes.ok) throw new Error(`GET /api/orders failed: ${ordersRes.status}`);
-  const orders = await ordersRes.json();
-  const createdOrder = orders.find((o) => o.orderId === orderId || o.trackingCode === trackingCode);
-  if (!createdOrder) throw new Error(`Đơn hàng ${orderId} không tìm thấy trong danh sách orders.`);
-  console.log(`✓ Đơn hàng tìm thấy: ${createdOrder.trackingCode} | Trạng thái: ${createdOrder.status} | Mức rủi ro SLA: ${createdOrder.riskLevel} (${createdOrder.riskExplanation})`);
-
-  // 4. Step 3: Dispatch Suggestion & Approval
-  console.log('\n[4/7] Bước 3: Gợi ý và Duyệt phân công (GET & POST /api/dispatch)...');
-  const suggestionsRes = await fetch(`${BASE_URL}/api/dispatch/suggestions`);
-  if (!suggestionsRes.ok) throw new Error(`Suggestions API failed: ${suggestionsRes.status}`);
-  const suggestions = await suggestionsRes.json();
-  console.log(`✓ Nhận được ${suggestions.length} đề xuất phân công theo quy tắc.`);
-  if (suggestions.length > 0) {
-    const targetSuggestion = suggestions.find((s) => s.orderId === orderId) || suggestions[0];
-    console.log(`  Chọn đề xuất: ${targetSuggestion.assignmentId} (Tài xế: ${targetSuggestion.driverName}, Điểm: ${targetSuggestion.suggestedScore}, Lý do: ${targetSuggestion.matchReason})`);
-    
-    const approveRes = await fetch(`${BASE_URL}/api/dispatch/approve`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ assignmentId: targetSuggestion.assignmentId }),
-    });
-    const approveResult = await approveRes.json();
-    console.log('✓ Kết quả duyệt phân công:', approveResult);
-    if (!approveResult.success) throw new Error('Approve dispatch failed');
-  }
-
-  // 5. Step 4 & 5: Driver Transit and Delivery
-  console.log('\n[5/7] Bước 4 & 5: Tài xế xuất kho & Giao thành công (POST /api/driver/update)...');
-  // 5a. Transit
-  const transitRes = await fetch(`${BASE_URL}/api/driver/update`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ orderId, action: 'TRANSIT', driverId: 'DRV-02' }),
-  });
-  const transitResult = await transitRes.json();
-  console.log('✓ Kết quả quét xuất kho (TRANSIT):', transitResult);
-  if (!transitResult.success) throw new Error('Transit update failed');
-
-  await sleep(500);
-
-  // 5b. Delivered
-  const deliveredRes = await fetch(`${BASE_URL}/api/driver/update`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ orderId, action: 'DELIVERED', driverId: 'DRV-02' }),
-  });
-  const deliveredResult = await deliveredRes.json();
-  console.log('✓ Kết quả giao thành công (DELIVERED):', deliveredResult);
-  if (!deliveredResult.success) throw new Error('Delivered update failed');
-
-  // 6. Step 6: Verify Audit Trail
-  console.log('\n[6/7] Bước 6: Kiểm tra toàn bộ vết kiểm toán Audit Trail (GET /api/order/history)...');
-  const historyRes = await fetch(`${BASE_URL}/api/order/history?orderId=${encodeURIComponent(orderId)}`);
-  if (!historyRes.ok) throw new Error(`History API failed: ${historyRes.status}`);
-  const history = await historyRes.json();
-  console.log(`✓ Nhận được ${history.length} mốc lịch sử trạng thái:`);
-  history.forEach((h, idx) => {
-    console.log(`  ${idx + 1}. [${h.time}] ${h.oldStatus || '(Bắt đầu)'} -> ${h.newStatus} | Tác nhân: ${h.actorId} | Ghi chú: ${h.note}`);
-  });
-  if (history.length < 2) throw new Error('Audit trail must have at least 2 events');
-
-  // 7. Step 7: Verify Final Analytics KPI Update
-  console.log('\n[7/7] Bước 7: Kiểm tra cập nhật KPI trên bảng điều hành (GET /api/analytics)...');
-  const finalAnalyticsRes = await fetch(`${BASE_URL}/api/analytics`);
-  const finalAnalytics = await finalAnalyticsRes.json();
-  console.log('✓ Final Analytics KPI:', finalAnalytics);
-  console.log(`  Tổng đơn: ${initialAnalytics.totalOrders} -> ${finalAnalytics.totalOrders} (+${finalAnalytics.totalOrders - initialAnalytics.totalOrders})`);
-  console.log(`  Đã giao: ${initialAnalytics.deliveredCount} -> ${finalAnalytics.deliveredCount} (+${finalAnalytics.deliveredCount - initialAnalytics.deliveredCount})`);
-
-  // 8. Verify Built React Frontend Asset Delivery
-  console.log('\n[Bonus] Kiểm tra máy chủ phục vụ React Production Build (/react/)...');
-  const reactRes = await fetch(`${BASE_URL}/react/`);
-  console.log(`✓ React index.html status: ${reactRes.status} (Content-Type: ${reactRes.headers.get('content-type')})`);
-  if (reactRes.status !== 200) throw new Error('React static file not served');
-
-  console.log('\n====================================================');
-  console.log('✅ TOÀN BỘ LUỒNG E2E DEMO ISSUE #3 ĐÃ PASS 100%!');
-  console.log('====================================================');
+  const body = response.status === 204 ? null : await response.json().catch(() => null);
+  if (!response.ok) throw new Error(`${options.method || 'GET'} ${path}: ${response.status} ${JSON.stringify(body)}`);
+  return body;
 }
+function assert(ok, message) { if (!ok) throw new Error(message); }
 
-runTest().catch((err) => {
-  console.error('\n❌ TEST THẤT BẠI:', err);
-  process.exit(1);
-});
+async function run() {
+  console.log('MINERVA NEXUS — LIVE ACCEPTANCE CHECK');
+  console.log('✓ API health:', await request('/api/health'));
+  // Isolated support data: the check does not rely on a Figma screen's sample records.
+  const area = `DEMO-${stamp}`;
+  const driver = await request('/api/drivers', {method: 'POST', headers: {'X-Actor-Id': operator}, body: JSON.stringify({name: `Tài xế demo ${stamp}`, area, capacity: 15, active: true, services: ['EXPRESS', 'STANDARD']})});
+  const shift = await request('/api/shifts', {method: 'POST', headers: {'X-Actor-Id': operator}, body: JSON.stringify({name: `Ca nghiệm thu ${stamp}`, area, start: new Date(Date.now() - 60_000).toISOString(), end: new Date(Date.now() + 7_200_000).toISOString()})});
+  await request(`/api/shifts/${encodeURIComponent(shift.id)}/attendance`, {method: 'POST', headers: {'X-Actor-Id': operator}, body: JSON.stringify({driverId: driver.id, present: true})});
+
+  const trackingCode = `MN-${stamp}ACCEPT`;
+  const created = await request('/api/orders', {method: 'POST', headers: {'X-Actor-Id': operator}, body: JSON.stringify({orderCode: `DEMO-${stamp}`, trackingCode, hubId, areaId: area, sender: {name: 'Người gửi Demo', phone: '0901234567', address: 'Hub demo'}, recipient: {name: 'Người nhận Demo', phone: '0907654321', address: 'Địa chỉ demo'}, serviceLevel: 'EXPRESS', slaDeadline: new Date(Date.now() + 3_600_000).toISOString()})});
+  const orderId = created.id;
+  assert(orderId && created.status === 'PENDING', 'Tạo đơn phải trả về PENDING và id.');
+  const ready = await request(`/api/orders/${orderId}/receive`, {method: 'POST', headers: {'X-Actor-Id': operator}});
+  assert(ready.status === 'READY_TO_DISPATCH', 'Tiếp nhận phải chuyển READY_TO_DISPATCH.');
+  await request(`/api/orders/${orderId}/shift`, {method: 'PUT', headers: {'X-Actor-Id': operator}, body: JSON.stringify({shiftId: shift.id})});
+  const proposals = await request('/api/dispatch/proposals', {method: 'POST', headers: {'X-Actor-Id': operator}, body: JSON.stringify({shiftId: shift.id})});
+  const proposal = proposals.find((row) => row.orderId === orderId)?.proposal;
+  assert(proposal?.id, 'Phải tạo được đề xuất cho đơn và tài xế hợp lệ.');
+  await request(`/api/dispatch/proposals/${proposal.id}/approve`, {method: 'POST', headers: {'X-Actor-Id': operator}, body: JSON.stringify({driverId: driver.id, reason: ''})});
+  await request(`/api/me/orders/${orderId}/accept`, {method: 'POST', headers: {'X-Actor-Id': driver.id}, body: JSON.stringify({reason: ''})});
+  const inTransit = await request(`/api/orders/${orderId}/status?target=IN_TRANSIT`, {method: 'PATCH', headers: {'X-Actor-Id': driver.id}, body: JSON.stringify({})});
+  assert(inTransit.status === 'IN_TRANSIT', 'Tài xế phải bắt đầu giao được.');
+  const delivered = await request(`/api/orders/${orderId}/status?target=DELIVERED`, {method: 'PATCH', headers: {'X-Actor-Id': driver.id}, body: JSON.stringify({})});
+  assert(delivered.status === 'DELIVERED', 'Đơn phải giao thành công được.');
+  const tracking = await request(`/api/tracking/${trackingCode}`);
+  assert(tracking.statusLabel === 'DELIVERED' && tracking.timeline.length >= 5, 'Public tracking phải hiển thị timeline hoàn tất.');
+  const timeline = await request(`/api/orders/${orderId}/timeline`);
+  assert(timeline.at(-1).toStatus === 'DELIVERED', 'Timeline nội bộ phải kết thúc DELIVERED.');
+  const metrics = await request('/api/analytics');
+  assert(metrics.deliveredCount >= 1, 'KPI phải phản ánh đơn đã giao.');
+  console.log(`✓ PASS: ${trackingCode}; ${timeline.length} mốc; KPI delivered=${metrics.deliveredCount}.`);
+}
+run().catch((error) => { console.error(`✗ LIVE CHECK FAILED: ${error.message}`); process.exit(1); });

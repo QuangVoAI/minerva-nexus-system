@@ -52,10 +52,21 @@ public class OrderService {
         if(o.getFailureCount()==2) allowed(OrderStatus.FAILED,OrderStatus.RETURN_PENDING);
         Instant now=clock.instant();int count=o.getFailureCount()+1;var failure=new DeliveryOrderDocument.DeliveryException();failure.attemptNumber=count;failure.driverId=o.getCurrentAssignment()==null?null:o.getCurrentAssignment().driverId;failure.reasonCode=reasonCode;failure.note=note;failure.reportedAt=now;o.getExceptions().add(failure);o.setFailureCount(count);
         event(o,OrderStatus.FAILED,actorId,reasonCode,note,now);
+        // Preserve the attempting driver in exception/audit history, but clear the current
+        // assignment so a failed order is never shown as active work for that driver.
+        o.setCurrentAssignment(null);
         if(count==3) {event(o,OrderStatus.RETURN_PENDING,actorId,"MAX_FAILURES","",now);var r=new DeliveryOrderDocument.ReturnInfo();r.returnRequestedAt=now;r.reason="MAX_FAILURES";o.setReturnInfo(r);}
         return save(o,actorId,"DELIVERY_FAILURE",now);
     }
     public DeliveryOrderDocument assessSla(String id,String actorId) {actor(actorId);return save(findById(id),actorId,"SLA_ASSESSED",clock.instant());}
+    public DeliveryOrderDocument confirmReturn(String id,String actorId,String note) {
+        actor(actorId); var o=findById(id);
+        if(o.getStatus()!=OrderStatus.RETURN_PENDING) throw new OrderProblem(409,"Chỉ đơn đang chờ hoàn mới được xác nhận đã về Hub.");
+        if(!actorId.startsWith("HUB") && !actorId.equals("DISPATCHER_WEB")) throw new OrderProblem(403,"Chỉ nhân viên Hub được xác nhận hoàn hàng.");
+        var info=o.getReturnInfo(); if(info==null) { info=new DeliveryOrderDocument.ReturnInfo(); o.setReturnInfo(info); }
+        info.returnConfirmedAt=clock.instant(); info.confirmedBy=actorId; info.reason=note;
+        return transition(id,OrderStatus.RETURNED,actorId,note==null?"Đã nhận hàng hoàn về Hub":note);
+    }
     private DeliveryOrderDocument save(DeliveryOrderDocument o,String actor,String action,Instant now) {
         o.setUpdatedAt(now);o.setSlaAssessment(slaRuleService.assess(o,now));var audit=new DeliveryOrderDocument.AuditEvent();audit.actorId=actor;audit.action=action;audit.occurredAt=now;
         if(!"SLA_ASSESSED".equals(action)) {

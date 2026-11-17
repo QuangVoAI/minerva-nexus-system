@@ -262,7 +262,11 @@ function ArrowRight() {
 
 function DangNhp() {
   return (
-    <div className="bg-[#087f8c] content-stretch flex gap-[10px] h-[50px] items-center justify-center overflow-clip relative rounded-[12px] shrink-0 w-full" data-name="Đăng nhập">
+    <div
+      onClick={() => { window.location.hash = "driver"; }}
+      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex gap-[10px] h-[50px] items-center justify-center overflow-clip relative rounded-[12px] shrink-0 w-full"
+      data-name="Đăng nhập"
+    >
       <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[14px] text-white whitespace-nowrap">Đăng nhập</p>
       <ArrowRight />
     </div>

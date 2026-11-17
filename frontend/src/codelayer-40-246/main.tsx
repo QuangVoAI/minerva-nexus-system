@@ -1,4 +1,13 @@
+import { useState, createContext, useContext } from "react";
 import svgPaths from "./svg-lzvjgarkuc";
+import { orderService } from "../services";
+
+const DriverActionContext = createContext<{
+  onTransit?: () => void;
+  onDelivered?: () => void;
+  onFailure?: () => void;
+  isProcessing?: boolean;
+}>({});
 
 function IosSignal() {
   return (
@@ -69,7 +78,12 @@ function ChevronLeft() {
 
 function QuayLi() {
   return (
-    <div className="content-stretch flex h-[44px] items-center justify-center overflow-clip relative shrink-0 w-[36px]" data-name="Quay lại">
+    <div
+      onClick={() => { window.location.hash = "dashboard"; }}
+      className="content-stretch flex h-[44px] items-center justify-center overflow-clip relative shrink-0 w-[36px] cursor-pointer hover:opacity-80 transition-opacity"
+      data-name="Quay lại"
+      title="Quay lại Bàn điều hành"
+    >
       <ChevronLeft />
     </div>
   );
@@ -350,23 +364,37 @@ function TinThuH() {
 }
 
 function GiaoThanhCongChaKhDng() {
+  const { onDelivered, isProcessing } = useContext(DriverActionContext);
   return (
-    <div className="bg-[#e8f2ec] h-[42px] relative rounded-[10px] shrink-0 w-full" data-name="Giao thành công · Chưa khả dụng">
+    <div
+      onClick={onDelivered}
+      className="bg-[#15803d] hover:bg-[#166534] cursor-pointer transition-colors h-[42px] relative rounded-[10px] shrink-0 w-full"
+      data-name="Giao thành công"
+    >
       <div className="content-stretch flex items-center justify-center overflow-clip px-[8px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] flex-[1_0_0] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] min-w-px not-italic relative text-[#719884] text-[13px] text-center">✔ Giao thành công</p>
+        <p className="[word-break:break-word] flex-[1_0_0] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] min-w-px not-italic relative text-white text-[13px] text-center">
+          {isProcessing ? "Đang cập nhật..." : "✔ Giao thành công"}
+        </p>
       </div>
-      <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[10px]" />
+      <div aria-hidden className="absolute border border-[#15803d] border-solid inset-0 pointer-events-none rounded-[10px]" />
     </div>
   );
 }
 
 function BaoSCChaKhDng() {
+  const { onFailure } = useContext(DriverActionContext);
   return (
-    <div className="bg-[#f8ecec] h-[42px] relative rounded-[10px] shrink-0 w-full" data-name="Báo sự cố · Chưa khả dụng">
+    <div
+      onClick={onFailure}
+      className="bg-[#dc2626] hover:bg-[#b91c1c] cursor-pointer transition-colors h-[42px] relative rounded-[10px] shrink-0 w-full"
+      data-name="Báo sự cố"
+    >
       <div className="content-stretch flex items-center justify-center overflow-clip px-[8px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] flex-[1_0_0] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] min-w-px not-italic relative text-[#b98787] text-[13px] text-center">✖ Báo sự cố</p>
+        <p className="[word-break:break-word] flex-[1_0_0] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] min-w-px not-italic relative text-white text-[13px] text-center">
+          ✖ Báo sự cố
+        </p>
       </div>
-      <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[10px]" />
+      <div aria-hidden className="absolute border border-[#dc2626] border-solid inset-0 pointer-events-none rounded-[10px]" />
     </div>
   );
 }
@@ -1686,10 +1714,17 @@ function ArrowRight() {
 }
 
 function XacNhnNhnDHangVaXutKho() {
+  const { onTransit, isProcessing } = useContext(DriverActionContext);
   return (
-    <div className="bg-[#087f8c] content-stretch flex gap-[12px] h-[56px] items-center overflow-clip px-[20px] relative rounded-[10px] shrink-0 w-full" data-name="Xác nhận nhận đủ hàng và xuất kho">
+    <div
+      onClick={onTransit}
+      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex gap-[12px] h-[56px] items-center overflow-clip px-[20px] relative rounded-[10px] shrink-0 w-full"
+      data-name="Xác nhận nhận đủ hàng và xuất kho"
+    >
       <PackageCheck />
-      <p className="[word-break:break-word] flex-[1_0_0] font-['Inter:Bold',sans-serif] font-bold leading-[1.45] min-w-px not-italic relative text-[15px] text-center text-white">{`Nhận đủ & Xuất kho`}</p>
+      <p className="[word-break:break-word] flex-[1_0_0] font-['Inter:Bold',sans-serif] font-bold leading-[1.45] min-w-px not-italic relative text-[15px] text-center text-white">
+        {isProcessing ? "Đang xuất kho..." : `Nhận đủ & Xuất kho`}
+      </p>
       <ArrowRight />
     </div>
   );
@@ -1709,11 +1744,85 @@ function XacNhnNhnHang() {
 }
 
 export default function Scr07TacVTaiX() {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const getTargetOrderId = () => {
+    return sessionStorage.getItem("lastAssignedOrderId") || sessionStorage.getItem("lastCreatedOrderId") || "ORD-01";
+  };
+  const getDriverId = () => {
+    return sessionStorage.getItem("lastAssignedDriverId") || "DRV-02";
+  };
+
+  const handleTransit = async () => {
+    setIsProcessing(true);
+    try {
+      const orderId = getTargetOrderId();
+      const driverId = getDriverId();
+      await orderService.updateDriverStatus({ orderId, action: "TRANSIT", driverId });
+      setToast(`Đã xuất kho đơn ${orderId} (IN_TRANSIT)`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Xuất kho thất bại";
+      alert(`Lỗi: ${msg}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDelivered = async () => {
+    setIsProcessing(true);
+    try {
+      const orderId = getTargetOrderId();
+      const driverId = getDriverId();
+      await orderService.updateDriverStatus({ orderId, action: "DELIVERED", driverId });
+      setToast(`Đã giao thành công đơn ${orderId}! Thu tiền COD hoàn tất.`);
+      setTimeout(() => {
+        window.location.hash = "dashboard";
+      }, 1200);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Cập nhật thất bại";
+      alert(`Lỗi: ${msg}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleFailure = async () => {
+    setIsProcessing(true);
+    try {
+      const orderId = getTargetOrderId();
+      const driverId = getDriverId();
+      await orderService.updateDriverStatus({
+        orderId,
+        action: "FAILED",
+        reasonCode: "CUSTOMER_UNREACHABLE",
+        note: "Khách không nghe máy sau 3 cuộc gọi",
+        driverId
+      });
+      setToast(`Đã ghi nhận sự cố đơn ${orderId}: Khách không nghe máy`);
+      setTimeout(() => {
+        window.location.hash = "failed-1";
+      }, 1200);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Báo sự cố thất bại";
+      alert(`Lỗi: ${msg}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
-    <div className="bg-[#f0f4f7] content-stretch flex flex-col items-start relative size-full" data-name="SCR-07 · Tác vụ tài xế">
-      <ThongTinLTrinh />
-      <DanhSachDnCunDc />
-      <XacNhnNhnHang />
-    </div>
+    <DriverActionContext.Provider value={{ onTransit: handleTransit, onDelivered: handleDelivered, onFailure: handleFailure, isProcessing }}>
+      <div className="bg-[#f0f4f7] content-stretch flex flex-col items-start relative size-full" data-name="SCR-07 · Tác vụ tài xế">
+        {toast && (
+          <div className="fixed top-16 right-8 z-50 bg-[#15803d] text-white px-5 py-3 rounded-lg shadow-xl font-bold text-[13px] animate-bounce">
+            ✓ {toast}
+          </div>
+        )}
+        <ThongTinLTrinh />
+        <DanhSachDnCunDc />
+        <XacNhnNhnHang />
+      </div>
+    </DriverActionContext.Provider>
   );
 }

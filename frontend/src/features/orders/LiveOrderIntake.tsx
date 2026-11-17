@@ -67,6 +67,10 @@ export const LiveOrderIntake: React.FC = () => {
         return <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-[#dcfce7] text-[#15803d]">Đã giao thành công</span>;
       case 'FAILED':
         return <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-[#fee2e2] text-[#b91c1c]">Giao thất bại</span>;
+      case 'RETURN_PENDING':
+        return <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-[#fff7ed] text-[#c2410c]">Chờ hoàn hàng</span>;
+      case 'RETURNED':
+        return <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-[#e2e8f0] text-[#475569]">Đã hoàn hàng</span>;
       case 'IN_TRANSIT':
         return <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-[#fef3c7] text-[#b45309]">Đang giao hàng</span>;
       case 'ASSIGNED':
@@ -161,6 +165,8 @@ export const LiveOrderIntake: React.FC = () => {
               <option value="IN_TRANSIT">Đang giao hàng</option>
               <option value="DELIVERED">Đã giao thành công</option>
               <option value="FAILED">Giao thất bại</option>
+              <option value="RETURN_PENDING">Chờ hoàn hàng</option>
+              <option value="RETURNED">Đã hoàn hàng</option>
             </select>
           </div>
 

@@ -1,4 +1,18 @@
+import { useState, useEffect, createContext, useContext } from "react";
 import svgPaths from "./svg-pwzfn0yyu6";
+import { analyticsService } from "../services";
+import { DiuHngHub as DiuHngHubShared } from "../components/DiuHngHub";
+import type { AnalyticsMetrics } from "../types";
+
+const DashboardMetricsContext = createContext<AnalyticsMetrics>({
+  totalOrders: 20,
+  deliveredCount: 0,
+  failedCount: 0,
+  pendingCount: 20,
+  successRate: 100,
+  slaRate: 100,
+  highRiskCount: 9,
+});
 
 function Boxes() {
   return (
@@ -337,16 +351,7 @@ function PhienTrc() {
 }
 
 function DiuHngHub() {
-  return (
-    <div className="bg-[#082e40] content-stretch flex flex-col gap-[28px] items-start min-h-[1120px] overflow-clip pb-[20px] pt-[24px] px-[16px] relative self-stretch shrink-0 w-[204px]" data-name="Điều hướng Hub">
-      <NhnDin />
-      <HubHinTi />
-      <NghipV />
-      <QunTr />
-      <KhongDm />
-      <PhienTrc />
-    </div>
-  );
+  return <DiuHngHubShared />;
 }
 
 function ChevronRight() {
@@ -526,14 +531,15 @@ function DngHCongSut() {
 }
 
 function DnTipNhn() {
+  const metrics = useContext(DashboardMetricsContext);
   return (
     <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] flex-col gap-[6px] items-start min-w-px not-italic overflow-clip relative" data-name="Đơn tiếp nhận">
       <p className="font-['Inter:Bold',sans-serif] font-bold leading-[0] relative shrink-0 text-[0px] text-white tracking-[-0.8px] whitespace-nowrap">
-        <span className="leading-[normal] text-[34px]">{`95 `}</span>
+        <span className="leading-[normal] text-[34px]">{`${metrics.totalOrders} `}</span>
         <span className="font-['Inter:Regular',sans-serif] font-normal leading-[normal] text-[#8fa0b3] text-[19px]">/ 120 đơn</span>
       </p>
-      <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.5] min-w-full relative shrink-0 text-[#b8d0db] text-[12px] w-[min-content]">Đã tiếp nhận · Sức chứa tối đa</p>
-      <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] relative shrink-0 text-[#b8d0db] text-[12px] whitespace-nowrap">Tổng sức chứa đội</p>
+      <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.5] min-w-full relative shrink-0 text-[#b8d0db] text-[12px] w-[min-content]">Đã tiếp nhận ({metrics.totalOrders} đơn) · Sức chứa tối đa</p>
+      <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] relative shrink-0 text-[#b8d0db] text-[12px] whitespace-nowrap">Đã giao: {metrics.deliveredCount} · Đang xử lý: {metrics.pendingCount}</p>
     </div>
   );
 }
@@ -560,12 +566,14 @@ function PackagePlus() {
 }
 
 function DDaTipNhn() {
+  const metrics = useContext(DashboardMetricsContext);
+  const remaining = Math.max(0, 120 - metrics.totalOrders);
   return (
     <div className="bg-[#0f1b2a] content-stretch flex gap-[8px] items-center overflow-clip px-[12px] py-[10px] relative rounded-[6px] shrink-0 w-full" data-name="Dư địa tiếp nhận">
       <PackagePlus />
       <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[#d1e0eb] text-[12px] whitespace-nowrap">
         <span className="leading-[normal]">{`Còn `}</span>
-        <span className="font-['Inter:Bold',sans-serif] font-bold leading-[normal] text-[#087f8c]">25 đơn</span>
+        <span className="font-['Inter:Bold',sans-serif] font-bold leading-[normal] text-[#087f8c]">{remaining} đơn</span>
       </p>
     </div>
   );
@@ -1055,7 +1063,11 @@ function ArrowUpRight() {
 
 function DiuPhiNgay() {
   return (
-    <div className="bg-[#087f8c] content-stretch flex h-[33px] items-center justify-between overflow-clip px-[12px] relative rounded-[6px] shrink-0 w-full" data-name="Điều phối ngay">
+    <div
+      onClick={() => { window.location.hash = "dispatch"; }}
+      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex h-[33px] items-center justify-between overflow-clip px-[12px] relative rounded-[6px] shrink-0 w-full"
+      data-name="Điều phối ngay"
+    >
       <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[12px] text-white whitespace-nowrap">Điều phối</p>
       <ArrowUpRight />
     </div>
@@ -1195,7 +1207,11 @@ function ArrowUpRight1() {
 
 function DiuPhiNgay1() {
   return (
-    <div className="bg-[#087f8c] content-stretch flex h-[33px] items-center justify-between overflow-clip px-[12px] relative rounded-[6px] shrink-0 w-full" data-name="Điều phối ngay">
+    <div
+      onClick={() => { window.location.hash = "dispatch"; }}
+      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex h-[33px] items-center justify-between overflow-clip px-[12px] relative rounded-[6px] shrink-0 w-full"
+      data-name="Điều phối ngay"
+    >
       <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[12px] text-white whitespace-nowrap">Điều phối</p>
       <ArrowUpRight1 />
     </div>
@@ -1335,7 +1351,11 @@ function ArrowUpRight2() {
 
 function DiuPhiNgay2() {
   return (
-    <div className="bg-[#087f8c] content-stretch flex h-[33px] items-center justify-between overflow-clip px-[12px] relative rounded-[6px] shrink-0 w-full" data-name="Điều phối ngay">
+    <div
+      onClick={() => { window.location.hash = "dispatch"; }}
+      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex h-[33px] items-center justify-between overflow-clip px-[12px] relative rounded-[6px] shrink-0 w-full"
+      data-name="Điều phối ngay"
+    >
       <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[12px] text-white whitespace-nowrap">Điều phối</p>
       <ArrowUpRight2 />
     </div>
@@ -1475,7 +1495,11 @@ function ArrowUpRight3() {
 
 function DiuPhiNgay3() {
   return (
-    <div className="bg-[#087f8c] content-stretch flex h-[33px] items-center justify-between overflow-clip px-[12px] relative rounded-[6px] shrink-0 w-full" data-name="Điều phối ngay">
+    <div
+      onClick={() => { window.location.hash = "dispatch"; }}
+      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex h-[33px] items-center justify-between overflow-clip px-[12px] relative rounded-[6px] shrink-0 w-full"
+      data-name="Điều phối ngay"
+    >
       <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[12px] text-white whitespace-nowrap">Điều phối</p>
       <ArrowUpRight3 />
     </div>
@@ -1615,7 +1639,11 @@ function ArrowUpRight4() {
 
 function DiuPhiNgay4() {
   return (
-    <div className="bg-[#087f8c] content-stretch flex h-[33px] items-center justify-between overflow-clip px-[12px] relative rounded-[6px] shrink-0 w-full" data-name="Điều phối ngay">
+    <div
+      onClick={() => { window.location.hash = "dispatch"; }}
+      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex h-[33px] items-center justify-between overflow-clip px-[12px] relative rounded-[6px] shrink-0 w-full"
+      data-name="Điều phối ngay"
+    >
       <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[12px] text-white whitespace-nowrap">Điều phối</p>
       <ArrowUpRight4 />
     </div>
@@ -1755,7 +1783,11 @@ function ArrowUpRight5() {
 
 function DiuPhiNgay5() {
   return (
-    <div className="bg-[#087f8c] content-stretch flex h-[33px] items-center justify-between overflow-clip px-[12px] relative rounded-[6px] shrink-0 w-full" data-name="Điều phối ngay">
+    <div
+      onClick={() => { window.location.hash = "dispatch"; }}
+      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex h-[33px] items-center justify-between overflow-clip px-[12px] relative rounded-[6px] shrink-0 w-full"
+      data-name="Điều phối ngay"
+    >
       <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[12px] text-white whitespace-nowrap">Điều phối</p>
       <ArrowUpRight5 />
     </div>
@@ -1846,10 +1878,28 @@ function KhongGianDiuHanh() {
 }
 
 export default function Scr02BanDiuHanhTrungTamHub() {
+  const [metrics, setMetrics] = useState<AnalyticsMetrics>({
+    totalOrders: 20,
+    deliveredCount: 0,
+    failedCount: 0,
+    pendingCount: 20,
+    successRate: 100,
+    slaRate: 100,
+    highRiskCount: 9,
+  });
+
+  useEffect(() => {
+    analyticsService.getAnalytics().then((res) => {
+      if (res) setMetrics(res);
+    }).catch(() => {});
+  }, []);
+
   return (
-    <div className="bg-[#f0f4f7] content-stretch flex items-start relative size-full" data-name="SCR-02 · Bàn điều hành trung tâm Hub">
-      <DiuHngHub />
-      <KhongGianDiuHanh />
-    </div>
+    <DashboardMetricsContext.Provider value={metrics}>
+      <div className="bg-[#f0f4f7] content-stretch flex items-start relative size-full" data-name="SCR-02 · Bàn điều hành trung tâm Hub">
+        <DiuHngHub />
+        <KhongGianDiuHanh />
+      </div>
+    </DashboardMetricsContext.Provider>
   );
 }

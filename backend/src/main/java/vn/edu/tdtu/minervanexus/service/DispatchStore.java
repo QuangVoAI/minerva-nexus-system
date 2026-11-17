@@ -89,6 +89,17 @@ public class DispatchStore {
     }
   }
 
+  public DeliveryOrderDocument cancel(String hubId, String orderId, String actor, String reason) {
+    write(
+        hubId,
+        actor,
+        manifest -> {
+          new DispatchPlan(manifest, java.time.Instant.now(), actor).cancel(orderId, reason);
+          return null;
+        });
+    return orderService.findById(orderId);
+  }
+
   private void persistTransition(DispatchManifest manifest, Order order, String actor) {
     var event = manifest.events.getLast();
     var live = orderService.transition(order.id(), order.status(), actor, event.detail());
@@ -109,7 +120,7 @@ public class DispatchStore {
       ref.approvedBy = actor;
       ref.assignedAt = event.time();
       live.setCurrentAssignment(ref);
-    } else if (order.status() == OrderStatus.READY_TO_DISPATCH) {
+    } else if (order.status() == OrderStatus.READY_TO_DISPATCH || order.status() == OrderStatus.CANCELLED) {
       live.setCurrentAssignment(null);
     }
     orders.save(live);

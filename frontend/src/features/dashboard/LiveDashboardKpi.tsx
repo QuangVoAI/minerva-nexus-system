@@ -28,7 +28,7 @@ export const LiveDashboardKpi: React.FC = () => {
       <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#e2e8f0]">
         <div>
           <h3 className="text-[16px] font-bold text-[#1e3a8a] m-0">
-            Chỉ số vận hành Hub thời gian thực (/api/analytics)
+            Chỉ số vận hành Hub theo lần cập nhật (/api/analytics)
           </h3>
           <p className="text-[12px] text-[#64748b] mt-0.5 mb-0">Cập nhật tự động trực tiếp từ backend</p>
         </div>

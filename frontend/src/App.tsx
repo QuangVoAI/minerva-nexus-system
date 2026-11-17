@@ -17,9 +17,24 @@ import FailedPending from "./codelayer-40-335/main";
 import RefusedThird from "./codelayer-40-365/main";
 import Returned from "./codelayer-40-398/main";
 import Dispatch from "./codelayer-40-432/main";
+
+import {
+  LiveCreateOrderForm,
+  LiveDashboardKpi,
+  LiveDispatchView,
+  LiveDriverActionCard,
+  LiveOrderDetailTimeline,
+  LiveOrderIntake,
+  LiveTracking,
+  LiveCancelOrder,
+  LiveAuditLog,
+  LiveReports,
+  LiveDriverManagement,
+} from "./features";
 import "./styles/globals.css";
 
 type Screen = { id: string; title: string; group: string; Component: () => JSX.Element };
+const EmptyScreen = () => <div />;
 
 const screens: Screen[] = [
   { id: "login", title: "SCR-01 · Đăng nhập desktop", group: "Xác thực", Component: LoginDesktop },
@@ -40,6 +55,11 @@ const screens: Screen[] = [
   { id: "failed", title: "SCR-08 · FAILED chờ phát lại", group: "Mobile", Component: FailedPending },
   { id: "refused", title: "SCR-08 · Từ chối nhận lần ba", group: "Mobile", Component: RefusedThird },
   { id: "returned", title: "SCR-08 · RETURNED chuyển hoàn", group: "Mobile", Component: Returned }
+  ,{ id: "tracking", title: "UC-24 · Tra cứu hành trình công khai", group: "Công khai", Component: EmptyScreen }
+  ,{ id: "cancel", title: "UC-23 · Hủy đơn hàng", group: "Đơn hàng", Component: EmptyScreen }
+  ,{ id: "audit", title: "UC-22 · Nhật ký hệ thống", group: "Hệ thống", Component: EmptyScreen }
+  ,{ id: "reports", title: "UC-20 · Báo cáo vận hành", group: "Báo cáo", Component: EmptyScreen }
+  ,{ id: "drivers", title: "UC-03 · Tài xế và khu vực", group: "Tài xế", Component: EmptyScreen }
 ];
 
 function getScreenFromHash() {
@@ -47,41 +67,93 @@ function getScreenFromHash() {
   return screens.some((screen) => screen.id === value) ? value : "dashboard";
 }
 
+function LiveScreen({ id }: { id: string }): JSX.Element | null {
+  switch (id) {
+    case "dashboard":
+      return <LiveDashboardKpi />;
+    case "orders":
+      return <LiveOrderIntake />;
+    case "create-order":
+      return <LiveCreateOrderForm />;
+    case "dispatch":
+      return <LiveDispatchView />;
+    case "order-detail":
+      return <LiveOrderDetailTimeline orderId={new URLSearchParams(window.location.search).get("orderId")} />;
+    case "driver":
+      return <LiveDriverActionCard />;
+    case "tracking": return <LiveTracking />;
+    case "cancel": return <LiveCancelOrder />;
+    case "audit": return <LiveAuditLog />;
+    case "reports": return <LiveReports />;
+    case "drivers": return <LiveDriverManagement />;
+    default:
+      return null;
+  }
+}
+
 export default function App() {
   const [screenId, setScreenId] = useState(getScreenFromHash);
-  const [apiStatus, setApiStatus] = useState<"checking" | "online" | "offline">("checking");
-  const embed = new URLSearchParams(window.location.search).get("embed") === "1";
+  const [showQuickMenu, setShowQuickMenu] = useState(false);
+  const liveMode = new URLSearchParams(window.location.search).get("mode") === "live";
   const active = useMemo(() => screens.find((screen) => screen.id === screenId) ?? screens[4], [screenId]);
 
   useEffect(() => {
     const syncHash = () => setScreenId(getScreenFromHash());
     window.addEventListener("hashchange", syncHash);
-    fetch("/api/analytics").then((response) => setApiStatus(response.ok ? "online" : "offline")).catch(() => setApiStatus("offline"));
     return () => window.removeEventListener("hashchange", syncHash);
   }, []);
 
-  const selectScreen = (id: string) => { window.location.hash = id; };
-  const groups = [...new Set(screens.map((screen) => screen.group))];
+  const selectScreen = (id: string) => {
+    window.location.hash = id;
+    setShowQuickMenu(false);
+  };
+
   const ScreenComponent = active.Component;
+  const liveOnlyIds = new Set(["tracking", "cancel", "audit", "reports", "drivers"]);
+  const isExtendedScreen = liveOnlyIds.has(active.id);
+  const content = (liveMode || isExtendedScreen) ? (<LiveScreen id={active.id} /> ?? <ScreenComponent />) : <ScreenComponent />;
 
   return (
-    <main className={embed ? "figma-runtime figma-runtime--embed" : "figma-runtime"}>
-      <aside className="figma-runtime__nav" aria-label="Danh sách màn hình prototype">
-        <div className="figma-runtime__brand"><span>MINERVA NEXUS</span><small>Figma React runtime</small></div>
-        {groups.map((group) => (
-          <section key={group} className="figma-runtime__group">
-            <h2>{group}</h2>
-            {screens.filter((screen) => screen.group === group).map((screen) => (
-              <button key={screen.id} className={screen.id === active.id ? "is-active" : ""} onClick={() => selectScreen(screen.id)}>{screen.title}</button>
+    <main className="min-h-screen bg-[#edf2f5] flex justify-center relative">
+      {/* Khung hiển thị giao diện thuần Figma 100%, không bị trùng thanh điều hướng ngoài */}
+      <div className="w-full flex justify-center">
+        {content}
+      </div>
+
+      {/* Nút menu nổi nhỏ gọn góc dưới bên phải - hỗ trợ chuyển nhanh màn hình khi thuyết trình */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <button
+          type="button"
+          onClick={() => setShowQuickMenu(!showQuickMenu)}
+          className="bg-[#082e40] hover:bg-[#0f1b2a] text-[#b8d0db] hover:text-white text-[11px] font-semibold px-3 py-1.5 rounded-full shadow-lg border border-[#1e3a4e] flex items-center gap-1.5 cursor-pointer transition-colors"
+          title="Chọn nhanh màn hình Figma (18 màn) hoặc tính năng mở rộng"
+        >
+          <span>⚡ Chọn màn hình</span>
+          <span className="text-[9px]">▾</span>
+        </button>
+
+        {showQuickMenu && (
+          <div className="absolute bottom-10 right-0 w-[270px] max-h-[440px] overflow-y-auto bg-[#082e40] border border-[#1e3a4e] rounded-xl shadow-2xl p-2.5 text-[#b8d0db]">
+            <div className="text-[11px] font-bold text-white mb-2 px-2 pb-1 border-b border-[#1e3a4e] flex justify-between items-center">
+              <span>Danh sách màn hình demo</span>
+              <button onClick={() => setShowQuickMenu(false)} className="text-[#8fa0b3] hover:text-white text-[12px] cursor-pointer">✕</button>
+            </div>
+            {screens.map((screen) => (
+              <button
+                key={screen.id}
+                onClick={() => selectScreen(screen.id)}
+                className={`w-full text-left text-[11px] py-1.5 px-2 rounded-md transition-colors block cursor-pointer ${
+                  screen.id === active.id
+                    ? "bg-[#087f8c] text-white font-bold"
+                    : "hover:bg-[#10243a] text-[#c2dde5]"
+                }`}
+              >
+                {screen.title}
+              </button>
             ))}
-          </section>
-        ))}
-        <div className={`figma-runtime__api figma-runtime__api--${apiStatus}`}>API Java: {apiStatus === "checking" ? "đang kiểm tra" : apiStatus === "online" ? "đã kết nối" : "chưa chạy"}</div>
-      </aside>
-      <section className="figma-runtime__stage" aria-label={active.title}>
-        <div className="figma-runtime__toolbar"><strong>{active.title}</strong><span>Render từ Figma code export gốc</span></div>
-        <div className="figma-runtime__canvas"><ScreenComponent /></div>
-      </section>
+          </div>
+        )}
+      </div>
     </main>
   );
 }

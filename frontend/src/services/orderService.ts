@@ -13,9 +13,14 @@ export const orderService = {
    * GET /api/orders
    */
   async getOrders(): Promise<DeliveryOrder[]> {
-    return await apiClient.get<DeliveryOrder[]>('/api/orders');
+    const rows = await apiClient.get<any[]>('/api/orders');
+    return rows.map(normalizeOrder);
   },
 
+  /**
+   * Tạo đơn hàng gửi lẻ mới tại Hub
+   * POST /api/orders
+   */
   /**
    * Tạo đơn hàng gửi lẻ mới tại Hub
    * POST /api/orders
@@ -36,9 +41,7 @@ export const orderService = {
    * GET /api/order/history?orderId=...
    */
   async getOrderHistory(orderId: string): Promise<StatusHistoryItem[]> {
-    return await apiClient.get<StatusHistoryItem[]>('/api/order/history', {
-      orderId,
-    });
+    return await apiClient.get<StatusHistoryItem[]>('/api/order/history', { orderId });
   },
 
   /**
@@ -46,12 +49,35 @@ export const orderService = {
    * POST /api/driver/update
    */
   async updateDriverStatus(payload: DriverStatusUpdatePayload): Promise<{ success: boolean }> {
+    const actor = payload.driverId || 'DRIVER_APP';
     return await apiClient.post<{ success: boolean }>('/api/driver/update', {
       orderId: payload.orderId,
       action: payload.action,
-      driverId: payload.driverId || 'DRIVER_APP',
+      driverId: actor,
       reasonCode: payload.reasonCode || 'CUSTOMER_UNREACHABLE',
       note: payload.note || '',
     });
   },
 };
+
+function normalizeOrder(row: any): DeliveryOrder {
+  const recipient = row.recipient || {};
+  return {
+    orderId: row.id || row.orderId,
+    trackingCode: row.trackingCode,
+    recipientName: recipient.name || '',
+    recipientPhone: recipient.phone || '',
+    address: recipient.address || '',
+    areaId: row.areaId,
+    serviceLevel: row.serviceLevel,
+    serviceLevelDisplay: row.serviceLevel,
+    slaDeadline: row.slaDeadline,
+    codAmount: 0,
+    status: row.status,
+    statusDisplay: row.status,
+    assignedDriverId: row.currentAssignment?.driverId || null,
+    failureCount: row.failureCount || 0,
+    riskLevel: row.slaAssessment?.riskLevel || 'UNKNOWN',
+    riskExplanation: row.slaAssessment?.reasons?.join(' ') || '',
+  };
+}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDriverTasks } from '../../hooks';
 import { LoadingSpinner, ErrorMessage } from '../../components';
 import type { FailureReason } from '../../types';
+import { apiClient } from '../../services/apiClient';
 
 interface LiveDriverActionCardProps {
   orderId?: string;
@@ -50,6 +51,12 @@ export const LiveDriverActionCard: React.FC<LiveDriverActionCardProps> = ({
     }
   };
 
+  const respond = async (action: 'accept' | 'reject') => {
+    if (!orderId.trim()) return;
+    await apiClient.post(`/api/me/orders/${encodeURIComponent(orderId.trim())}/${action}`, { reason: action === 'reject' ? 'Tài xế từ chối nhận đơn' : '' }, { 'X-Actor-Id': driverId });
+    if (onActionComplete) onActionComplete();
+  };
+
   return (
     <div className="bg-white rounded-xl border border-[#dbeafe] p-5 shadow-xs font-sans max-w-md mx-auto">
       <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#e2e8f0]">
@@ -84,6 +91,10 @@ export const LiveDriverActionCard: React.FC<LiveDriverActionCardProps> = ({
 
         {/* Action Buttons */}
         <div className="space-y-2 pt-2">
+          <div className="grid grid-cols-2 gap-2">
+            <button type="button" disabled={isLoading || !orderId.trim()} onClick={() => respond('accept')} className="bg-[#087f8c] text-white text-[12px] font-bold py-2 rounded-lg disabled:opacity-50">Nhận đơn</button>
+            <button type="button" disabled={isLoading || !orderId.trim()} onClick={() => respond('reject')} className="bg-white border border-[#cbd5e1] text-[#b91c1c] text-[12px] font-bold py-2 rounded-lg disabled:opacity-50">Từ chối</button>
+          </div>
           <button
             type="button"
             disabled={isLoading || !orderId.trim()}
@@ -101,7 +112,7 @@ export const LiveDriverActionCard: React.FC<LiveDriverActionCardProps> = ({
             className="w-full bg-[#16a34a] hover:bg-[#15803d] disabled:opacity-50 text-white text-[13px] font-bold py-2.5 px-4 rounded-lg cursor-pointer transition-colors shadow-2xs flex items-center justify-center gap-2"
           >
             <span>✓</span>
-            <span>2. Giao thành công & Thu tiền COD (DELIVERED)</span>
+            <span>2. Xác nhận giao thành công (DELIVERED)</span>
           </button>
 
           <button

@@ -15,14 +15,14 @@ export const ApiStatusBadge: React.FC<ApiStatusBadgeProps> = ({ status, classNam
       dot: 'bg-[#94a3b8]',
     },
     online: {
-      text: 'Máy chủ Java 8080: Đã kết nối',
+      text: 'Máy chủ Java 8081: Đã kết nối',
       bg: 'bg-[#eff6ff]',
       border: 'border-[#bfdbfe]',
       textCol: 'text-[#1d4ed8]',
       dot: 'bg-[#2563eb]',
     },
     offline: {
-      text: 'Máy chủ Java 8080: Chưa chạy (Vui lòng chạy ./run.sh)',
+      text: 'Máy chủ Java 8081: Chưa chạy (Vui lòng chạy Maven)',
       bg: 'bg-[#fef2f2]',
       border: 'border-[#fecaca]',
       textCol: 'text-[#dc2626]',

@@ -1,4 +1,5 @@
 import svgPaths from "./svg-10wz5514xz";
+import { DiuHngHub as DiuHngHubShared } from "../components/DiuHngHub";
 
 function Boxes() {
   return (
@@ -398,17 +399,7 @@ function PhienTrc() {
 }
 
 function DiuHngHub() {
-  return (
-    <div className="bg-[#082e40] content-stretch flex flex-col gap-[28px] h-full items-start min-h-[1120px] overflow-clip pb-[20px] pt-[24px] px-[16px] relative shrink-0 w-[204px]" data-name="Điều hướng Hub">
-      <NhnDin />
-      <HubHinTi />
-      <NghipV />
-      <QunTr />
-      <KhongDm />
-      <HTrVnHanh />
-      <PhienTrc />
-    </div>
-  );
+  return <DiuHngHubShared />;
 }
 
 function ChevronRight() {
@@ -533,7 +524,11 @@ function Plus() {
 
 function NutThaoTac() {
   return (
-    <div className="bg-white h-[42px] relative rounded-[8px] shrink-0" data-name="Nút thao tác">
+    <div
+      onClick={() => { window.location.hash = "create-order"; }}
+      className="bg-white hover:bg-[#f8fafc] cursor-pointer transition-colors h-[42px] relative rounded-[8px] shrink-0"
+      data-name="Nút thao tác"
+    >
       <div className="content-stretch flex gap-[8px] items-center justify-center overflow-clip px-[16px] relative rounded-[inherit] size-full">
         <Plus />
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[13px] whitespace-nowrap">Tạo đơn</p>

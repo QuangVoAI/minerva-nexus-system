@@ -13,7 +13,7 @@ Minerva Nexus là phần mềm mô phỏng hệ thống điều hành tại mộ
 * Đánh giá và cảnh báo nguy cơ vi phạm thời gian cam kết giao hàng bằng **quy tắc SLA**.
 * Đề xuất tài xế theo khu vực, trạng thái ca, sức chứa, mức dịch vụ và hạn SLA; Nhân viên vận hành Hub là người duyệt cuối.
 * Cho phép tài xế nhận đơn, xác nhận phát thành công hoặc ghi nhận sự cố giao thất bại theo đúng chuẩn nghiệp vụ.
-* Dashboard thống kê các chỉ số vận hành then chốt (KPI) theo thời gian thực.
+* Dashboard thống kê các chỉ số vận hành then chốt (KPI) theo lần cập nhật dữ liệu.
 
 ---
 
@@ -52,12 +52,19 @@ Tạo biến môi trường `MONGODB_URI` trong máy cục bộ, sau đó chạy
 
 ```bash
 cd backend
-mvn spring-boot:run
+./mvnw test
+./mvnw spring-boot:run
 ```
 
 Sau khi chạy, kiểm tra kết nối tại `GET http://localhost:8081/api/health`.
 
 Tài liệu cấu trúc MongoDB và quy tắc trạng thái nằm tại [docs/DATA_STRUCTURE.md](docs/DATA_STRUCTURE.md). Phân công, ownership thư mục và quy ước merge của nhóm nằm tại [docs/TEAM_TASKS.md](docs/TEAM_TASKS.md).
+
+Để chạy các panel API đã tích hợp mà vẫn giữ nguyên màn hình Figma, mở frontend với query `?mode=live`, ví dụ `/react/?mode=live#orders`. Không có query này, runtime hiển thị đúng các frame Figma gốc.
+
+Các panel live bổ sung dùng cho nghiệm thu MVP: `#tracking`, `#cancel`, `#audit`, `#reports`, `#drivers`. Sau `bootstrap.js`, có thể chạy thêm `docs/mongodb/seed-demo.js` để tạo tài xế và ca giao mẫu cho luồng điều phối.
+
+Kịch bản chạy, các nhánh ngoại lệ và checklist bằng chứng trước khi nộp nằm tại [docs/DEMO_RUNBOOK.md](docs/DEMO_RUNBOOK.md). Khi backend đang chạy với MongoDB, có thể kiểm tra toàn bộ luồng chính không phụ thuộc dữ liệu mẫu bằng `cd frontend && npm run test:e2e`.
 
 ---
 
@@ -80,7 +87,7 @@ Khi lên bục thuyết trình trước giảng viên, thực hiện đúng 5 b�
   * Nhấn **"✔ Xác nhận Giao thành công"** (chuyển sang `DELIVERED`).
   * Với đơn khác, bấm **"✖ Báo Giao thất bại"** $\rightarrow$ Chọn lý do *"Khách không nghe máy"* $\rightarrow$ Hệ thống tự động ghi nhận ngoại lệ và tăng số lần thất bại (`failureCount`).
 * **Bước 5 (Tab 4 - Dashboard KPI):**
-  * Chuyển sang Tab 4 để giảng viên xem các thẻ chỉ số KPI: Tỷ lệ giao thành công (%), Tỷ lệ đúng hạn SLA (%), và Biểu đồ tải của từng tài xế tự động cập nhật theo thời gian thực!
+  * Chuyển sang Tab 4 để giảng viên xem các thẻ chỉ số KPI: Tỷ lệ giao thành công (%), Tỷ lệ đúng hạn SLA (%), và biểu đồ tải của từng tài xế theo dữ liệu vừa cập nhật.
 
 ---
 
