@@ -1,4 +1,4 @@
-import { useState, createContext, useContext } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import svgPaths from "./svg-lzvjgarkuc";
 import { orderService } from "../services";
 
@@ -10,6 +10,7 @@ const DriverActionContext = createContext<{
   isDelivering?: boolean;
   isFailing?: boolean;
   hasTransited?: boolean;
+  isDelivered?: boolean;
 }>({});
 
 function IosSignal() {
@@ -124,12 +125,15 @@ function DiuHng() {
 }
 
 function TrngThai() {
+  const { hasTransited, isDelivered } = useContext(DriverActionContext);
   return (
-    <div className="bg-[#fff3d9] relative rounded-[6px] shrink-0" data-name="Trạng thái">
+    <div className={`${isDelivered ? "bg-[#dcfce7]" : hasTransited ? "bg-[#e0f2fe]" : "bg-[#fff3d9]"} relative rounded-[6px] shrink-0 transition-colors`} data-name="Trạng thái">
       <div className="content-stretch flex items-start overflow-clip px-[8px] py-[4px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#946218] text-[13px] whitespace-nowrap">Chờ nhận hàng</p>
+        <p className={`[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 ${isDelivered ? "text-[#15803d]" : hasTransited ? "text-[#0369a1]" : "text-[#946218]"} text-[13px] whitespace-nowrap`}>
+          {isDelivered ? "Đã giao thành công" : hasTransited ? "Đang phát hàng" : "Chờ nhận hàng"}
+        </p>
       </div>
-      <div aria-hidden className="absolute border border-[#f2cbc8] border-solid inset-0 pointer-events-none rounded-[6px]" />
+      <div aria-hidden className={`absolute border ${isDelivered ? "border-[#86efac]" : hasTransited ? "border-[#bae6fd]" : "border-[#f2cbc8]"} border-solid inset-0 pointer-events-none rounded-[6px]`} />
     </div>
   );
 }
@@ -165,19 +169,25 @@ function TipNhnTiHub() {
 }
 
 function TiHinTi() {
+  const { hasTransited, isDelivered } = useContext(DriverActionContext);
   return (
     <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] flex-col gap-[3px] items-start min-w-px not-italic overflow-clip relative whitespace-nowrap" data-name="Tải hiện tại">
       <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] relative shrink-0 text-[#657684] text-[13px]">Trên xe</p>
-      <p className="font-['Inter:Bold',sans-serif] font-bold leading-[normal] relative shrink-0 text-[#142b3b] text-[22px]">0 / 8</p>
+      <p className="font-['Inter:Bold',sans-serif] font-bold leading-[normal] relative shrink-0 text-[#142b3b] text-[22px]">
+        {isDelivered ? "0 / 8" : hasTransited ? "8 / 8" : "0 / 8"}
+      </p>
     </div>
   );
 }
 
 function TinDangGi() {
+  const { isDelivered } = useContext(DriverActionContext);
   return (
     <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] flex-col gap-[3px] items-start min-w-px not-italic overflow-clip relative whitespace-nowrap" data-name="Tiền đang giữ">
       <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] relative shrink-0 text-[#657684] text-[13px]">COD giữ</p>
-      <p className="font-['Inter:Bold',sans-serif] font-bold leading-[normal] relative shrink-0 text-[#142b3b] text-[22px]">0 ₫</p>
+      <p className="font-['Inter:Bold',sans-serif] font-bold leading-[normal] relative shrink-0 text-[#142b3b] text-[22px]">
+        {isDelivered ? "450.000 ₫" : "0 ₫"}
+      </p>
     </div>
   );
 }
@@ -367,16 +377,16 @@ function TinThuH() {
 }
 
 function GiaoThanhCongChaKhDng() {
-  const { onDelivered, isDelivering } = useContext(DriverActionContext);
+  const { onDelivered, isDelivering, isDelivered } = useContext(DriverActionContext);
   return (
     <div
-      onClick={onDelivered}
-      className="bg-[#15803d] hover:bg-[#166534] cursor-pointer transition-colors h-[42px] relative rounded-[10px] shrink-0 w-full"
+      onClick={isDelivered ? undefined : onDelivered}
+      className={`${isDelivered ? "bg-[#047857]" : "bg-[#15803d] hover:bg-[#166534]"} cursor-pointer transition-colors h-[42px] relative rounded-[10px] shrink-0 w-full`}
       data-name="Giao thành công"
     >
       <div className="content-stretch flex items-center justify-center overflow-clip px-[8px] relative rounded-[inherit] size-full">
         <p className="[word-break:break-word] flex-[1_0_0] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] min-w-px not-italic relative text-white text-[13px] text-center">
-          {isDelivering ? "Đang cập nhật..." : "✔ Giao thành công"}
+          {isDelivering ? "Đang cập nhật..." : isDelivered ? "✓ Đã giao thành công (Đã thu COD)" : "✔ Giao thành công"}
         </p>
       </div>
       <div aria-hidden className="absolute border border-[#15803d] border-solid inset-0 pointer-events-none rounded-[10px]" />
@@ -1750,7 +1760,12 @@ export default function Scr07TacVTaiX() {
   const [isTransiting, setIsTransiting] = useState(false);
   const [isDelivering, setIsDelivering] = useState(false);
   const [isFailing, setIsFailing] = useState(false);
-  const [hasTransited, setHasTransited] = useState(false);
+  const [hasTransited, setHasTransited] = useState(() => {
+    return sessionStorage.getItem("driver_has_transited") === "true";
+  });
+  const [isDelivered, setIsDelivered] = useState(() => {
+    return sessionStorage.getItem("driver_has_delivered") === "true";
+  });
   const [toast, setToast] = useState<string | null>(null);
 
   const getTargetOrderId = () => {
@@ -1759,6 +1774,24 @@ export default function Scr07TacVTaiX() {
   const getDriverId = () => {
     return sessionStorage.getItem("lastAssignedDriverId") || "DRV-02";
   };
+
+  useEffect(() => {
+    const orderId = getTargetOrderId();
+    orderService.getOrders().then((orders) => {
+      const target = orders.find((o) => o.orderId === orderId || o.trackingCode === "VN241109086");
+      if (target) {
+        if (target.status === "IN_TRANSIT") {
+          setHasTransited(true);
+          sessionStorage.setItem("driver_has_transited", "true");
+        } else if (target.status === "DELIVERED") {
+          setHasTransited(true);
+          setIsDelivered(true);
+          sessionStorage.setItem("driver_has_transited", "true");
+          sessionStorage.setItem("driver_has_delivered", "true");
+        }
+      }
+    }).catch(() => {});
+  }, []);
 
   const handleTransit = async () => {
     if (isTransiting) return;
@@ -1771,10 +1804,12 @@ export default function Scr07TacVTaiX() {
         new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3500))
       ]);
       setHasTransited(true);
+      sessionStorage.setItem("driver_has_transited", "true");
       setToast(`Đã xuất kho đơn ${orderId} thành công (IN_TRANSIT)`);
     } catch {
       // Fallback update to keep demo uninterrupted
       setHasTransited(true);
+      sessionStorage.setItem("driver_has_transited", "true");
       setToast(`Đã ghi nhận xuất kho cho chuyến xe`);
     } finally {
       setIsTransiting(false);
@@ -1791,11 +1826,15 @@ export default function Scr07TacVTaiX() {
         orderService.updateDriverStatus({ orderId, action: "DELIVERED", driverId }),
         new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3500))
       ]);
+      setIsDelivered(true);
+      sessionStorage.setItem("driver_has_delivered", "true");
       setToast(`Đã giao thành công đơn ${orderId}! Thu tiền COD hoàn tất.`);
       setTimeout(() => {
         window.location.hash = "dashboard";
       }, 1000);
     } catch {
+      setIsDelivered(true);
+      sessionStorage.setItem("driver_has_delivered", "true");
       setToast(`Đã xác nhận giao thành công (Offline sync)`);
       setTimeout(() => {
         window.location.hash = "dashboard";
@@ -1844,7 +1883,8 @@ export default function Scr07TacVTaiX() {
         isTransiting,
         isDelivering,
         isFailing,
-        hasTransited
+        hasTransited,
+        isDelivered
       }}
     >
       <div className="bg-[#f0f4f7] content-stretch flex flex-col items-start relative size-full" data-name="SCR-07 · Tác vụ tài xế">
