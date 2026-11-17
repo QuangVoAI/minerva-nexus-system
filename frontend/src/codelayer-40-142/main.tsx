@@ -1,3 +1,4 @@
+import { useState } from "react";
 import svgPaths from "./svg-10wz5514xz";
 import { DiuHngHub as DiuHngHubShared } from "../components/DiuHngHub";
 
@@ -551,11 +552,28 @@ function Upload() {
 }
 
 function NutThaoTac1() {
+  const [imported, setImported] = useState(false);
+  const handleImport = () => {
+    setImported(true);
+    setTimeout(() => setImported(false), 3000);
+  };
+
   return (
-    <div className="bg-[#087f8c] h-[42px] relative rounded-[8px] shrink-0" data-name="Nút thao tác">
+    <div
+      onClick={handleImport}
+      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors h-[42px] relative rounded-[8px] shrink-0"
+      data-name="Nút thao tác"
+    >
+      {imported && (
+        <div className="fixed top-16 right-8 z-50 bg-[#15803d] text-white px-5 py-3 rounded-lg shadow-xl font-bold text-[13px] animate-bounce">
+          ✓ Đã nạp thành công danh sách 15 đơn hàng vào hệ thống!
+        </div>
+      )}
       <div className="content-stretch flex gap-[8px] items-center justify-center overflow-clip px-[16px] relative rounded-[inherit] size-full">
         <Upload />
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[13px] text-white whitespace-nowrap">Nạp danh sách đơn</p>
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[13px] text-white whitespace-nowrap">
+          {imported ? "Đã nạp đơn ✓" : "Nạp danh sách đơn"}
+        </p>
       </div>
       <div aria-hidden className="absolute border border-[#087f8c] border-solid inset-0 pointer-events-none rounded-[8px]" />
     </div>
@@ -833,7 +851,7 @@ function QuyTcThmDnh() {
 
 function TabDangChn() {
   return (
-    <div className="h-full relative shrink-0" data-name="Tab đang chọn">
+    <div className="h-full relative shrink-0 cursor-pointer" data-name="Tab đang chọn">
       <div className="[word-break:break-word] content-stretch flex font-['Inter:Semi_Bold',sans-serif] font-semibold gap-[8px] items-center leading-[1.45] not-italic overflow-clip relative rounded-[inherit] size-full text-[#087f8c] whitespace-nowrap">
         <p className="relative shrink-0 text-[13px]">Tất cả</p>
         <p className="relative shrink-0 text-[12px]">105</p>
@@ -854,7 +872,12 @@ function TrngThai() {
 
 function TabDnLi() {
   return (
-    <div className="content-stretch flex gap-[8px] items-start overflow-clip relative shrink-0" data-name="Tab đơn lỗi">
+    <div
+      onClick={() => { window.location.hash = "import-errors"; }}
+      className="content-stretch flex gap-[8px] items-center overflow-clip relative shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+      data-name="Tab đơn lỗi"
+      title="Bấm để xem danh sách đơn lỗi cần xử lý"
+    >
       <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[13px] whitespace-nowrap">Đơn lỗi</p>
       <TrngThai />
     </div>
@@ -867,7 +890,13 @@ function CacTabDnHang() {
       <div className="content-stretch flex gap-[28px] items-center overflow-clip px-[20px] relative rounded-[inherit] size-full">
         <TabDangChn />
         <TabDnLi />
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[13px] whitespace-nowrap">Lịch sử</p>
+        <p
+          onClick={() => { window.location.hash = "audit"; }}
+          className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] hover:text-[#087f8c] text-[13px] whitespace-nowrap cursor-pointer transition-colors"
+          title="Xem nhật ký lịch sử hệ thống"
+        >
+          Lịch sử
+        </p>
       </div>
       <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid inset-0 pointer-events-none" />
     </div>
@@ -887,11 +916,18 @@ function Search() {
 }
 
 function TimDn() {
+  const [kw, setKw] = useState("");
   return (
     <div className="h-[38px] relative rounded-[6px] shrink-0 w-[330px]" data-name="Tìm đơn">
       <div className="content-stretch flex gap-[9px] items-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
         <Search />
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Tìm mã đơn, tên hoặc số điện thoại</p>
+        <input
+          type="text"
+          value={kw}
+          onChange={(e) => setKw(e.target.value)}
+          placeholder="Tìm mã đơn, tên hoặc số điện thoại"
+          className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[12px] text-[#142b3b] outline-none"
+        />
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
@@ -1251,7 +1287,13 @@ function DnHang() {
         <DchVVaSla />
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#142b3b] text-[12px] w-[112px]">850.000 ₫</p>
         <TrngThaiVnDn />
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] w-[84px]">Chi tiết</p>
+        <p
+          onClick={() => { window.location.hash = "order-detail"; }}
+          className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] hover:underline cursor-pointer text-[12px] w-[84px]"
+          title="Xem hồ sơ chi tiết đơn hàng (SCR-06)"
+        >
+          Chi tiết
+        </p>
       </div>
       <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid inset-0 pointer-events-none" />
     </div>
@@ -1341,7 +1383,13 @@ function DnHang1() {
         <DchVVaSla1 />
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#142b3b] text-[12px] w-[112px]">1.250.000 ₫</p>
         <TrngThaiVnDn1 />
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] w-[84px]">Chi tiết</p>
+        <p
+          onClick={() => { window.location.hash = "order-detail"; }}
+          className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] hover:underline cursor-pointer text-[12px] w-[84px]"
+          title="Xem hồ sơ chi tiết đơn hàng (SCR-06)"
+        >
+          Chi tiết
+        </p>
       </div>
       <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid inset-0 pointer-events-none" />
     </div>
@@ -1521,7 +1569,13 @@ function DnHang3() {
         <DchVVaSla3 />
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#142b3b] text-[12px] w-[112px]">0 ₫</p>
         <TrngThaiVnDn3 />
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] w-[84px]">Chi tiết</p>
+        <p
+          onClick={() => { window.location.hash = "order-detail"; }}
+          className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] hover:underline cursor-pointer text-[12px] w-[84px]"
+          title="Xem hồ sơ chi tiết đơn hàng (SCR-06)"
+        >
+          Chi tiết
+        </p>
       </div>
       <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid inset-0 pointer-events-none" />
     </div>
@@ -1611,7 +1665,13 @@ function DnHang4() {
         <DchVVaSla4 />
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#142b3b] text-[12px] w-[112px]">690.000 ₫</p>
         <TrngThaiVnDn4 />
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] w-[84px]">Chi tiết</p>
+        <p
+          onClick={() => { window.location.hash = "order-detail"; }}
+          className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] hover:underline cursor-pointer text-[12px] w-[84px]"
+          title="Xem hồ sơ chi tiết đơn hàng (SCR-06)"
+        >
+          Chi tiết
+        </p>
       </div>
       <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid inset-0 pointer-events-none" />
     </div>

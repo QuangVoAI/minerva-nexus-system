@@ -1,5 +1,28 @@
+import { createContext, useContext, useState } from "react";
 import svgPaths from "./svg-oz9anbhy43";
 import { DiuHngHub as DiuHngHubShared } from "../components/DiuHngHub";
+
+export interface ShiftContextType {
+  activeShift: "ca1" | "ca2";
+  setActiveShift: (s: "ca1" | "ca2") => void;
+  attendanceFilter: "all" | "checked_in" | "not_checked_in";
+  setAttendanceFilter: (f: "all" | "checked_in" | "not_checked_in") => void;
+  driverSearch: string;
+  setDriverSearch: (q: string) => void;
+  checkedInDrivers: Record<string, boolean>;
+  toggleDriverCheckIn: (code: string) => void;
+}
+
+export const ShiftContext = createContext<ShiftContextType>({
+  activeShift: "ca1",
+  setActiveShift: () => {},
+  attendanceFilter: "all",
+  setAttendanceFilter: () => {},
+  driverSearch: "",
+  setDriverSearch: () => {},
+  checkedInDrivers: { TX045: true, TX048: true, TX051: true, TX055: true },
+  toggleDriverCheckIn: () => {},
+});
 
 function Boxes() {
   return (
@@ -453,7 +476,12 @@ function History2() {
 
 function LchSDimDanh() {
   return (
-    <div className="bg-white h-[36px] relative rounded-[8px] shrink-0" data-name="Lịch sử điểm danh">
+    <div
+      onClick={() => { window.location.hash = "audit"; }}
+      className="bg-white hover:bg-slate-50 cursor-pointer transition-colors h-[36px] relative rounded-[8px] shrink-0"
+      data-name="Lịch sử điểm danh"
+      title="Bấm để xem lịch sử điểm danh và nhật ký ca"
+    >
       <div className="content-stretch flex gap-[8px] items-center overflow-clip px-[13px] relative rounded-[inherit] size-full">
         <History2 />
         <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#182b39] text-[12px] whitespace-nowrap">Lịch sử điểm danh</p>
@@ -528,14 +556,21 @@ function NutChn() {
 }
 
 function LaChnCa() {
+  const { activeShift, setActiveShift } = useContext(ShiftContext);
+  const isSelected = activeShift === "ca1";
   return (
-    <div className="bg-[#e7f4f3] h-[42px] relative rounded-[8px] shrink-0 w-[258px]" data-name="Lựa chọn ca">
+    <div
+      onClick={() => setActiveShift("ca1")}
+      className={`${isSelected ? "bg-[#e7f4f3] border-[#087f8c]" : "bg-white border-[#e3e9ed]"} h-[42px] relative rounded-[8px] shrink-0 w-[258px] cursor-pointer transition-colors border border-solid`}
+      data-name="Lựa chọn ca"
+    >
       <div className="content-stretch flex gap-[10px] items-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <NutChn />
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[13px] whitespace-nowrap">Ca 1</p>
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">08:00 - 12:00</p>
+        <div className="bg-white relative rounded-[100px] shrink-0 size-[14px]">
+          <div aria-hidden className={`absolute ${isSelected ? "border-4 border-[#087f8c]" : "border border-[#b4bfc7]"} border-solid inset-0 pointer-events-none rounded-[100px]`} />
+        </div>
+        <p className={`[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 ${isSelected ? "text-[#087f8c] font-semibold" : "text-[#182b39]"} text-[13px] whitespace-nowrap`}>Ca 1</p>
+        <p className={`[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 ${isSelected ? "text-[#087f8c]" : "text-[#6b7b88]"} text-[12px] whitespace-nowrap`}>08:00 - 12:00</p>
       </div>
-      <div aria-hidden className="absolute border border-[#087f8c] border-solid inset-0 pointer-events-none rounded-[8px]" />
     </div>
   );
 }
@@ -566,15 +601,22 @@ function Clock() {
 }
 
 function LaChnCa1() {
+  const { activeShift, setActiveShift } = useContext(ShiftContext);
+  const isSelected = activeShift === "ca2";
   return (
-    <div className="bg-white h-[42px] relative rounded-[8px] shrink-0 w-[258px]" data-name="Lựa chọn ca">
+    <div
+      onClick={() => setActiveShift("ca2")}
+      className={`${isSelected ? "bg-[#e7f4f3] border-[#087f8c]" : "bg-white border-[#e3e9ed]"} h-[42px] relative rounded-[8px] shrink-0 w-[258px] cursor-pointer transition-colors border border-solid`}
+      data-name="Lựa chọn ca"
+    >
       <div className="content-stretch flex gap-[10px] items-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <NutChn1 />
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#182b39] text-[13px] whitespace-nowrap">Ca 2</p>
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#6b7b88] text-[12px] whitespace-nowrap">13:30 - 17:30</p>
+        <div className="bg-white relative rounded-[100px] shrink-0 size-[14px]">
+          <div aria-hidden className={`absolute ${isSelected ? "border-4 border-[#087f8c]" : "border border-[#b4bfc7]"} border-solid inset-0 pointer-events-none rounded-[100px]`} />
+        </div>
+        <p className={`[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 ${isSelected ? "text-[#087f8c] font-semibold" : "text-[#182b39]"} text-[13px] whitespace-nowrap`}>Ca 2</p>
+        <p className={`[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 ${isSelected ? "text-[#087f8c]" : "text-[#6b7b88]"} text-[12px] whitespace-nowrap`}>13:30 - 17:30</p>
         <Clock />
       </div>
-      <div aria-hidden className="absolute border border-[#e3e9ed] border-solid inset-0 pointer-events-none rounded-[8px]" />
     </div>
   );
 }
@@ -1052,8 +1094,25 @@ function UserCheck1() {
 }
 
 function DimDanhTaiX() {
+  const { toggleDriverCheckIn } = useContext(ShiftContext);
+  const [toast, setToast] = useState(false);
+  const handleBatchCheckIn = () => {
+    toggleDriverCheckIn("ALL");
+    setToast(true);
+    setTimeout(() => setToast(false), 2500);
+  };
   return (
-    <div className="bg-[#087f8c] content-stretch flex gap-[7px] h-[34px] items-center overflow-clip px-[13px] relative rounded-[6px] shrink-0" data-name="Điểm danh tài xế">
+    <div
+      onClick={handleBatchCheckIn}
+      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex gap-[7px] h-[34px] items-center overflow-clip px-[13px] relative rounded-[6px] shrink-0"
+      data-name="Điểm danh tài xế"
+      title="Bấm để điểm danh nhanh tài xế vào ca"
+    >
+      {toast && (
+        <div className="fixed top-16 right-8 z-50 bg-[#15803d] text-white px-5 py-3 rounded-lg shadow-xl font-bold text-[13px] animate-bounce">
+          ✓ Đã xác nhận điểm danh tài xế thành công!
+        </div>
+      )}
       <UserCheck1 />
       <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[12px] text-white whitespace-nowrap">Điểm danh tài xế</p>
     </div>
@@ -1139,11 +1198,50 @@ function BLcDimDanh2() {
 }
 
 function LcTheoDimDanh() {
+  const { attendanceFilter, setAttendanceFilter } = useContext(ShiftContext);
   return (
     <div className="content-stretch flex gap-[22px] items-center overflow-clip relative shrink-0" data-name="Lọc theo điểm danh">
-      <BLcDimDanh />
-      <BLcDimDanh1 />
-      <BLcDimDanh2 />
+      <div
+        onClick={() => setAttendanceFilter("all")}
+        className="h-[45px] relative shrink-0 cursor-pointer"
+        data-name="Bộ lọc điểm danh"
+      >
+        <div className="content-stretch flex gap-[6px] items-center overflow-clip px-[3px] relative rounded-[inherit] size-full">
+          <p className={`[word-break:break-word] ${attendanceFilter === "all" ? "font-semibold text-[#087f8c]" : "font-normal text-[#6b7b88]"} font-['Inter:Semi_Bold',sans-serif] leading-[1.45] not-italic relative shrink-0 text-[12px] whitespace-nowrap`}>Tất cả</p>
+          <div className="bg-[#e7f4f3] content-stretch flex items-start overflow-clip px-[5px] py-[2px] relative rounded-[4px] shrink-0">
+            <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">6</p>
+          </div>
+        </div>
+        {attendanceFilter === "all" && <div aria-hidden className="absolute border-[#087f8c] border-b-2 border-solid inset-0 pointer-events-none" />}
+      </div>
+
+      <div
+        onClick={() => setAttendanceFilter("checked_in")}
+        className="h-[45px] relative shrink-0 cursor-pointer"
+        data-name="Bộ lọc điểm danh"
+      >
+        <div className="content-stretch flex gap-[6px] items-center overflow-clip px-[3px] relative rounded-[inherit] size-full">
+          <p className={`[word-break:break-word] ${attendanceFilter === "checked_in" ? "font-semibold text-[#087f8c]" : "font-normal text-[#6b7b88]"} font-['Inter:Regular',sans-serif] leading-[1.45] not-italic relative shrink-0 text-[12px] whitespace-nowrap`}>Đã điểm danh</p>
+          <div className="bg-[#f0f3f5] content-stretch flex items-start overflow-clip px-[5px] py-[2px] relative rounded-[4px] shrink-0">
+            <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#6b7b88] text-[12px] whitespace-nowrap">4</p>
+          </div>
+        </div>
+        {attendanceFilter === "checked_in" && <div aria-hidden className="absolute border-[#087f8c] border-b-2 border-solid inset-0 pointer-events-none" />}
+      </div>
+
+      <div
+        onClick={() => setAttendanceFilter("not_checked_in")}
+        className="h-[45px] relative shrink-0 cursor-pointer"
+        data-name="Bộ lọc điểm danh"
+      >
+        <div className="content-stretch flex gap-[6px] items-center overflow-clip px-[3px] relative rounded-[inherit] size-full">
+          <p className={`[word-break:break-word] ${attendanceFilter === "not_checked_in" ? "font-semibold text-[#087f8c]" : "font-normal text-[#6b7b88]"} font-['Inter:Regular',sans-serif] leading-[1.45] not-italic relative shrink-0 text-[12px] whitespace-nowrap`}>Chưa điểm danh</p>
+          <div className="bg-[#f0f3f5] content-stretch flex items-start overflow-clip px-[5px] py-[2px] relative rounded-[4px] shrink-0">
+            <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#6b7b88] text-[12px] whitespace-nowrap">2</p>
+          </div>
+        </div>
+        {attendanceFilter === "not_checked_in" && <div aria-hidden className="absolute border-[#087f8c] border-b-2 border-solid inset-0 pointer-events-none" />}
+      </div>
     </div>
   );
 }
@@ -1161,11 +1259,18 @@ function Search() {
 }
 
 function TimTaiX() {
+  const { driverSearch, setDriverSearch } = useContext(ShiftContext);
   return (
     <div className="h-[32px] relative rounded-[6px] shrink-0 w-[252px]" data-name="Tìm tài xế">
       <div className="content-stretch flex gap-[7px] items-center overflow-clip px-[10px] relative rounded-[inherit] size-full">
         <Search />
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#94a1ac] text-[12px] whitespace-nowrap">Tìm mã hoặc tên tài xế...</p>
+        <input
+          type="text"
+          value={driverSearch}
+          onChange={(e) => setDriverSearch(e.target.value)}
+          placeholder="Tìm mã hoặc tên tài xế..."
+          className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[12px] text-[#182b39] outline-none"
+        />
       </div>
       <div aria-hidden className="absolute border border-[#e3e9ed] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
@@ -2223,10 +2328,48 @@ function KhongGianDiuPhi() {
 }
 
 export default function LpCaGiaoDimDanhTaiX() {
+  const [activeShift, setActiveShift] = useState<"ca1" | "ca2">("ca1");
+  const [attendanceFilter, setAttendanceFilter] = useState<"all" | "checked_in" | "not_checked_in">("all");
+  const [driverSearch, setDriverSearch] = useState("");
+  const [checkedInDrivers, setCheckedInDrivers] = useState<Record<string, boolean>>({
+    TX045: true,
+    TX048: true,
+    TX051: true,
+    TX055: true,
+  });
+
+  const toggleDriverCheckIn = (code: string) => {
+    if (code === "ALL") {
+      setCheckedInDrivers({
+        TX045: true,
+        TX048: true,
+        TX051: true,
+        TX055: true,
+        TX058: true,
+        TX062: true,
+      });
+    } else {
+      setCheckedInDrivers((prev) => ({ ...prev, [code]: !prev[code] }));
+    }
+  };
+
   return (
-    <div className="bg-[#f4f6f8] content-stretch flex items-start relative size-full" data-name="Lập ca giao & điểm danh tài xế">
-      <DiuHngHub />
-      <KhongGianDiuPhi />
-    </div>
+    <ShiftContext.Provider
+      value={{
+        activeShift,
+        setActiveShift,
+        attendanceFilter,
+        setAttendanceFilter,
+        driverSearch,
+        setDriverSearch,
+        checkedInDrivers,
+        toggleDriverCheckIn,
+      }}
+    >
+      <div className="bg-[#f4f6f8] content-stretch flex items-start relative size-full" data-name="Lập ca giao & điểm danh tài xế">
+        <DiuHngHubShared />
+        <KhongGianDiuPhi />
+      </div>
+    </ShiftContext.Provider>
   );
 }

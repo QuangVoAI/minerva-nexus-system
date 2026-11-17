@@ -1,7 +1,37 @@
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 import svgPaths from "./svg-fotlugvvbo";
 import { orderService } from "../services";
 import { DiuHngHub as DiuHngHubShared } from "../components/DiuHngHub";
+
+export interface CreateOrderFormData {
+  senderName: string;
+  senderPhone: string;
+  senderAddress: string;
+  recipientName: string;
+  recipientPhone: string;
+  recipientAddress: string;
+  recipientWard: string;
+  cargoType: string;
+  codAmount: string;
+}
+
+export const CreateOrderContext = createContext<{
+  form: CreateOrderFormData;
+  updateForm: (k: keyof CreateOrderFormData, v: string) => void;
+}>({
+  form: {
+    senderName: "Mai Anh",
+    senderPhone: "0932 678 901",
+    senderAddress: "30 Đường số 17, Phường Tân Thuận Tây, Quận 7, TP. Hồ Chí Minh",
+    recipientName: "Nguyễn Thảo Vy",
+    recipientPhone: "0903 456 789",
+    recipientAddress: "125 Nguyễn Thị Thập, Quận 7, TP. Hồ Chí Minh",
+    recipientWard: "Phường Tân Phong",
+    cargoType: "Quần áo / Thời trang",
+    codAmount: "850.000 ₫",
+  },
+  updateForm: () => {},
+});
 
 function Boxes() {
   return (
@@ -1684,7 +1714,12 @@ function McDichBiuMu() {
 
 function X() {
   return (
-    <div className="relative shrink-0 size-[21px]" data-name="x">
+    <div
+      onClick={() => { window.location.hash = "orders"; }}
+      className="relative shrink-0 size-[21px] cursor-pointer hover:opacity-75 transition-opacity"
+      title="Đóng (Quay lại Tiếp nhận đơn)"
+      data-name="x"
+    >
       <svg className="absolute block inset-0 size-full" fill="none" height="21" preserveAspectRatio="none" viewBox="0 0 21 21" width="21">
         <g id="x">
           <path d={svgPaths.p22e22f00} id="Vector" stroke="#65758A" strokeLinecap="round" />
@@ -1729,10 +1764,17 @@ function TieuDNhomThongTin() {
 }
 
 function GiaTrNhp() {
+  const { form, updateForm } = useContext(CreateOrderContext);
   return (
     <div className="bg-white h-[42px] relative rounded-[6px] shrink-0 w-full" data-name="Giá trị nhập">
       <div className="content-stretch flex items-center justify-between overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[13px] whitespace-nowrap">Mai Anh</p>
+        <input
+          type="text"
+          value={form.senderName}
+          onChange={(e) => updateForm("senderName", e.target.value)}
+          placeholder="Nhập tên người gửi"
+          className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[#142b3b] text-[13px] outline-none"
+        />
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
@@ -1749,10 +1791,17 @@ function TrngThongTin() {
 }
 
 function GiaTrNhp1() {
+  const { form, updateForm } = useContext(CreateOrderContext);
   return (
     <div className="bg-white h-[42px] relative rounded-[6px] shrink-0 w-full" data-name="Giá trị nhập">
       <div className="content-stretch flex items-center justify-between overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[13px] whitespace-nowrap">0932 678 901</p>
+        <input
+          type="tel"
+          value={form.senderPhone}
+          onChange={(e) => updateForm("senderPhone", e.target.value)}
+          placeholder="Nhập số điện thoại"
+          className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[#142b3b] text-[13px] outline-none"
+        />
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
@@ -1778,10 +1827,17 @@ function LienHNgiGi() {
 }
 
 function GiaTrNhp2() {
+  const { form, updateForm } = useContext(CreateOrderContext);
   return (
     <div className="bg-white h-[42px] relative rounded-[6px] shrink-0 w-full" data-name="Giá trị nhập">
       <div className="content-stretch flex items-center justify-between overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[13px] whitespace-nowrap">30 Đường số 17, Phường Tân Thuận Tây, Quận 7, TP. Hồ Chí Minh</p>
+        <input
+          type="text"
+          value={form.senderAddress}
+          onChange={(e) => updateForm("senderAddress", e.target.value)}
+          placeholder="Nhập địa chỉ người gửi"
+          className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[#142b3b] text-[13px] outline-none"
+        />
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
@@ -1829,10 +1885,17 @@ function TieuDNhomThongTin1() {
 }
 
 function GiaTrNhp3() {
+  const { form, updateForm } = useContext(CreateOrderContext);
   return (
     <div className="bg-white h-[42px] relative rounded-[6px] shrink-0 w-full" data-name="Giá trị nhập">
       <div className="content-stretch flex items-center justify-between overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[13px] whitespace-nowrap">Nguyễn Thảo Vy</p>
+        <input
+          type="text"
+          value={form.recipientName}
+          onChange={(e) => updateForm("recipientName", e.target.value)}
+          placeholder="Nhập tên người nhận"
+          className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[#142b3b] text-[13px] outline-none"
+        />
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
@@ -1849,10 +1912,17 @@ function TrngThongTin3() {
 }
 
 function GiaTrNhp4() {
+  const { form, updateForm } = useContext(CreateOrderContext);
   return (
     <div className="bg-white h-[42px] relative rounded-[6px] shrink-0 w-full" data-name="Giá trị nhập">
       <div className="content-stretch flex items-center justify-between overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[13px] whitespace-nowrap">0903 456 789</p>
+        <input
+          type="tel"
+          value={form.recipientPhone}
+          onChange={(e) => updateForm("recipientPhone", e.target.value)}
+          placeholder="Nhập số điện thoại người nhận"
+          className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[#142b3b] text-[13px] outline-none"
+        />
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
@@ -1878,10 +1948,17 @@ function LienHNgiNhn() {
 }
 
 function GiaTrNhp5() {
+  const { form, updateForm } = useContext(CreateOrderContext);
   return (
     <div className="bg-white h-[42px] relative rounded-[6px] shrink-0 w-full" data-name="Giá trị nhập">
       <div className="content-stretch flex items-center justify-between overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[13px] whitespace-nowrap">125 Nguyễn Thị Thập, Quận 7, TP. Hồ Chí Minh</p>
+        <input
+          type="text"
+          value={form.recipientAddress}
+          onChange={(e) => updateForm("recipientAddress", e.target.value)}
+          placeholder="Nhập địa chỉ chi tiết"
+          className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[#142b3b] text-[13px] outline-none"
+        />
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
@@ -1918,11 +1995,22 @@ function ChevronDown4() {
 }
 
 function GiaTrNhp6() {
+  const { form, updateForm } = useContext(CreateOrderContext);
   return (
     <div className="bg-white h-[42px] relative rounded-[6px] shrink-0 w-full" data-name="Giá trị nhập">
       <div className="content-stretch flex items-center justify-between overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[13px] whitespace-nowrap">Phường Tân Phong</p>
-        <ChevronDown4 />
+        <select
+          value={form.recipientWard}
+          onChange={(e) => updateForm("recipientWard", e.target.value)}
+          className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[#142b3b] text-[13px] outline-none cursor-pointer"
+        >
+          <option value="Phường Tân Phong">Phường Tân Phong</option>
+          <option value="Phường Tân Thuận Đông">Phường Tân Thuận Đông</option>
+          <option value="Phường Tân Thuận Tây">Phường Tân Thuận Tây</option>
+          <option value="Phường Tân Kiểng">Phường Tân Kiểng</option>
+          <option value="Phường Tân Quy">Phường Tân Quy</option>
+          <option value="Phường Phú Thuận">Phường Phú Thuận</option>
+        </select>
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
@@ -2018,11 +2106,21 @@ function ChevronDown5() {
 }
 
 function GiaTrNhp7() {
+  const { form, updateForm } = useContext(CreateOrderContext);
   return (
     <div className="bg-white h-[42px] relative rounded-[6px] shrink-0 w-full" data-name="Giá trị nhập">
       <div className="content-stretch flex items-center justify-between overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[13px] whitespace-nowrap">Quần áo / Thời trang</p>
-        <ChevronDown5 />
+        <select
+          value={form.cargoType}
+          onChange={(e) => updateForm("cargoType", e.target.value)}
+          className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[#142b3b] text-[13px] outline-none cursor-pointer"
+        >
+          <option value="Quần áo / Thời trang">Quần áo / Thời trang</option>
+          <option value="Điện tử / Gia dụng">Điện tử / Gia dụng</option>
+          <option value="Mỹ phẩm / Làm đẹp">Mỹ phẩm / Làm đẹp</option>
+          <option value="Thực phẩm khô">Thực phẩm khô</option>
+          <option value="Hàng tổng hợp">Hàng tổng hợp</option>
+        </select>
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
@@ -2040,10 +2138,17 @@ function TrngThongTin7() {
 }
 
 function GiaTrNhp8() {
+  const { form, updateForm } = useContext(CreateOrderContext);
   return (
     <div className="bg-white h-[42px] relative rounded-[6px] shrink-0 w-full" data-name="Giá trị nhập">
       <div className="content-stretch flex items-center justify-between overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[13px] whitespace-nowrap">850.000 ₫</p>
+        <input
+          type="text"
+          value={form.codAmount}
+          onChange={(e) => updateForm("codAmount", e.target.value)}
+          placeholder="0 ₫"
+          className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[#142b3b] text-[13px] outline-none"
+        />
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
@@ -2326,7 +2431,11 @@ function KtQuSauKhiLu() {
 
 function NutThaoTac2() {
   return (
-    <div className="bg-white h-[42px] relative rounded-[8px] shrink-0" data-name="Nút thao tác">
+    <div
+      onClick={() => { window.location.hash = "orders"; }}
+      className="bg-white hover:bg-[#f8fafc] cursor-pointer transition-colors h-[42px] relative rounded-[8px] shrink-0"
+      data-name="Nút thao tác"
+    >
       <div className="content-stretch flex items-center justify-center overflow-clip px-[16px] relative rounded-[inherit] size-full">
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[13px] whitespace-nowrap">Hủy</p>
       </div>
@@ -2384,22 +2493,38 @@ function HpThoiToDnGiL({ onSave, isLoading }: { onSave?: () => void; isLoading?:
 }
 
 export default function Scr03ToDnGiLThCong() {
+  const [form, setForm] = useState<CreateOrderFormData>({
+    senderName: "Mai Anh",
+    senderPhone: "0932 678 901",
+    senderAddress: "30 Đường số 17, Phường Tân Thuận Tây, Quận 7, TP. Hồ Chí Minh",
+    recipientName: "Nguyễn Thảo Vy",
+    recipientPhone: "0903 456 789",
+    recipientAddress: "125 Nguyễn Thị Thập, Quận 7, TP. Hồ Chí Minh",
+    recipientWard: "Phường Tân Phong",
+    cargoType: "Quần áo / Thời trang",
+    codAmount: "850.000 ₫",
+  });
+
+  const updateForm = (k: keyof CreateOrderFormData, v: string) => {
+    setForm((prev) => ({ ...prev, [k]: v }));
+  };
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
   const handleQuickCreate = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
+    const codNum = parseInt(form.codAmount.replace(/\D/g, "") || "0", 10);
     try {
-      const rand = Math.floor(1000 + Math.random() * 9000);
       const res = await Promise.race([
         orderService.createOrder({
-          recipientName: `Nguyễn Văn Demo ${rand}`,
-          phone: `0912${rand}`,
-          address: `${(rand % 200) + 1} Huỳnh Tấn Phát, P. Tân Thuận Đông, Q7`,
-          areaId: "Q7_TAN_THUAN",
+          recipientName: form.recipientName || "Khách nhận mới",
+          phone: form.recipientPhone || "0901234567",
+          address: form.recipientAddress || "125 Nguyễn Thị Thập, P. Tân Phong, Q7",
+          areaId: form.recipientWard.includes("Thuận") ? "Q7_TAN_THUAN" : "Q7_TAN_PHONG",
           serviceLevel: "STANDARD",
-          codAmount: 320000,
+          codAmount: codNum > 0 ? codNum : 850000,
         }),
         new Promise<any>((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3500))
       ]);
@@ -2407,7 +2532,7 @@ export default function Scr03ToDnGiLThCong() {
       sessionStorage.setItem("lastCreatedTrackingCode", res.trackingCode);
       setSuccessToast(`Tạo đơn thành công! Mã vận đơn: ${res.trackingCode}`);
       setTimeout(() => {
-        window.location.hash = "dispatch";
+        window.location.hash = "orders";
       }, 1000);
     } catch {
       const fallbackCode = `VN2411090${Math.floor(10 + Math.random() * 90)}`;
@@ -2415,7 +2540,7 @@ export default function Scr03ToDnGiLThCong() {
       sessionStorage.setItem("lastCreatedTrackingCode", fallbackCode);
       setSuccessToast(`Đã tạo đơn thành công! Mã vận đơn: ${fallbackCode}`);
       setTimeout(() => {
-        window.location.hash = "dispatch";
+        window.location.hash = "orders";
       }, 1000);
     } finally {
       setIsSubmitting(false);
@@ -2423,19 +2548,26 @@ export default function Scr03ToDnGiLThCong() {
   };
 
   return (
-    <div className="bg-[#f0f4f7] content-stretch flex items-start relative size-full" data-name="SCR-03 · Tạo đơn gửi lẻ thủ công">
-      {successToast && (
-        <div className="fixed top-16 right-8 z-50 bg-[#15803d] text-white px-5 py-3 rounded-lg shadow-xl font-bold text-[13px] animate-bounce">
-          ✓ {successToast}
-        </div>
-      )}
-      <DiuHngHub />
-      <KhongGianLamVic />
-      <div className="absolute bg-[rgba(13,32,62,0.52)] h-[1360px] left-0 top-0 w-[1600px]" data-name="Lớp phủ nền" />
-      <HpThoiToDnGiL
-        onSave={handleQuickCreate}
-        isLoading={isSubmitting}
-      />
-    </div>
+    <CreateOrderContext.Provider value={{ form, updateForm }}>
+      <div className="bg-[#f0f4f7] content-stretch flex items-start relative size-full" data-name="SCR-03 · Tạo đơn gửi lẻ thủ công">
+        {successToast && (
+          <div className="fixed top-16 right-8 z-50 bg-[#15803d] text-white px-5 py-3 rounded-lg shadow-xl font-bold text-[13px] animate-bounce">
+            ✓ {successToast}
+          </div>
+        )}
+        <DiuHngHubShared />
+        <KhongGianLamVic />
+        <div
+          onClick={() => { window.location.hash = "orders"; }}
+          className="absolute bg-[rgba(13,32,62,0.52)] h-[1360px] left-0 top-0 w-[1600px] cursor-pointer"
+          data-name="Lớp phủ nền"
+          title="Bấm ra ngoài để hủy và đóng"
+        />
+        <HpThoiToDnGiL
+          onSave={handleQuickCreate}
+          isLoading={isSubmitting}
+        />
+      </div>
+    </CreateOrderContext.Provider>
   );
 }

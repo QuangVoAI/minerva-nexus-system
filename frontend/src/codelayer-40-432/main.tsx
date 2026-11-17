@@ -531,11 +531,28 @@ function RefreshCw() {
 }
 
 function ChyLiGiY() {
+  const [refreshing, setRefreshing] = useState(false);
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 2000);
+  };
   return (
-    <div className="bg-white h-[40px] relative rounded-[6px] shrink-0" data-name="Chạy lại gợi ý">
+    <div
+      onClick={handleRefresh}
+      className="bg-white hover:bg-slate-50 cursor-pointer transition-colors h-[40px] relative rounded-[6px] shrink-0"
+      data-name="Chạy lại gợi ý"
+      title="Bấm để tính toán lại gợi ý phân công"
+    >
+      {refreshing && (
+        <div className="fixed top-16 right-8 z-50 bg-[#087f8c] text-white px-5 py-3 rounded-lg shadow-xl font-bold text-[13px] animate-bounce">
+          ⚡ Đã tối ưu và cập nhật phương án phân công mới nhất!
+        </div>
+      )}
       <div className="content-stretch flex gap-[8px] items-center justify-center overflow-clip px-[16px] relative rounded-[inherit] size-full">
         <RefreshCw />
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#18252f] text-[13px] whitespace-nowrap">Chạy lại gợi ý</p>
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#18252f] text-[13px] whitespace-nowrap">
+          {refreshing ? "Đang tính toán..." : "Chạy lại gợi ý"}
+        </p>
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>

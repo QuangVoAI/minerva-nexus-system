@@ -57,7 +57,12 @@ function ThanhTrngThai() {
 
 function ArrowLeft() {
   return (
-    <div className="relative shrink-0 size-[24px]" data-name="arrow-left">
+    <div
+      onClick={() => { window.location.hash = "driver"; }}
+      className="relative shrink-0 size-[24px] cursor-pointer hover:opacity-80 transition-opacity"
+      data-name="arrow-left"
+      title="Quay lại danh sách tác vụ tài xế"
+    >
       <svg className="absolute block inset-0 size-full" fill="none" height="24" preserveAspectRatio="none" viewBox="0 0 24 24" width="24">
         <g id="arrow-left">
           <path d={svgPaths.p177d0d00} id="Vector" stroke="white" strokeLinecap="round" strokeWidth="1.8" />

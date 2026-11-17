@@ -1,3 +1,4 @@
+import { useState } from "react";
 import svgPaths from "./svg-m20rp2w9f2";
 
 function IosSignal() {
@@ -190,26 +191,6 @@ function ChnHub() {
   );
 }
 
-function ONhpLiu() {
-  return (
-    <div className="bg-white h-[50px] relative rounded-[12px] shrink-0 w-full" data-name="Ô nhập liệu">
-      <div className="content-stretch flex items-center overflow-clip px-[14px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] flex-[1_0_0] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-px not-italic relative text-[#142b3b] text-[14px]">TX045</p>
-      </div>
-      <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[12px]" />
-    </div>
-  );
-}
-
-function TrngDangNhp() {
-  return (
-    <div className="content-stretch flex flex-col gap-[8px] items-start overflow-clip relative shrink-0 w-full" data-name="Trường đăng nhập">
-      <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[13px] whitespace-nowrap">Tên đăng nhập / Mã nhân viên</p>
-      <ONhpLiu />
-    </div>
-  );
-}
-
 function EyeOff() {
   return (
     <div className="relative shrink-0 size-[20px]" data-name="eye-off">
@@ -227,27 +208,6 @@ function EyeOff() {
   );
 }
 
-function ONhpLiu1() {
-  return (
-    <div className="bg-white h-[50px] relative rounded-[12px] shrink-0 w-full" data-name="Ô nhập liệu">
-      <div className="content-stretch flex gap-[12px] items-center overflow-clip px-[14px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] flex-[1_0_0] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-px not-italic relative text-[#142b3b] text-[14px] tracking-[3px]">••••••••••</p>
-        <EyeOff />
-      </div>
-      <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[12px]" />
-    </div>
-  );
-}
-
-function TrngDangNhp1() {
-  return (
-    <div className="content-stretch flex flex-col gap-[8px] items-start overflow-clip relative shrink-0 w-full" data-name="Trường đăng nhập">
-      <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[13px] whitespace-nowrap">Mật khẩu</p>
-      <ONhpLiu1 />
-    </div>
-  );
-}
-
 function ArrowRight() {
   return (
     <div className="relative shrink-0 size-[18px]" data-name="arrow-right">
@@ -260,27 +220,67 @@ function ArrowRight() {
   );
 }
 
-function DangNhp() {
-  return (
-    <div
-      onClick={() => { window.location.hash = "driver"; }}
-      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex gap-[10px] h-[50px] items-center justify-center overflow-clip relative rounded-[12px] shrink-0 w-full"
-      data-name="Đăng nhập"
-    >
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[14px] text-white whitespace-nowrap">Đăng nhập</p>
-      <ArrowRight />
-    </div>
-  );
-}
-
 function FormDangNhp() {
+  const [username, setUsername] = useState("TX045");
+  const [password, setPassword] = useState("password123");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    window.location.hash = "driver";
+  };
+
   return (
-    <div className="content-stretch flex flex-col gap-[22px] items-start relative shrink-0 w-full" data-name="Form đăng nhập">
+    <form onSubmit={handleSubmit} className="content-stretch flex flex-col gap-[22px] items-start relative shrink-0 w-full" data-name="Form đăng nhập">
       <ChnHub />
-      <TrngDangNhp />
-      <TrngDangNhp1 />
-      <DangNhp />
-    </div>
+      <div className="content-stretch flex flex-col gap-[8px] items-start overflow-clip relative shrink-0 w-full" data-name="Trường đăng nhập">
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[13px] whitespace-nowrap">Tên đăng nhập / Mã nhân viên</p>
+        <div className="bg-white h-[50px] relative rounded-[12px] shrink-0 w-full" data-name="Ô nhập liệu">
+          <div className="content-stretch flex items-center overflow-clip px-[14px] relative rounded-[inherit] size-full">
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="VD: TX045"
+              className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[#142b3b] text-[14px] outline-none"
+            />
+          </div>
+          <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[12px]" />
+        </div>
+      </div>
+
+      <div className="content-stretch flex flex-col gap-[8px] items-start overflow-clip relative shrink-0 w-full" data-name="Trường đăng nhập">
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[13px] whitespace-nowrap">Mật khẩu</p>
+        <div className="bg-white h-[50px] relative rounded-[12px] shrink-0 w-full" data-name="Ô nhập liệu">
+          <div className="content-stretch flex gap-[12px] items-center overflow-clip px-[14px] relative rounded-[inherit] size-full">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Nhập mật khẩu"
+              className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[#142b3b] text-[14px] outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="shrink-0 text-[#657684] hover:text-[#142b3b] focus:outline-none cursor-pointer"
+            >
+              <EyeOff />
+            </button>
+          </div>
+          <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[12px]" />
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex gap-[10px] h-[50px] items-center justify-center overflow-clip relative rounded-[12px] shrink-0 w-full border-none"
+        data-name="Đăng nhập"
+      >
+        <span className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[14px] text-white whitespace-nowrap">Đăng nhập</span>
+        <ArrowRight />
+      </button>
+    </form>
   );
 }
 

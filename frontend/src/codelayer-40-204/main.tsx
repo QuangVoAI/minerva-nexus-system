@@ -1,3 +1,4 @@
+import { useState } from "react";
 import svgPaths from "./svg-2auud66ghj";
 import { DiuHngHub as DiuHngHubShared } from "../components/DiuHngHub";
 
@@ -356,7 +357,13 @@ function ChevronRight() {
 function DngDn() {
   return (
     <div className="content-stretch flex gap-[10px] items-center overflow-clip relative shrink-0" data-name="Đường dẫn">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#5f7180] text-[12px] whitespace-nowrap">Đơn hàng</p>
+      <p
+        onClick={() => { window.location.hash = "orders"; }}
+        className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#5f7180] hover:text-[#087f8c] text-[12px] whitespace-nowrap cursor-pointer transition-colors"
+        title="Quay về danh sách đơn hàng"
+      >
+        Đơn hàng
+      </p>
       <ChevronRight />
       <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#172b3a] text-[12px] whitespace-nowrap">Hồ sơ chi tiết</p>
     </div>
@@ -376,12 +383,25 @@ function Search() {
 }
 
 function TimKim() {
+  const [kw, setKw] = useState("");
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && kw.trim()) {
+      window.location.hash = "tracking";
+    }
+  };
   return (
     <div className="bg-[#f8fafb] h-[34px] relative rounded-[6px] shrink-0 w-[255px]" data-name="Tìm kiếm">
       <div className="content-stretch flex gap-[8px] items-center overflow-clip px-[11px] relative rounded-[inherit] size-full">
         <Search />
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#84929d] text-[12px] whitespace-nowrap">Tìm mã vận đơn...</p>
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#84929d] text-[12px] whitespace-nowrap">⌘ K</p>
+        <input
+          type="text"
+          value={kw}
+          onChange={(e) => setKw(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Tìm mã vận đơn..."
+          className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[12px] text-[#172b3a] outline-none"
+        />
+        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#84929d] text-[11px] whitespace-nowrap">Enter</p>
       </div>
       <div aria-hidden className="absolute border border-[#dfe5ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
@@ -505,7 +525,12 @@ function Download() {
 
 function XutHS() {
   return (
-    <div className="bg-white h-[36px] relative rounded-[6px] shrink-0" data-name="Xuất hồ sơ">
+    <div
+      onClick={() => { window.location.hash = "reports"; }}
+      className="bg-white hover:bg-slate-50 cursor-pointer transition-colors h-[36px] relative rounded-[6px] shrink-0"
+      data-name="Xuất hồ sơ"
+      title="Bấm để tải/xuất báo cáo hồ sơ đơn hàng"
+    >
       <div className="content-stretch flex gap-[8px] items-center overflow-clip px-[14px] relative rounded-[inherit] size-full">
         <Download />
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#172b3a] text-[12px] whitespace-nowrap">Xuất hồ sơ</p>

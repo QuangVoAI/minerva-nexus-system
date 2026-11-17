@@ -679,7 +679,12 @@ function SDn() {
 
 function NhomSla() {
   return (
-    <div className="bg-[#eaf5ef] flex-[1_0_26px] min-w-px relative rounded-[8px]" data-name="Nhóm SLA">
+    <div
+      onClick={() => { window.location.hash = "orders"; }}
+      className="bg-[#eaf5ef] hover:opacity-90 cursor-pointer transition-opacity flex-[1_0_26px] min-w-px relative rounded-[8px]"
+      data-name="Nhóm SLA"
+      title="Bấm để lọc đơn SLA An toàn"
+    >
       <div className="content-stretch flex flex-col gap-[8px] items-start overflow-clip p-[12px] relative rounded-[inherit] size-full">
         <McD />
         <SDn />
@@ -727,7 +732,12 @@ function SDn1() {
 
 function NhomSla1() {
   return (
-    <div className="bg-[#fff5de] flex-[1_0_26px] min-w-px relative rounded-[8px]" data-name="Nhóm SLA">
+    <div
+      onClick={() => { window.location.hash = "orders"; }}
+      className="bg-[#fff5de] hover:opacity-90 cursor-pointer transition-opacity flex-[1_0_26px] min-w-px relative rounded-[8px]"
+      data-name="Nhóm SLA"
+      title="Bấm để lọc đơn SLA Cận hạn"
+    >
       <div className="content-stretch flex flex-col gap-[8px] items-start overflow-clip p-[12px] relative rounded-[inherit] size-full">
         <McD1 />
         <SDn1 />
@@ -775,7 +785,12 @@ function SDn2() {
 
 function NhomSla2() {
   return (
-    <div className="bg-[#fff0ef] flex-[1_0_26px] min-w-px relative rounded-[8px]" data-name="Nhóm SLA">
+    <div
+      onClick={() => { window.location.hash = "orders"; }}
+      className="bg-[#fff0ef] hover:opacity-90 cursor-pointer transition-opacity flex-[1_0_26px] min-w-px relative rounded-[8px]"
+      data-name="Nhóm SLA"
+      title="Bấm để lọc đơn SLA Nguy cơ cao"
+    >
       <div className="content-stretch flex flex-col gap-[8px] items-start overflow-clip p-[12px] relative rounded-[inherit] size-full">
         <McD2 />
         <SDn2 />
