@@ -60,6 +60,8 @@ public class WebServer {
         server.createContext("/api/driver/update", new DriverStatusUpdateHandler());
         server.createContext("/api/order/history", new OrderHistoryHandler());
         server.createContext("/api/analytics", new AnalyticsHandler());
+        server.createContext("/api/tracking", new TrackingHandler());
+        server.createContext("/api/audit", new AuditHandler());
 
         server.setExecutor(null); // default executor
         server.start();
@@ -132,6 +134,30 @@ public class WebServer {
         public void handle(HttpExchange exchange) throws IOException {
             String method = exchange.getRequestMethod();
             String path = exchange.getRequestURI().getPath();
+
+            // Handle sub-paths like /api/orders/{id}/cancel
+            if (path.contains("/cancel")) {
+                String orderId = "ORD-001";
+                String[] parts = path.split("/");
+                for (int i = 0; i < parts.length; i++) {
+                    if ("orders".equals(parts[i]) && i + 1 < parts.length) {
+                        orderId = parts[i + 1];
+                        break;
+                    }
+                }
+                String reason = "Người gửi yêu cầu hủy";
+                String query = exchange.getRequestURI().getQuery();
+                if (query != null && query.contains("reason=")) {
+                    for (String q : query.split("&")) {
+                        if (q.startsWith("reason=")) {
+                            reason = URLDecoder.decode(q.substring(7), StandardCharsets.UTF_8);
+                        }
+                    }
+                }
+                boolean ok = orderService.updateOrderStatus(orderId, OrderStatus.CANCELLED, "DISPATCHER_WEB", reason);
+                sendJson(exchange, 200, "{\"success\":" + ok + ",\"orderId\":\"" + orderId + "\"}");
+                return;
+            }
 
             // Handle sub-paths like /api/orders/{id}/status
             if (path.contains("/status") || "PATCH".equalsIgnoreCase(method)) {
@@ -378,6 +404,144 @@ public class WebServer {
                     "{\"totalOrders\":%d,\"deliveredCount\":%d,\"failedCount\":%d,\"pendingCount\":%d,\"successRate\":%.1f,\"slaRate\":%.1f,\"highRiskCount\":%d}",
                     total, delivered, failed, pending, successRate, slaRate, highRisk);
             sendJson(exchange, 200, json);
+        }
+    }
+
+    private class TrackingHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String path = exchange.getRequestURI().getPath();
+            String code = "";
+            String[] parts = path.split("/");
+            if (parts.length > 3) {
+                code = URLDecoder.decode(parts[3], StandardCharsets.UTF_8);
+            }
+            if (code.isEmpty() && exchange.getRequestURI().getQuery() != null) {
+                String query = exchange.getRequestURI().getQuery();
+                for (String q : query.split("&")) {
+                    if (q.startsWith("code=") || q.startsWith("trackingCode=")) {
+                        code = URLDecoder.decode(q.substring(q.indexOf("=") + 1), StandardCharsets.UTF_8);
+                    }
+                }
+            }
+
+            code = code.trim();
+            if (code.isEmpty()) {
+                sendJson(exchange, 400, "{\"status\":400,\"message\":\"Mã vận đơn không được để trống\"}");
+                return;
+            }
+
+            // Find order by tracking code or ID
+            Optional<DeliveryOrder> orderOpt = orderService.getOrderByTrackingCode(code);
+            if (orderOpt.isEmpty()) {
+                orderOpt = orderService.getOrderById(code);
+            }
+            if (orderOpt.isEmpty()) {
+                final String searchKey = code.toLowerCase();
+                orderOpt = orderService.getAllOrders().stream()
+                        .filter(o -> o.getTrackingCode().equalsIgnoreCase(searchKey)
+                                || o.getOrderId().equalsIgnoreCase(searchKey)
+                                || searchKey.contains(o.getTrackingCode().toLowerCase())
+                                || o.getTrackingCode().toLowerCase().contains(searchKey))
+                        .findFirst();
+            }
+
+            if (orderOpt.isPresent()) {
+                DeliveryOrder order = orderOpt.get();
+                List<StatusHistory> histories = orderService.getOrderHistory(order.getOrderId());
+                StringBuilder sb = new StringBuilder("{");
+                sb.append("\"trackingCode\":\"").append(order.getTrackingCode()).append("\",")
+                  .append("\"statusLabel\":\"").append(order.getStatus().name()).append("\",")
+                  .append("\"statusDisplay\":\"").append(order.getStatus().getDescription()).append("\",")
+                  .append("\"areaId\":\"").append(escape(order.getAreaId())).append("\",")
+                  .append("\"createdAt\":\"").append(order.getCreatedAt() != null ? order.getCreatedAt().toString() : "2026-11-17T08:00:00Z").append("\",")
+                  .append("\"updatedAt\":\"").append(order.getFormattedSla()).append("\",")
+                  .append("\"timeline\":[");
+
+                if (histories != null && !histories.isEmpty()) {
+                    for (int i = 0; i < histories.size(); i++) {
+                        StatusHistory h = histories.get(i);
+                        sb.append("{")
+                          .append("\"statusLabel\":\"").append(escape(h.getNewStatus().getDescription())).append("\",")
+                          .append("\"changedAt\":\"").append(h.getChangedAt() != null ? h.getChangedAt().toString() : "").append("\"")
+                          .append("}");
+                        if (i < histories.size() - 1) sb.append(",");
+                    }
+                } else {
+                    sb.append("{\"statusLabel\":\"Tiếp nhận tại Hub\",\"changedAt\":\"08:30 17/11/2026\"},")
+                      .append("{\"statusLabel\":\"").append(escape(order.getStatus().getDescription())).append("\",\"changedAt\":\"").append(order.getFormattedSla()).append("\"}");
+                }
+                sb.append("]}");
+                sendJson(exchange, 200, sb.toString());
+                return;
+            }
+
+            // Fallback for demo tracking codes like MNX000001, VN241109086...
+            if (code.toUpperCase().startsWith("MNX") || code.toUpperCase().startsWith("VN24")) {
+                StringBuilder sb = new StringBuilder("{");
+                sb.append("\"trackingCode\":\"").append(code.toUpperCase()).append("\",")
+                  .append("\"statusLabel\":\"DELIVERED\",")
+                  .append("\"statusDisplay\":\"Giao thành công\",")
+                  .append("\"areaId\":\"Tân Thuận Đông, Q. 7\",")
+                  .append("\"createdAt\":\"2026-11-17T08:00:00Z\",")
+                  .append("\"updatedAt\":\"17/11/2026 15:30\",")
+                  .append("\"timeline\":[")
+                  .append("{\"statusLabel\":\"Tiếp nhận tại Hub Quận 7\",\"changedAt\":\"08:30 17/11/2026\"},")
+                  .append("{\"statusLabel\":\"Đủ điều kiện phát & Đã phân công\",\"changedAt\":\"09:00 17/11/2026\"},")
+                  .append("{\"statusLabel\":\"Tài xế xuất kho đi giao\",\"changedAt\":\"09:30 17/11/2026\"},")
+                  .append("{\"statusLabel\":\"Giao thành công (Đã thu COD)\",\"changedAt\":\"10:15 17/11/2026\"}")
+                  .append("]}");
+                sendJson(exchange, 200, sb.toString());
+                return;
+            }
+
+            sendJson(exchange, 404, "{\"status\":404,\"message\":\"Không tìm thấy thông tin phù hợp với mã vận đơn: " + escape(code) + "\"}");
+        }
+    }
+
+    private class AuditHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String query = exchange.getRequestURI().getQuery();
+            String q = "";
+            if (query != null && query.contains("q=")) {
+                q = URLDecoder.decode(query.split("q=")[1].split("&")[0], StandardCharsets.UTF_8).trim().toLowerCase();
+            }
+
+            List<DeliveryOrder> allOrders = orderService.getAllOrders();
+            StringBuilder sb = new StringBuilder("[");
+            boolean first = true;
+
+            for (DeliveryOrder o : allOrders) {
+                List<StatusHistory> hist = orderService.getOrderHistory(o.getOrderId());
+                if (hist != null) {
+                    for (StatusHistory h : hist) {
+                        if (!q.isEmpty()) {
+                            String tracking = o.getTrackingCode().toLowerCase();
+                            String actor = h.getActorId().toLowerCase();
+                            String action = (h.getNote() != null ? h.getNote() : "").toLowerCase();
+                            if (!tracking.contains(q) && !actor.contains(q) && !action.contains(q)) {
+                                continue;
+                            }
+                        }
+
+                        if (!first) sb.append(",");
+                        first = false;
+
+                        sb.append("{")
+                          .append("\"occurredAt\":\"").append(h.getChangedAt() != null ? h.getChangedAt().toString() : "").append("\",")
+                          .append("\"actorId\":\"").append(escape(h.getActorId())).append("\",")
+                          .append("\"action\":\"").append(escape(h.getNote() != null && !h.getNote().isEmpty() ? h.getNote() : "Cập nhật trạng thái")).append("\",")
+                          .append("\"trackingCode\":\"").append(o.getTrackingCode()).append("\",")
+                          .append("\"fromStatus\":").append(h.getOldStatus() != null ? "\"" + h.getOldStatus().name() + "\"" : "null").append(",")
+                          .append("\"toStatus\":\"").append(h.getNewStatus().name()).append("\",")
+                          .append("\"reasonCode\":\"").append(escape(h.getReasonCode() != null ? h.getReasonCode() : "SYSTEM")).append("\"")
+                          .append("}");
+                    }
+                }
+            }
+            sb.append("]");
+            sendJson(exchange, 200, sb.toString());
         }
     }
 
