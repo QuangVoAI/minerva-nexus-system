@@ -3,10 +3,208 @@ import svgPaths from "./svg-mmw8u2i6ev";
 import { dispatchService } from "../services";
 import { DiuHngHub as DiuHngHubShared } from "../components/DiuHngHub";
 
+export interface DispatchOrder {
+  id: string;
+  address: string;
+  ward: string;
+  slaTime: string;
+  slaDeadline: string;
+  isUrgent: boolean;
+  driverId: string;
+  driverName: string;
+  route: string;
+  currentLoad: number;
+  maxLoad: number;
+  matchPercent: number;
+  intervention: string;
+  checked: boolean;
+  breakdown: {
+    w1: number;
+    w2: number;
+    w3: number;
+    explanation: string;
+    note?: string;
+  };
+}
+
+export interface DriverOption {
+  id: string;
+  name: string;
+  code: string;
+  route: string;
+  baseLoad: number;
+  maxLoad: number;
+}
+
+export const DRIVER_OPTIONS: DriverOption[] = [
+  { id: "DRV-01", name: "Nguyễn Văn An", code: "DRV-01", route: "Tuyến Tân Thuận Đông", baseLoad: 4, maxLoad: 15 },
+  { id: "DRV-02", name: "Trần Quốc Bình", code: "DRV-02", route: "Tuyến Tân Phú", baseLoad: 6, maxLoad: 15 },
+  { id: "DRV-03", name: "Lê Thị Chi", code: "DRV-03", route: "Tuyến Tân Kiểng", baseLoad: 8, maxLoad: 15 },
+  { id: "DRV-04", name: "Phạm Minh Dũng", code: "DRV-04", route: "Tuyến Tân Phú", baseLoad: 11, maxLoad: 15 },
+  { id: "DRV-05", name: "Hoàng Văn Em", code: "DRV-05", route: "Tuyến Dự phòng Tân Quy", baseLoad: 2, maxLoad: 15 },
+];
+
+export const INITIAL_DISPATCH_ORDERS: DispatchOrder[] = [
+  {
+    id: "MNX000001",
+    address: "Giao 12 Huỳnh Tấn Phát",
+    ward: "P. Tân Thuận Đông",
+    slaTime: "35 phút",
+    slaDeadline: "Hạn 09:55",
+    isUrgent: true,
+    driverId: "DRV-01",
+    driverName: "Nguyễn Văn An",
+    route: "Tuyến Tân Thuận Đông",
+    currentLoad: 4,
+    maxLoad: 15,
+    matchPercent: 96,
+    intervention: "Đang xem chi tiết",
+    checked: true,
+    breakdown: {
+      w1: 50,
+      w2: 30,
+      w3: 16,
+      explanation: "Trùng 100% tuyến + Tải còn trống nhiều + Gần vị trí giao.",
+      note: "Vị trí gần hỗ trợ; không cộng thêm vào 3 trọng số."
+    }
+  },
+  {
+    id: "MNX000006",
+    address: "Giao 85 Nguyễn Lương Bằng",
+    ward: "P. Tân Phú",
+    slaTime: "55 phút",
+    slaDeadline: "Hạn 10:15",
+    isUrgent: true,
+    driverId: "DRV-02",
+    driverName: "Trần Quốc Bình",
+    route: "Tuyến Tân Phú",
+    currentLoad: 6,
+    maxLoad: 15,
+    matchPercent: 91,
+    intervention: "Đã đổi thủ công Lê Thu Hà · 09:19",
+    checked: true,
+    breakdown: {
+      w1: 45,
+      w2: 30,
+      w3: 16,
+      explanation: "Tài xế quen thuộc khu đô thị Phú Mỹ Hưng, sẵn sàng nhận thêm đơn.",
+      note: "Đã can thiệp thủ công từ điều phối viên."
+    }
+  },
+  {
+    id: "MNX000012",
+    address: "Giao 68 Lê Văn Lương",
+    ward: "P. Tân Kiểng",
+    slaTime: "1 giờ 20",
+    slaDeadline: "Hạn 10:40",
+    isUrgent: false,
+    driverId: "DRV-03",
+    driverName: "Lê Thị Chi",
+    route: "Tuyến Tân Kiểng",
+    currentLoad: 8,
+    maxLoad: 15,
+    matchPercent: 94,
+    intervention: "Theo quy tắc",
+    checked: true,
+    breakdown: {
+      w1: 48,
+      w2: 28,
+      w3: 18,
+      explanation: "Tuyến đường tối ưu, gần điểm giao hiện tại.",
+      note: "Tự động phân công theo thuật toán v2.4."
+    }
+  },
+  {
+    id: "MNX000018",
+    address: "Giao 24 Bùi Văn Ba",
+    ward: "P. Tân Thuận Đông",
+    slaTime: "1 giờ 45",
+    slaDeadline: "Hạn 11:05",
+    isUrgent: false,
+    driverId: "DRV-01",
+    driverName: "Nguyễn Văn An",
+    route: "Tuyến Tân Thuận Đông",
+    currentLoad: 4,
+    maxLoad: 15,
+    matchPercent: 95,
+    intervention: "Theo quy tắc",
+    checked: true,
+    breakdown: {
+      w1: 50,
+      w2: 25,
+      w3: 20,
+      explanation: "Cùng trục đường với MNX000001, gom đơn tiết kiệm thời gian di chuyển.",
+      note: "Tự động phân công theo thuật toán v2.4."
+    }
+  },
+  {
+    id: "MNX000023",
+    address: "Giao 156 Nguyễn Thị Thập",
+    ward: "P. Tân Phú",
+    slaTime: "2 giờ 10",
+    slaDeadline: "Hạn 11:30",
+    isUrgent: false,
+    driverId: "DRV-04",
+    driverName: "Phạm Minh Dũng",
+    route: "Tuyến Tân Phú",
+    currentLoad: 11,
+    maxLoad: 15,
+    matchPercent: 88,
+    intervention: "Theo quy tắc",
+    checked: false,
+    breakdown: {
+      w1: 45,
+      w2: 23,
+      w3: 20,
+      explanation: "Đơn giao giờ trưa, sức chứa tài xế còn 4 đơn.",
+      note: "Tự động phân công theo thuật toán v2.4."
+    }
+  },
+  {
+    id: "MNX000029",
+    address: "Giao 40 Trần Xuân Soạn",
+    ward: "P. Tân Kiểng",
+    slaTime: "2 giờ 40",
+    slaDeadline: "Hạn 12:00",
+    isUrgent: false,
+    driverId: "DRV-03",
+    driverName: "Lê Thị Chi",
+    route: "Tuyến Tân Kiểng",
+    currentLoad: 8,
+    maxLoad: 15,
+    matchPercent: 92,
+    intervention: "Theo quy tắc",
+    checked: false,
+    breakdown: {
+      w1: 48,
+      w2: 24,
+      w3: 20,
+      explanation: "Điểm giao cuối tuyến, phù hợp hành trình về trạm.",
+      note: "Tự động phân công theo thuật toán v2.4."
+    }
+  }
+];
+
 const DispatchActionContext = createContext<{
-  onApprove?: () => void;
-  isApproving?: boolean;
-}>({});
+  orders: DispatchOrder[];
+  selectedOrderId: string;
+  setSelectedOrderId: (id: string) => void;
+  toggleCheck: (id: string) => void;
+  toggleCheckAll: () => void;
+  uncheckAll: () => void;
+  changeDriver: (orderId: string, driverId: string) => void;
+  searchQuery: string;
+  setSearchQuery: (q: string) => void;
+  filterSla: string;
+  setFilterSla: (f: string) => void;
+  filterIntervention: string;
+  setFilterIntervention: (f: string) => void;
+  onApprove: () => void;
+  isApproving: boolean;
+  checkedCount: number;
+  filteredOrders: DispatchOrder[];
+  selectedOrder: DispatchOrder;
+}>({} as any);
 
 function Boxes() {
   return (
@@ -767,11 +965,14 @@ function ChuGiiRiRo() {
 }
 
 function LaChnVaChuGii() {
+  const { checkedCount, orders } = useContext(DispatchActionContext);
   return (
     <div className="content-stretch flex gap-[14px] items-center overflow-clip relative shrink-0" data-name="Lựa chọn và chú giải">
       <ChuGiiRiRo />
       <div className="bg-[#dce4ea] h-[16px] relative shrink-0 w-px" data-name="Phân cách" />
-      <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">Đã chọn 4 / 6</p>
+      <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">
+        Đã chọn {checkedCount} / {orders.length}
+      </p>
     </div>
   );
 }
@@ -802,70 +1003,6 @@ function Search() {
   );
 }
 
-function TimDn() {
-  return (
-    <div className="h-[34px] relative rounded-[6px] shrink-0 w-[230px]" data-name="Tìm đơn">
-      <div className="content-stretch flex gap-[8px] items-center overflow-clip px-[10px] relative rounded-[inherit] size-full">
-        <Search />
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#84919c] text-[12px] whitespace-nowrap">Tìm mã đơn, địa chỉ</p>
-      </div>
-      <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
-    </div>
-  );
-}
-
-function ChevronDown1() {
-  return (
-    <div className="relative shrink-0 size-[14px]" data-name="chevron-down">
-      <svg className="absolute block inset-0 size-full" fill="none" height="14" preserveAspectRatio="none" viewBox="0 0 14 14" width="14">
-        <g id="chevron-down">
-          <path d="M3.5 5.25L7 8.75L10.5 5.25" id="Vector" stroke="#596975" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function BLc() {
-  return (
-    <div className="bg-white h-[34px] relative rounded-[6px] shrink-0 w-[144px]" data-name="Bộ lọc">
-      <div className="content-stretch flex items-center justify-between overflow-clip px-[10px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Tất cả</p>
-        <ChevronDown1 />
-      </div>
-      <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
-    </div>
-  );
-}
-
-function ChevronDown2() {
-  return (
-    <div className="relative shrink-0 size-[14px]" data-name="chevron-down">
-      <svg className="absolute block inset-0 size-full" fill="none" height="14" preserveAspectRatio="none" viewBox="0 0 14 14" width="14">
-        <g id="chevron-down">
-          <path d="M3.5 5.25L7 8.75L10.5 5.25" id="Vector" stroke="#596975" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function BLc1() {
-  return (
-    <div className="bg-white h-[34px] relative rounded-[6px] shrink-0 w-[146px]" data-name="Bộ lọc">
-      <div className="content-stretch flex items-center justify-between overflow-clip px-[10px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Can thiệp</p>
-        <ChevronDown2 />
-      </div>
-      <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
-    </div>
-  );
-}
-
-function KhongTrng() {
-  return <div className="flex-[1_0_0] h-px min-w-px relative" data-name="Khoảng trống" />;
-}
-
 function ArrowDownWideNarrow() {
   return (
     <div className="relative shrink-0 size-[14px]" data-name="arrow-down-wide-narrow">
@@ -878,24 +1015,66 @@ function ArrowDownWideNarrow() {
   );
 }
 
-function SpXpuTien() {
-  return (
-    <div className="content-stretch flex gap-[6px] items-center overflow-clip relative shrink-0" data-name="Sắp xếp ưu tiên">
-      <ArrowDownWideNarrow />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">SLA</p>
-    </div>
-  );
-}
-
 function BLcBng() {
+  const { searchQuery, setSearchQuery, filterSla, setFilterSla, filterIntervention, setFilterIntervention } = useContext(DispatchActionContext);
   return (
     <div className="h-[54px] relative shrink-0 w-full" data-name="Bộ lọc bảng">
-      <div className="content-stretch flex gap-[8px] items-center overflow-clip px-[16px] relative rounded-[inherit] size-full">
-        <TimDn />
-        <BLc />
-        <BLc1 />
-        <KhongTrng />
-        <SpXpuTien />
+      <div className="content-stretch flex gap-[8px] items-center px-[16px] relative rounded-[inherit] size-full">
+        {/* Tìm đơn */}
+        <div className="h-[34px] relative rounded-[6px] shrink-0 w-[230px] border border-[#dce4ea] bg-white flex items-center px-[10px] gap-[8px]">
+          <Search />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Tìm mã đơn, địa chỉ..."
+            className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[12px] text-[#18252f] placeholder-[#84919c] outline-none"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              className="text-[#84919c] hover:text-[#18252f] text-[11px] cursor-pointer"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Lọc SLA / Trạng thái */}
+        <div className="bg-white h-[34px] relative rounded-[6px] shrink-0 border border-[#dce4ea] px-[8px] flex items-center">
+          <select
+            value={filterSla}
+            onChange={(e) => setFilterSla(e.target.value)}
+            className="bg-transparent font-['Inter:Regular',sans-serif] text-[12px] text-[#657684] outline-none cursor-pointer"
+          >
+            <option value="all">Tất cả đề xuất</option>
+            <option value="urgent">SLA khẩn cấp (&lt; 60 phút)</option>
+            <option value="checked">Đã chọn</option>
+            <option value="unchecked">Chưa chọn</option>
+          </select>
+        </div>
+
+        {/* Lọc Can thiệp */}
+        <div className="bg-white h-[34px] relative rounded-[6px] shrink-0 border border-[#dce4ea] px-[8px] flex items-center">
+          <select
+            value={filterIntervention}
+            onChange={(e) => setFilterIntervention(e.target.value)}
+            className="bg-transparent font-['Inter:Regular',sans-serif] text-[12px] text-[#657684] outline-none cursor-pointer"
+          >
+            <option value="all">Tất cả can thiệp</option>
+            <option value="manual">Đã đổi thủ công</option>
+            <option value="rule">Theo quy tắc</option>
+          </select>
+        </div>
+
+        <div className="flex-[1_0_0] h-px min-w-px relative" />
+
+        {/* Sắp xếp */}
+        <div className="content-stretch flex gap-[6px] items-center overflow-clip relative shrink-0">
+          <ArrowDownWideNarrow />
+          <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] text-[#657684] text-[12px] whitespace-nowrap">Sắp xếp: SLA</p>
+        </div>
       </div>
       <div aria-hidden className="absolute border-[#dce4ea] border-solid border-t inset-0 pointer-events-none" />
     </div>
@@ -914,42 +1093,6 @@ function Minus() {
   );
 }
 
-function ChnDn() {
-  return (
-    <div className="bg-[#087f8c] relative rounded-[3px] shrink-0 size-[17px]" data-name="Chọn đơn">
-      <div className="content-stretch flex items-center justify-center overflow-clip relative rounded-[inherit] size-full">
-        <Minus />
-      </div>
-      <div aria-hidden className="absolute border border-[#087f8c] border-solid inset-0 pointer-events-none rounded-[3px]" />
-    </div>
-  );
-}
-
-function ChnTtC() {
-  return (
-    <div className="content-stretch flex items-start overflow-clip relative shrink-0 w-[24px]" data-name="Chọn tất cả">
-      <ChnDn />
-    </div>
-  );
-}
-
-function TieuDCt() {
-  return (
-    <div className="bg-[#f6f8fa] h-[40px] relative shrink-0 w-full" data-name="Tiêu đề cột">
-      <div className="content-stretch flex gap-[8px] items-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <ChnTtC />
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] w-[230px]">Đơn / Địa chỉ</p>
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] w-[88px]">SLA</p>
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] w-[168px]">Tài xế</p>
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] w-[100px]">Tải</p>
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] w-[62px]">Khớp</p>
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] w-[128px]">Can thiệp</p>
-      </div>
-      <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid border-t inset-0 pointer-events-none" />
-    </div>
-  );
-}
-
 function Check() {
   return (
     <div className="relative shrink-0 size-[12px]" data-name="check">
@@ -958,56 +1101,6 @@ function Check() {
           <path d={svgPaths.p2a580400} id="Vector" stroke="white" strokeLinecap="round" strokeWidth="1.7" />
         </g>
       </svg>
-    </div>
-  );
-}
-
-function ChnDn1() {
-  return (
-    <div className="bg-[#087f8c] relative rounded-[3px] shrink-0 size-[17px]" data-name="Chọn đơn">
-      <div className="content-stretch flex items-center justify-center overflow-clip relative rounded-[inherit] size-full">
-        <Check />
-      </div>
-      <div aria-hidden className="absolute border border-[#087f8c] border-solid inset-0 pointer-events-none rounded-[3px]" />
-    </div>
-  );
-}
-
-function LaChn() {
-  return (
-    <div className="content-stretch flex items-start overflow-clip relative shrink-0 w-[24px]" data-name="Lựa chọn">
-      <ChnDn1 />
-    </div>
-  );
-}
-
-function Flag1() {
-  return (
-    <div className="relative shrink-0 size-[12px]" data-name="flag">
-      <svg className="absolute block inset-0 size-full" fill="none" height="12" preserveAspectRatio="none" viewBox="0 0 12 12" width="12">
-        <g id="flag">
-          <path d={svgPaths.p1e4e1000} id="Vector" stroke="#D14343" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function MaDnVauTien() {
-  return (
-    <div className="content-stretch flex gap-[8px] items-center overflow-clip relative shrink-0" data-name="Mã đơn và ưu tiên">
-      <p className="[word-break:break-word] font-['Roboto_Mono:SemiBold',sans-serif] font-semibold leading-[normal] relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">MNX000001</p>
-      <Flag1 />
-    </div>
-  );
-}
-
-function DnGiao() {
-  return (
-    <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[230px]" data-name="Đơn giao">
-      <MaDnVauTien />
-      <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] min-w-full not-italic relative shrink-0 text-[#18252f] text-[12px] w-[min-content]">Giao 12 Huỳnh Tấn Phát</p>
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-full not-italic relative shrink-0 text-[#657684] text-[12px] w-[min-content]">P. Tân Thuận Đông</p>
     </div>
   );
 }
@@ -1029,888 +1122,175 @@ function Clock() {
   );
 }
 
-function ThiGianConLi() {
-  return (
-    <div className="content-stretch flex gap-[5px] items-center overflow-clip relative shrink-0" data-name="Thời gian còn lại">
-      <Clock />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#d14343] text-[13px] whitespace-nowrap">35 phút</p>
-    </div>
-  );
-}
+function TieuDCt() {
+  const { filteredOrders, toggleCheckAll } = useContext(DispatchActionContext);
+  const allChecked = filteredOrders.length > 0 && filteredOrders.every((o) => o.checked);
+  const someChecked = filteredOrders.some((o) => o.checked) && !allChecked;
 
-function DCpBach() {
   return (
-    <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[88px]" data-name="Độ cấp bách">
-      <ThiGianConLi />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Hạn 09:55</p>
-    </div>
-  );
-}
-
-function ChevronDown3() {
-  return (
-    <div className="relative shrink-0 size-[12px]" data-name="chevron-down">
-      <svg className="absolute block inset-0 size-full" fill="none" height="12" preserveAspectRatio="none" viewBox="0 0 12 12" width="12">
-        <g id="chevron-down">
-          <path d="M3 4.5L6 7.5L9 4.5" id="Vector" stroke="#087F8C" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function DiTaiX() {
-  return (
-    <div className="content-stretch flex gap-[5px] items-center overflow-clip relative shrink-0" data-name="Đổi tài xế">
-      <p className="[text-underline-position:from-font] [word-break:break-word] decoration-from-font decoration-solid font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[12px] underline whitespace-nowrap">Nguyễn Văn An</p>
-      <ChevronDown3 />
-    </div>
-  );
-}
-
-function TaiXDXut() {
-  return (
-    <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[168px]" data-name="Tài xế đề xuất">
-      <DiTaiX />
-      <p className="[word-break:break-word] font-['Roboto_Mono:Regular',sans-serif] font-normal leading-[1.45] relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">DRV-01</p>
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-full not-italic relative shrink-0 text-[#657684] text-[12px] w-[min-content]">Tuyến Tân Thuận Đông</p>
-    </div>
-  );
-}
-
-function ThanhTi() {
-  return (
-    <div className="bg-[#dce4ea] content-stretch flex h-[3px] items-start overflow-clip relative rounded-[2px] shrink-0 w-[88px]" data-name="Thanh tải">
-      <div className="bg-[#087f8c] h-[3px] relative rounded-[2px] shrink-0 w-[23px]" data-name="Tải đã dùng" />
-    </div>
-  );
-}
-
-function ScCha() {
-  return (
-    <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[100px]" data-name="Sức chứa">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">4/15 đơn</p>
-      <ThanhTi />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Còn 11 chỗ</p>
-    </div>
-  );
-}
-
-function DimKhp() {
-  return (
-    <div className="[word-break:break-word] content-stretch flex flex-col gap-[5px] items-start not-italic overflow-clip relative shrink-0 text-[#087f8c] w-[62px] whitespace-nowrap" data-name="Điểm khớp">
-      <p className="font-['Inter:Bold',sans-serif] font-bold leading-[normal] relative shrink-0 text-[17px] tracking-[-0.5px]">96%</p>
-      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] relative shrink-0 text-[12px]">Chi tiết →</p>
-    </div>
-  );
-}
-
-function NhanTrngThai2() {
-  return (
-    <div className="bg-[#e7f4f3] content-stretch flex items-start overflow-clip px-[8px] py-[5px] relative rounded-[4px] shrink-0" data-name="Nhãn trạng thái">
-      <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">Đang xem chi tiết</p>
-    </div>
-  );
-}
-
-function TrngThaiCanThip() {
-  return (
-    <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[128px]" data-name="Trạng thái can thiệp">
-      <NhanTrngThai2 />
-    </div>
-  );
-}
-
-function DXutPhanCong() {
-  return (
-    <div className="bg-[#f0f8f6] h-[92px] relative shrink-0 w-full" data-name="Đề xuất phân công">
+    <div className="bg-[#f6f8fa] h-[40px] relative shrink-0 w-full" data-name="Tiêu đề cột">
       <div className="content-stretch flex gap-[8px] items-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <LaChn />
-        <DnGiao />
-        <DCpBach />
-        <TaiXDXut />
-        <ScCha />
-        <DimKhp />
-        <TrngThaiCanThip />
+        <div className="content-stretch flex items-start overflow-clip relative shrink-0 w-[24px]" data-name="Chọn tất cả">
+          <button
+            type="button"
+            onClick={toggleCheckAll}
+            className={`relative rounded-[3px] shrink-0 size-[17px] flex items-center justify-center cursor-pointer transition-colors border ${
+              allChecked || someChecked ? "bg-[#087f8c] border-[#087f8c]" : "bg-white border-[#dce4ea] hover:border-[#087f8c]"
+            }`}
+            title={allChecked ? "Bỏ chọn tất cả" : "Chọn tất cả đề xuất"}
+          >
+            {allChecked && <Check />}
+            {someChecked && <Minus />}
+          </button>
+        </div>
+        <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] text-[#657684] text-[12px] w-[230px]">Đơn / Địa chỉ</p>
+        <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] text-[#657684] text-[12px] w-[88px]">SLA</p>
+        <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] text-[#657684] text-[12px] w-[168px]">Tài xế (Sổ xuống để chọn)</p>
+        <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] text-[#657684] text-[12px] w-[100px]">Tải</p>
+        <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] text-[#657684] text-[12px] w-[62px]">Khớp</p>
+        <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] text-[#657684] text-[12px] w-[128px]">Can thiệp</p>
       </div>
-      <div aria-hidden className="absolute border-[#087f8c] border-b border-l-3 border-solid inset-0 pointer-events-none" />
+      <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid border-t inset-0 pointer-events-none" />
     </div>
   );
 }
 
-function Check1() {
-  return (
-    <div className="relative shrink-0 size-[12px]" data-name="check">
-      <svg className="absolute block inset-0 size-full" fill="none" height="12" preserveAspectRatio="none" viewBox="0 0 12 12" width="12">
-        <g id="check">
-          <path d={svgPaths.p2a580400} id="Vector" stroke="white" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
+function DispatchRow({ order }: { order: DispatchOrder }) {
+  const { selectedOrderId, setSelectedOrderId, toggleCheck, changeDriver } = useContext(DispatchActionContext);
+  const isSelected = order.id === selectedOrderId;
 
-function ChnDn2() {
   return (
-    <div className="bg-[#087f8c] relative rounded-[3px] shrink-0 size-[17px]" data-name="Chọn đơn">
-      <div className="content-stretch flex items-center justify-center overflow-clip relative rounded-[inherit] size-full">
-        <Check1 />
+    <div
+      onClick={() => setSelectedOrderId(order.id)}
+      className={`h-[92px] relative shrink-0 w-full cursor-pointer transition-colors border-b border-[#dce4ea] ${
+        isSelected ? "bg-[#f0f8f6] border-l-[3px] border-l-[#087f8c]" : "bg-white hover:bg-[#fafbfc]"
+      }`}
+      data-name="Đề xuất phân công"
+    >
+      <div className="content-stretch flex gap-[8px] items-center px-[12px] relative size-full">
+        {/* Checkbox */}
+        <div className="content-stretch flex items-start overflow-clip relative shrink-0 w-[24px]">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleCheck(order.id);
+            }}
+            className={`relative rounded-[3px] shrink-0 size-[17px] flex items-center justify-center cursor-pointer transition-colors border ${
+              order.checked ? "bg-[#087f8c] border-[#087f8c]" : "bg-white border-[#dce4ea] hover:border-[#087f8c]"
+            }`}
+            title={order.checked ? "Bỏ chọn đơn này" : "Chọn đơn này"}
+          >
+            {order.checked && <Check />}
+          </button>
+        </div>
+
+        {/* Đơn giao */}
+        <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[230px]">
+          <div className="content-stretch flex gap-[8px] items-center relative shrink-0">
+            <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold text-[#18252f] text-[12px] whitespace-nowrap">{order.id}</p>
+            {order.isUrgent && <Flag />}
+          </div>
+          <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#18252f] text-[12px] truncate w-full">{order.address}</p>
+          <p className="font-['Inter:Regular',sans-serif] font-normal text-[#657684] text-[12px] truncate w-full">{order.ward}</p>
+        </div>
+
+        {/* Độ cấp bách SLA */}
+        <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[88px]">
+          <div className="content-stretch flex gap-[5px] items-center overflow-clip relative shrink-0">
+            <Clock />
+            <p className={`font-['Inter:Regular',sans-serif] font-normal text-[13px] whitespace-nowrap ${order.isUrgent ? "text-[#d14343]" : "text-[#18252f]"}`}>
+              {order.slaTime}
+            </p>
+          </div>
+          <p className="font-['Inter:Regular',sans-serif] font-normal text-[#657684] text-[12px] whitespace-nowrap">{order.slaDeadline}</p>
+        </div>
+
+        {/* Tài xế đề xuất (Dropdown chọn tài xế) */}
+        <div className="content-stretch flex flex-col gap-[4px] items-start overflow-clip relative shrink-0 w-[168px]">
+          <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
+            <select
+              value={order.driverId}
+              onClick={(e) => e.stopPropagation()}
+              onChange={(e) => {
+                e.stopPropagation();
+                changeDriver(order.id, e.target.value);
+              }}
+              className="bg-transparent font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#087f8c] hover:text-[#066570] text-[12px] underline outline-none cursor-pointer"
+              title="Nhấn để đổi tài xế khác cho đơn này"
+            >
+              {DRIVER_OPTIONS.map((d) => (
+                <option key={d.id} value={d.id} className="text-[#18252f] no-underline font-normal">
+                  {d.name} ({d.code} · {d.route})
+                </option>
+              ))}
+            </select>
+          </div>
+          <p className="font-['Roboto_Mono:Regular',sans-serif] font-normal text-[#657684] text-[12px] whitespace-nowrap">{order.driverId}</p>
+          <p className="font-['Inter:Regular',sans-serif] font-normal text-[#657684] text-[12px] truncate w-full">{order.route}</p>
+        </div>
+
+        {/* Sức chứa / Tải */}
+        <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[100px]">
+          <p className="font-['Inter:Regular',sans-serif] font-normal text-[#18252f] text-[12px] whitespace-nowrap">
+            {order.currentLoad}/{order.maxLoad} đơn
+          </p>
+          <div className="bg-[#dce4ea] content-stretch flex h-[3px] items-start overflow-clip relative rounded-[2px] shrink-0 w-[88px]">
+            <div
+              className="bg-[#087f8c] h-[3px] relative rounded-[2px] shrink-0"
+              style={{ width: `${Math.min(100, Math.round((order.currentLoad / order.maxLoad) * 88))}px` }}
+            />
+          </div>
+          <p className="font-['Inter:Regular',sans-serif] font-normal text-[#657684] text-[12px] whitespace-nowrap">
+            Còn {order.maxLoad - order.currentLoad} chỗ
+          </p>
+        </div>
+
+        {/* Điểm khớp */}
+        <div className="content-stretch flex flex-col gap-[5px] items-start not-italic overflow-clip relative shrink-0 text-[#087f8c] w-[62px] whitespace-nowrap">
+          <p className="font-['Inter:Bold',sans-serif] font-bold text-[17px] tracking-[-0.5px]">{order.matchPercent}%</p>
+          <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[12px]">Chi tiết →</p>
+        </div>
+
+        {/* Trạng thái can thiệp */}
+        <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[128px]">
+          {isSelected ? (
+            <div className="bg-[#e7f4f3] content-stretch flex items-start overflow-clip px-[8px] py-[5px] relative rounded-[4px] shrink-0">
+              <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#087f8c] text-[12px] whitespace-nowrap">Đang xem chi tiết</p>
+            </div>
+          ) : order.intervention.includes("thủ công") ? (
+            <div className="bg-[#fff8ea] border border-[#fbd38d] content-stretch flex flex-col items-start px-[8px] py-[4px] relative rounded-[4px] shrink-0">
+              <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#b7791f] text-[11px] whitespace-nowrap">Đã đổi thủ công</p>
+            </div>
+          ) : (
+            <p className="font-['Inter:Regular',sans-serif] font-normal text-[#657684] text-[12px] whitespace-nowrap">{order.intervention}</p>
+          )}
+        </div>
       </div>
-      <div aria-hidden className="absolute border border-[#087f8c] border-solid inset-0 pointer-events-none rounded-[3px]" />
-    </div>
-  );
-}
-
-function LaChn1() {
-  return (
-    <div className="content-stretch flex items-start overflow-clip relative shrink-0 w-[24px]" data-name="Lựa chọn">
-      <ChnDn2 />
-    </div>
-  );
-}
-
-function Flag2() {
-  return (
-    <div className="relative shrink-0 size-[12px]" data-name="flag">
-      <svg className="absolute block inset-0 size-full" fill="none" height="12" preserveAspectRatio="none" viewBox="0 0 12 12" width="12">
-        <g id="flag">
-          <path d={svgPaths.p1e4e1000} id="Vector" stroke="#D14343" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function MaDnVauTien1() {
-  return (
-    <div className="content-stretch flex gap-[8px] items-center overflow-clip relative shrink-0" data-name="Mã đơn và ưu tiên">
-      <p className="[word-break:break-word] font-['Roboto_Mono:SemiBold',sans-serif] font-semibold leading-[normal] relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">MNX000006</p>
-      <Flag2 />
-    </div>
-  );
-}
-
-function DnGiao1() {
-  return (
-    <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[230px]" data-name="Đơn giao">
-      <MaDnVauTien1 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] min-w-full not-italic relative shrink-0 text-[#18252f] text-[12px] w-[min-content]">Giao 85 Nguyễn Lương Bằng</p>
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-full not-italic relative shrink-0 text-[#657684] text-[12px] w-[min-content]">P. Tân Phú</p>
-    </div>
-  );
-}
-
-function Clock1() {
-  return (
-    <div className="relative shrink-0 size-[12px]" data-name="clock-3">
-      <svg className="absolute block inset-0 size-full" fill="none" height="12" preserveAspectRatio="none" viewBox="0 0 12 12" width="12">
-        <g clipPath="url(#clip0_0_37)" id="clock-3">
-          <path d={svgPaths.p2ca19080} id="Vector" stroke="#D14343" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-        <defs>
-          <clipPath id="clip0_0_37">
-            <rect fill="white" height="12" width="12" />
-          </clipPath>
-        </defs>
-      </svg>
-    </div>
-  );
-}
-
-function ThiGianConLi1() {
-  return (
-    <div className="content-stretch flex gap-[5px] items-center overflow-clip relative shrink-0" data-name="Thời gian còn lại">
-      <Clock1 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#d14343] text-[13px] whitespace-nowrap">55 phút</p>
-    </div>
-  );
-}
-
-function DCpBach1() {
-  return (
-    <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[88px]" data-name="Độ cấp bách">
-      <ThiGianConLi1 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Hạn 10:15</p>
-    </div>
-  );
-}
-
-function ChevronDown4() {
-  return (
-    <div className="relative shrink-0 size-[12px]" data-name="chevron-down">
-      <svg className="absolute block inset-0 size-full" fill="none" height="12" preserveAspectRatio="none" viewBox="0 0 12 12" width="12">
-        <g id="chevron-down">
-          <path d="M3 4.5L6 7.5L9 4.5" id="Vector" stroke="#087F8C" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function DiTaiX1() {
-  return (
-    <div className="content-stretch flex gap-[5px] items-center overflow-clip relative shrink-0" data-name="Đổi tài xế">
-      <p className="[text-underline-position:from-font] [word-break:break-word] decoration-from-font decoration-solid font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[12px] underline whitespace-nowrap">Trần Quốc Bình</p>
-      <ChevronDown4 />
-    </div>
-  );
-}
-
-function TaiXDXut1() {
-  return (
-    <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[168px]" data-name="Tài xế đề xuất">
-      <DiTaiX1 />
-      <p className="[word-break:break-word] font-['Roboto_Mono:Regular',sans-serif] font-normal leading-[1.45] relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">DRV-02</p>
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-full not-italic relative shrink-0 text-[#657684] text-[12px] w-[min-content]">Tuyến Tân Phú</p>
-    </div>
-  );
-}
-
-function ThanhTi1() {
-  return (
-    <div className="bg-[#dce4ea] content-stretch flex h-[3px] items-start overflow-clip relative rounded-[2px] shrink-0 w-[88px]" data-name="Thanh tải">
-      <div className="bg-[#087f8c] h-[3px] relative rounded-[2px] shrink-0 w-[35px]" data-name="Tải đã dùng" />
-    </div>
-  );
-}
-
-function ScCha1() {
-  return (
-    <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[100px]" data-name="Sức chứa">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">6/15 đơn</p>
-      <ThanhTi1 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Còn 9 chỗ</p>
-    </div>
-  );
-}
-
-function DimKhp1() {
-  return (
-    <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[62px]" data-name="Điểm khớp">
-      <p className="[word-break:break-word] font-['Inter:Bold',sans-serif] font-bold leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[17px] tracking-[-0.5px] whitespace-nowrap">91%</p>
-    </div>
-  );
-}
-
-function NhanTrngThai3() {
-  return (
-    <div className="bg-[#fff6df] content-stretch flex items-start overflow-clip px-[8px] py-[5px] relative rounded-[4px] shrink-0" data-name="Nhãn trạng thái">
-      <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#94650b] text-[12px] whitespace-nowrap">Đã đổi thủ công</p>
-    </div>
-  );
-}
-
-function TrngThaiCanThip1() {
-  return (
-    <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[128px]" data-name="Trạng thái can thiệp">
-      <NhanTrngThai3 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Lê Thu Hà · 09:19</p>
-    </div>
-  );
-}
-
-function DXutPhanCong1() {
-  return (
-    <div className="bg-white h-[92px] relative shrink-0 w-full" data-name="Đề xuất phân công">
-      <div className="content-stretch flex gap-[8px] items-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <LaChn1 />
-        <DnGiao1 />
-        <DCpBach1 />
-        <TaiXDXut1 />
-        <ScCha1 />
-        <DimKhp1 />
-        <TrngThaiCanThip1 />
-      </div>
-      <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid inset-0 pointer-events-none" />
-    </div>
-  );
-}
-
-function Check2() {
-  return (
-    <div className="relative shrink-0 size-[12px]" data-name="check">
-      <svg className="absolute block inset-0 size-full" fill="none" height="12" preserveAspectRatio="none" viewBox="0 0 12 12" width="12">
-        <g id="check">
-          <path d={svgPaths.p2a580400} id="Vector" stroke="white" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function ChnDn3() {
-  return (
-    <div className="bg-[#087f8c] relative rounded-[3px] shrink-0 size-[17px]" data-name="Chọn đơn">
-      <div className="content-stretch flex items-center justify-center overflow-clip relative rounded-[inherit] size-full">
-        <Check2 />
-      </div>
-      <div aria-hidden className="absolute border border-[#087f8c] border-solid inset-0 pointer-events-none rounded-[3px]" />
-    </div>
-  );
-}
-
-function LaChn2() {
-  return (
-    <div className="content-stretch flex items-start overflow-clip relative shrink-0 w-[24px]" data-name="Lựa chọn">
-      <ChnDn3 />
-    </div>
-  );
-}
-
-function MaDnVauTien2() {
-  return (
-    <div className="content-stretch flex items-center overflow-clip relative shrink-0" data-name="Mã đơn và ưu tiên">
-      <p className="[word-break:break-word] font-['Roboto_Mono:SemiBold',sans-serif] font-semibold leading-[normal] relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">MNX000012</p>
-    </div>
-  );
-}
-
-function DnGiao2() {
-  return (
-    <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[230px]" data-name="Đơn giao">
-      <MaDnVauTien2 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] min-w-full not-italic relative shrink-0 text-[#18252f] text-[12px] w-[min-content]">Giao 68 Lê Văn Lương</p>
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-full not-italic relative shrink-0 text-[#657684] text-[12px] w-[min-content]">P. Tân Kiểng</p>
-    </div>
-  );
-}
-
-function ThiGianConLi2() {
-  return (
-    <div className="content-stretch flex items-center overflow-clip relative shrink-0" data-name="Thời gian còn lại">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#18252f] text-[13px] whitespace-nowrap">1 giờ 20</p>
-    </div>
-  );
-}
-
-function DCpBach2() {
-  return (
-    <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[88px]" data-name="Độ cấp bách">
-      <ThiGianConLi2 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Hạn 10:40</p>
-    </div>
-  );
-}
-
-function ChevronDown5() {
-  return (
-    <div className="relative shrink-0 size-[12px]" data-name="chevron-down">
-      <svg className="absolute block inset-0 size-full" fill="none" height="12" preserveAspectRatio="none" viewBox="0 0 12 12" width="12">
-        <g id="chevron-down">
-          <path d="M3 4.5L6 7.5L9 4.5" id="Vector" stroke="#087F8C" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function DiTaiX2() {
-  return (
-    <div className="content-stretch flex gap-[5px] items-center overflow-clip relative shrink-0" data-name="Đổi tài xế">
-      <p className="[text-underline-position:from-font] [word-break:break-word] decoration-from-font decoration-solid font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[12px] underline whitespace-nowrap">Lê Thị Chi</p>
-      <ChevronDown5 />
-    </div>
-  );
-}
-
-function TaiXDXut2() {
-  return (
-    <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[168px]" data-name="Tài xế đề xuất">
-      <DiTaiX2 />
-      <p className="[word-break:break-word] font-['Roboto_Mono:Regular',sans-serif] font-normal leading-[1.45] relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">DRV-03</p>
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-full not-italic relative shrink-0 text-[#657684] text-[12px] w-[min-content]">Tuyến Tân Kiểng</p>
-    </div>
-  );
-}
-
-function ThanhTi2() {
-  return (
-    <div className="bg-[#dce4ea] content-stretch flex h-[3px] items-start overflow-clip relative rounded-[2px] shrink-0 w-[88px]" data-name="Thanh tải">
-      <div className="bg-[#087f8c] h-[3px] relative rounded-[2px] shrink-0 w-[47px]" data-name="Tải đã dùng" />
-    </div>
-  );
-}
-
-function ScCha2() {
-  return (
-    <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[100px]" data-name="Sức chứa">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">8/15 đơn</p>
-      <ThanhTi2 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Còn 7 chỗ</p>
-    </div>
-  );
-}
-
-function DimKhp2() {
-  return (
-    <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[62px]" data-name="Điểm khớp">
-      <p className="[word-break:break-word] font-['Inter:Bold',sans-serif] font-bold leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[17px] tracking-[-0.5px] whitespace-nowrap">94%</p>
-    </div>
-  );
-}
-
-function TrngThaiCanThip2() {
-  return (
-    <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[128px]" data-name="Trạng thái can thiệp">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Theo quy tắc</p>
-    </div>
-  );
-}
-
-function DXutPhanCong2() {
-  return (
-    <div className="bg-white h-[92px] relative shrink-0 w-full" data-name="Đề xuất phân công">
-      <div className="content-stretch flex gap-[8px] items-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <LaChn2 />
-        <DnGiao2 />
-        <DCpBach2 />
-        <TaiXDXut2 />
-        <ScCha2 />
-        <DimKhp2 />
-        <TrngThaiCanThip2 />
-      </div>
-      <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid inset-0 pointer-events-none" />
-    </div>
-  );
-}
-
-function Check3() {
-  return (
-    <div className="relative shrink-0 size-[12px]" data-name="check">
-      <svg className="absolute block inset-0 size-full" fill="none" height="12" preserveAspectRatio="none" viewBox="0 0 12 12" width="12">
-        <g id="check">
-          <path d={svgPaths.p2a580400} id="Vector" stroke="white" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function ChnDn4() {
-  return (
-    <div className="bg-[#087f8c] relative rounded-[3px] shrink-0 size-[17px]" data-name="Chọn đơn">
-      <div className="content-stretch flex items-center justify-center overflow-clip relative rounded-[inherit] size-full">
-        <Check3 />
-      </div>
-      <div aria-hidden className="absolute border border-[#087f8c] border-solid inset-0 pointer-events-none rounded-[3px]" />
-    </div>
-  );
-}
-
-function LaChn3() {
-  return (
-    <div className="content-stretch flex items-start overflow-clip relative shrink-0 w-[24px]" data-name="Lựa chọn">
-      <ChnDn4 />
-    </div>
-  );
-}
-
-function MaDnVauTien3() {
-  return (
-    <div className="content-stretch flex items-center overflow-clip relative shrink-0" data-name="Mã đơn và ưu tiên">
-      <p className="[word-break:break-word] font-['Roboto_Mono:SemiBold',sans-serif] font-semibold leading-[normal] relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">MNX000018</p>
-    </div>
-  );
-}
-
-function DnGiao3() {
-  return (
-    <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[230px]" data-name="Đơn giao">
-      <MaDnVauTien3 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] min-w-full not-italic relative shrink-0 text-[#18252f] text-[12px] w-[min-content]">Giao 24 Bùi Văn Ba</p>
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-full not-italic relative shrink-0 text-[#657684] text-[12px] w-[min-content]">P. Tân Thuận Đông</p>
-    </div>
-  );
-}
-
-function ThiGianConLi3() {
-  return (
-    <div className="content-stretch flex items-center overflow-clip relative shrink-0" data-name="Thời gian còn lại">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#18252f] text-[13px] whitespace-nowrap">1 giờ 45</p>
-    </div>
-  );
-}
-
-function DCpBach3() {
-  return (
-    <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[88px]" data-name="Độ cấp bách">
-      <ThiGianConLi3 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Hạn 11:05</p>
-    </div>
-  );
-}
-
-function ChevronDown6() {
-  return (
-    <div className="relative shrink-0 size-[12px]" data-name="chevron-down">
-      <svg className="absolute block inset-0 size-full" fill="none" height="12" preserveAspectRatio="none" viewBox="0 0 12 12" width="12">
-        <g id="chevron-down">
-          <path d="M3 4.5L6 7.5L9 4.5" id="Vector" stroke="#087F8C" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function DiTaiX3() {
-  return (
-    <div className="content-stretch flex gap-[5px] items-center overflow-clip relative shrink-0" data-name="Đổi tài xế">
-      <p className="[text-underline-position:from-font] [word-break:break-word] decoration-from-font decoration-solid font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[12px] underline whitespace-nowrap">Nguyễn Văn An</p>
-      <ChevronDown6 />
-    </div>
-  );
-}
-
-function TaiXDXut3() {
-  return (
-    <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[168px]" data-name="Tài xế đề xuất">
-      <DiTaiX3 />
-      <p className="[word-break:break-word] font-['Roboto_Mono:Regular',sans-serif] font-normal leading-[1.45] relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">DRV-01</p>
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-full not-italic relative shrink-0 text-[#657684] text-[12px] w-[min-content]">Tuyến Tân Thuận Đông</p>
-    </div>
-  );
-}
-
-function ThanhTi3() {
-  return (
-    <div className="bg-[#dce4ea] content-stretch flex h-[3px] items-start overflow-clip relative rounded-[2px] shrink-0 w-[88px]" data-name="Thanh tải">
-      <div className="bg-[#087f8c] h-[3px] relative rounded-[2px] shrink-0 w-[23px]" data-name="Tải đã dùng" />
-    </div>
-  );
-}
-
-function ScCha3() {
-  return (
-    <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[100px]" data-name="Sức chứa">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">4/15 đơn</p>
-      <ThanhTi3 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Còn 11 chỗ</p>
-    </div>
-  );
-}
-
-function DimKhp3() {
-  return (
-    <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[62px]" data-name="Điểm khớp">
-      <p className="[word-break:break-word] font-['Inter:Bold',sans-serif] font-bold leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[17px] tracking-[-0.5px] whitespace-nowrap">95%</p>
-    </div>
-  );
-}
-
-function TrngThaiCanThip3() {
-  return (
-    <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[128px]" data-name="Trạng thái can thiệp">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Theo quy tắc</p>
-    </div>
-  );
-}
-
-function DXutPhanCong3() {
-  return (
-    <div className="bg-white h-[92px] relative shrink-0 w-full" data-name="Đề xuất phân công">
-      <div className="content-stretch flex gap-[8px] items-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <LaChn3 />
-        <DnGiao3 />
-        <DCpBach3 />
-        <TaiXDXut3 />
-        <ScCha3 />
-        <DimKhp3 />
-        <TrngThaiCanThip3 />
-      </div>
-      <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid inset-0 pointer-events-none" />
-    </div>
-  );
-}
-
-function ChnDn5() {
-  return (
-    <div className="bg-white relative rounded-[3px] shrink-0 size-[17px]" data-name="Chọn đơn">
-      <div aria-hidden className="absolute border border-[#b6c2cb] border-solid inset-0 pointer-events-none rounded-[3px]" />
-    </div>
-  );
-}
-
-function LaChn4() {
-  return (
-    <div className="content-stretch flex items-start overflow-clip relative shrink-0 w-[24px]" data-name="Lựa chọn">
-      <ChnDn5 />
-    </div>
-  );
-}
-
-function MaDnVauTien4() {
-  return (
-    <div className="content-stretch flex items-center overflow-clip relative shrink-0" data-name="Mã đơn và ưu tiên">
-      <p className="[word-break:break-word] font-['Roboto_Mono:SemiBold',sans-serif] font-semibold leading-[normal] relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">MNX000023</p>
-    </div>
-  );
-}
-
-function DnGiao4() {
-  return (
-    <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[230px]" data-name="Đơn giao">
-      <MaDnVauTien4 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] min-w-full not-italic relative shrink-0 text-[#18252f] text-[12px] w-[min-content]">Giao 156 Nguyễn Thị Thập</p>
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-full not-italic relative shrink-0 text-[#657684] text-[12px] w-[min-content]">P. Tân Phú</p>
-    </div>
-  );
-}
-
-function ThiGianConLi4() {
-  return (
-    <div className="content-stretch flex items-center overflow-clip relative shrink-0" data-name="Thời gian còn lại">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#18252f] text-[13px] whitespace-nowrap">2 giờ 10</p>
-    </div>
-  );
-}
-
-function DCpBach4() {
-  return (
-    <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[88px]" data-name="Độ cấp bách">
-      <ThiGianConLi4 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Hạn 11:30</p>
-    </div>
-  );
-}
-
-function ChevronDown7() {
-  return (
-    <div className="relative shrink-0 size-[12px]" data-name="chevron-down">
-      <svg className="absolute block inset-0 size-full" fill="none" height="12" preserveAspectRatio="none" viewBox="0 0 12 12" width="12">
-        <g id="chevron-down">
-          <path d="M3 4.5L6 7.5L9 4.5" id="Vector" stroke="#087F8C" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function DiTaiX4() {
-  return (
-    <div className="content-stretch flex gap-[5px] items-center overflow-clip relative shrink-0" data-name="Đổi tài xế">
-      <p className="[text-underline-position:from-font] [word-break:break-word] decoration-from-font decoration-solid font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[12px] underline whitespace-nowrap">Phạm Minh Dũng</p>
-      <ChevronDown7 />
-    </div>
-  );
-}
-
-function TaiXDXut4() {
-  return (
-    <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[168px]" data-name="Tài xế đề xuất">
-      <DiTaiX4 />
-      <p className="[word-break:break-word] font-['Roboto_Mono:Regular',sans-serif] font-normal leading-[1.45] relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">DRV-04</p>
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-full not-italic relative shrink-0 text-[#657684] text-[12px] w-[min-content]">Tuyến Tân Phú</p>
-    </div>
-  );
-}
-
-function ThanhTi4() {
-  return (
-    <div className="bg-[#dce4ea] content-stretch flex h-[3px] items-start overflow-clip relative rounded-[2px] shrink-0 w-[88px]" data-name="Thanh tải">
-      <div className="bg-[#087f8c] h-[3px] relative rounded-[2px] shrink-0 w-[65px]" data-name="Tải đã dùng" />
-    </div>
-  );
-}
-
-function ScCha4() {
-  return (
-    <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[100px]" data-name="Sức chứa">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">11/15 đơn</p>
-      <ThanhTi4 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Còn 4 chỗ</p>
-    </div>
-  );
-}
-
-function DimKhp4() {
-  return (
-    <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[62px]" data-name="Điểm khớp">
-      <p className="[word-break:break-word] font-['Inter:Bold',sans-serif] font-bold leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[17px] tracking-[-0.5px] whitespace-nowrap">88%</p>
-    </div>
-  );
-}
-
-function TrngThaiCanThip4() {
-  return (
-    <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[128px]" data-name="Trạng thái can thiệp">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Theo quy tắc</p>
-    </div>
-  );
-}
-
-function DXutPhanCong4() {
-  return (
-    <div className="bg-white h-[92px] relative shrink-0 w-full" data-name="Đề xuất phân công">
-      <div className="content-stretch flex gap-[8px] items-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <LaChn4 />
-        <DnGiao4 />
-        <DCpBach4 />
-        <TaiXDXut4 />
-        <ScCha4 />
-        <DimKhp4 />
-        <TrngThaiCanThip4 />
-      </div>
-      <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid inset-0 pointer-events-none" />
-    </div>
-  );
-}
-
-function ChnDn6() {
-  return (
-    <div className="bg-white relative rounded-[3px] shrink-0 size-[17px]" data-name="Chọn đơn">
-      <div aria-hidden className="absolute border border-[#b6c2cb] border-solid inset-0 pointer-events-none rounded-[3px]" />
-    </div>
-  );
-}
-
-function LaChn5() {
-  return (
-    <div className="content-stretch flex items-start overflow-clip relative shrink-0 w-[24px]" data-name="Lựa chọn">
-      <ChnDn6 />
-    </div>
-  );
-}
-
-function MaDnVauTien5() {
-  return (
-    <div className="content-stretch flex items-center overflow-clip relative shrink-0" data-name="Mã đơn và ưu tiên">
-      <p className="[word-break:break-word] font-['Roboto_Mono:SemiBold',sans-serif] font-semibold leading-[normal] relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">MNX000029</p>
-    </div>
-  );
-}
-
-function DnGiao5() {
-  return (
-    <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[230px]" data-name="Đơn giao">
-      <MaDnVauTien5 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] min-w-full not-italic relative shrink-0 text-[#18252f] text-[12px] w-[min-content]">Giao 40 Trần Xuân Soạn</p>
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-full not-italic relative shrink-0 text-[#657684] text-[12px] w-[min-content]">P. Tân Kiểng</p>
-    </div>
-  );
-}
-
-function ThiGianConLi5() {
-  return (
-    <div className="content-stretch flex items-center overflow-clip relative shrink-0" data-name="Thời gian còn lại">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#18252f] text-[13px] whitespace-nowrap">2 giờ 40</p>
-    </div>
-  );
-}
-
-function DCpBach5() {
-  return (
-    <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[88px]" data-name="Độ cấp bách">
-      <ThiGianConLi5 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Hạn 12:00</p>
-    </div>
-  );
-}
-
-function ChevronDown8() {
-  return (
-    <div className="relative shrink-0 size-[12px]" data-name="chevron-down">
-      <svg className="absolute block inset-0 size-full" fill="none" height="12" preserveAspectRatio="none" viewBox="0 0 12 12" width="12">
-        <g id="chevron-down">
-          <path d="M3 4.5L6 7.5L9 4.5" id="Vector" stroke="#087F8C" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function DiTaiX5() {
-  return (
-    <div className="content-stretch flex gap-[5px] items-center overflow-clip relative shrink-0" data-name="Đổi tài xế">
-      <p className="[text-underline-position:from-font] [word-break:break-word] decoration-from-font decoration-solid font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[12px] underline whitespace-nowrap">Lê Thị Chi</p>
-      <ChevronDown8 />
-    </div>
-  );
-}
-
-function TaiXDXut5() {
-  return (
-    <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[168px]" data-name="Tài xế đề xuất">
-      <DiTaiX5 />
-      <p className="[word-break:break-word] font-['Roboto_Mono:Regular',sans-serif] font-normal leading-[1.45] relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">DRV-03</p>
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-full not-italic relative shrink-0 text-[#657684] text-[12px] w-[min-content]">Tuyến Tân Kiểng</p>
-    </div>
-  );
-}
-
-function ThanhTi5() {
-  return (
-    <div className="bg-[#dce4ea] content-stretch flex h-[3px] items-start overflow-clip relative rounded-[2px] shrink-0 w-[88px]" data-name="Thanh tải">
-      <div className="bg-[#087f8c] h-[3px] relative rounded-[2px] shrink-0 w-[47px]" data-name="Tải đã dùng" />
-    </div>
-  );
-}
-
-function ScCha5() {
-  return (
-    <div className="content-stretch flex flex-col gap-[6px] items-start overflow-clip relative shrink-0 w-[100px]" data-name="Sức chứa">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">8/15 đơn</p>
-      <ThanhTi5 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Còn 7 chỗ</p>
-    </div>
-  );
-}
-
-function DimKhp5() {
-  return (
-    <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[62px]" data-name="Điểm khớp">
-      <p className="[word-break:break-word] font-['Inter:Bold',sans-serif] font-bold leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[17px] tracking-[-0.5px] whitespace-nowrap">92%</p>
-    </div>
-  );
-}
-
-function TrngThaiCanThip5() {
-  return (
-    <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[128px]" data-name="Trạng thái can thiệp">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Theo quy tắc</p>
-    </div>
-  );
-}
-
-function DXutPhanCong5() {
-  return (
-    <div className="bg-white h-[92px] relative shrink-0 w-full" data-name="Đề xuất phân công">
-      <div className="content-stretch flex gap-[8px] items-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <LaChn5 />
-        <DnGiao5 />
-        <DCpBach5 />
-        <TaiXDXut5 />
-        <ScCha5 />
-        <DimKhp5 />
-        <TrngThaiCanThip5 />
-      </div>
-      <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid inset-0 pointer-events-none" />
-    </div>
-  );
-}
-
-function ThongTinBng() {
-  return (
-    <div className="[word-break:break-word] bg-[#f6f8fa] content-stretch flex font-['Inter:Regular',sans-serif] font-normal h-[42px] items-center justify-between leading-[1.45] not-italic overflow-clip px-[16px] relative shrink-0 text-[#657684] text-[12px] w-full whitespace-nowrap" data-name="Thông tin bảng">
-      <p className="relative shrink-0">6/6 đề xuất · Không có đơn bị loại</p>
-      <p className="relative shrink-0">Tải hiện tại: 09:20, chưa cộng đơn đã chọn</p>
     </div>
   );
 }
 
 function BngDXutPhanCong() {
+  const { filteredOrders, orders } = useContext(DispatchActionContext);
+
   return (
     <div className="bg-white flex-[1_0_2px] min-w-px relative rounded-[10px]" data-name="Bảng đề xuất phân công">
       <div className="content-stretch flex flex-col items-start overflow-clip relative rounded-[inherit] size-full">
         <TieuDBng />
         <BLcBng />
         <TieuDCt />
-        <DXutPhanCong />
-        <DXutPhanCong1 />
-        <DXutPhanCong2 />
-        <DXutPhanCong3 />
-        <DXutPhanCong4 />
-        <DXutPhanCong5 />
-        <ThongTinBng />
+        {filteredOrders.length === 0 ? (
+          <div className="w-full py-12 text-center text-[#657684] text-[13px]">
+            Không tìm thấy đề xuất phân công phù hợp với bộ lọc hiện tại.
+          </div>
+        ) : (
+          filteredOrders.map((order) => <DispatchRow key={order.id} order={order} />)
+        )}
+        <div className="[word-break:break-word] bg-[#f6f8fa] content-stretch flex font-['Inter:Regular',sans-serif] font-normal h-[42px] items-center justify-between leading-[1.45] overflow-clip px-[16px] relative shrink-0 text-[#657684] text-[12px] w-full whitespace-nowrap" data-name="Thông tin bảng">
+          <p className="relative shrink-0">{filteredOrders.length}/{orders.length} đề xuất hiển thị · Không có đơn bị loại</p>
+          <p className="relative shrink-0">Tải hiện tại: 09:20, tính theo ca trực đang chạy</p>
+        </div>
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[10px]" />
     </div>
@@ -1929,209 +1309,90 @@ function ScanLine() {
   );
 }
 
-function TieuDChiTit() {
-  return (
-    <div className="h-[49px] relative shrink-0 w-full" data-name="Tiêu đề chi tiết">
-      <div className="content-stretch flex items-center justify-between overflow-clip px-[20px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#18252f] text-[13px] whitespace-nowrap">Vì sao khớp 96%?</p>
-        <ScanLine />
-      </div>
-      <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid inset-0 pointer-events-none" />
-    </div>
-  );
-}
-
-function Flag3() {
-  return (
-    <div className="relative shrink-0 size-[12px]" data-name="flag">
-      <svg className="absolute block inset-0 size-full" fill="none" height="12" preserveAspectRatio="none" viewBox="0 0 12 12" width="12">
-        <g id="flag">
-          <path d={svgPaths.p1e4e1000} id="Vector" stroke="#D14343" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function SlaKhnCp() {
-  return (
-    <div className="content-stretch flex gap-[5px] items-center overflow-clip relative shrink-0" data-name="SLA khẩn cấp">
-      <Flag3 />
-      <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#d14343] text-[12px] whitespace-nowrap">SLA 35 phút</p>
-    </div>
-  );
-}
-
-function DnDangXem() {
-  return (
-    <div className="content-stretch flex flex-col gap-[7px] items-start overflow-clip relative shrink-0" data-name="Đơn đang xem">
-      <p className="[word-break:break-word] font-['Roboto_Mono:SemiBold',sans-serif] font-semibold leading-[normal] relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">MNX000001</p>
-      <SlaKhnCp />
-    </div>
-  );
-}
-
-function DimVaDn() {
-  return (
-    <div className="content-stretch flex items-center justify-between overflow-clip relative shrink-0 w-full" data-name="Điểm và đơn">
-      <DnDangXem />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[#087f8c] text-[0px] tracking-[-1.7px] whitespace-nowrap">
-        <span className="leading-[normal] text-[36px]">96</span>
-        <span className="leading-[normal] text-[21px]">%</span>
-      </p>
-    </div>
-  );
-}
-
-function ChSVaDim() {
-  return (
-    <div className="[word-break:break-word] content-stretch flex items-start justify-between leading-[1.45] overflow-clip relative shrink-0 text-[12px] w-full whitespace-nowrap" data-name="Chỉ số và điểm">
-      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Trùng tuyến địa bàn · w1</p>
-      <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold relative shrink-0 text-[#18252f]">50 / 50</p>
-    </div>
-  );
-}
-
-function ThangDim() {
-  return (
-    <div className="bg-[#dce4ea] content-stretch flex h-[4px] items-start overflow-clip relative rounded-[2px] shrink-0 w-full" data-name="Thang điểm">
-      <div className="bg-[#087f8c] h-[4px] relative rounded-[2px] shrink-0 w-[312px]" data-name="Điểm đạt" />
-    </div>
-  );
-}
-
-function ThanhPhnDim() {
-  return (
-    <div className="content-stretch flex flex-col gap-[7px] items-start overflow-clip relative shrink-0 w-full" data-name="Thành phần điểm">
-      <ChSVaDim />
-      <ThangDim />
-    </div>
-  );
-}
-
-function ChSVaDim1() {
-  return (
-    <div className="[word-break:break-word] content-stretch flex items-start justify-between leading-[1.45] overflow-clip relative shrink-0 text-[12px] w-full whitespace-nowrap" data-name="Chỉ số và điểm">
-      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Độ cấp bách SLA · w2</p>
-      <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold relative shrink-0 text-[#18252f]">30 / 30</p>
-    </div>
-  );
-}
-
-function ThangDim1() {
-  return (
-    <div className="bg-[#dce4ea] content-stretch flex h-[4px] items-start overflow-clip relative rounded-[2px] shrink-0 w-full" data-name="Thang điểm">
-      <div className="bg-[#087f8c] h-[4px] relative rounded-[2px] shrink-0 w-[312px]" data-name="Điểm đạt" />
-    </div>
-  );
-}
-
-function ThanhPhnDim1() {
-  return (
-    <div className="content-stretch flex flex-col gap-[7px] items-start overflow-clip relative shrink-0 w-full" data-name="Thành phần điểm">
-      <ChSVaDim1 />
-      <ThangDim1 />
-    </div>
-  );
-}
-
-function ChSVaDim2() {
-  return (
-    <div className="[word-break:break-word] content-stretch flex items-start justify-between leading-[1.45] overflow-clip relative shrink-0 text-[12px] w-full whitespace-nowrap" data-name="Chỉ số và điểm">
-      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Cân bằng tải · w3</p>
-      <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold relative shrink-0 text-[#18252f]">16 / 20</p>
-    </div>
-  );
-}
-
-function ThangDim2() {
-  return (
-    <div className="bg-[#dce4ea] content-stretch flex h-[4px] items-start overflow-clip relative rounded-[2px] shrink-0 w-full" data-name="Thang điểm">
-      <div className="bg-[#087f8c] h-[4px] relative rounded-[2px] shrink-0 w-[250px]" data-name="Điểm đạt" />
-    </div>
-  );
-}
-
-function ThanhPhnDim2() {
-  return (
-    <div className="content-stretch flex flex-col gap-[7px] items-start overflow-clip relative shrink-0 w-full" data-name="Thành phần điểm">
-      <ChSVaDim2 />
-      <ThangDim2 />
-    </div>
-  );
-}
-
-function DinGiiDXut() {
-  return (
-    <div className="[word-break:break-word] bg-[#e7f4f3] content-stretch flex flex-col font-['Inter:Regular',sans-serif] font-normal gap-[7px] items-start leading-[1.45] not-italic overflow-clip p-[12px] relative rounded-[6px] shrink-0 text-[12px] w-full" data-name="Diễn giải đề xuất">
-      <p className="relative shrink-0 text-[#066361] w-full">Trùng 100% tuyến + Tải còn trống nhiều + Gần vị trí giao.</p>
-      <p className="relative shrink-0 text-[#657684] w-full">Vị trí gần hỗ trợ; không cộng thêm vào 3 trọng số.</p>
-    </div>
-  );
-}
-
-function NiDungDim() {
-  return (
-    <div className="content-stretch flex flex-col gap-[15px] items-start overflow-clip p-[20px] relative shrink-0 w-full" data-name="Nội dung điểm">
-      <DimVaDn />
-      <div className="bg-[#dce4ea] h-px relative shrink-0 w-full" data-name="Phân cách" />
-      <ThanhPhnDim />
-      <ThanhPhnDim1 />
-      <ThanhPhnDim2 />
-      <DinGiiDXut />
-    </div>
-  );
-}
-
 function GiiThichDKhp() {
+  const { selectedOrder } = useContext(DispatchActionContext);
+
   return (
     <div className="bg-white relative rounded-[10px] shrink-0 w-full" data-name="Giải thích độ khớp">
       <div className="content-stretch flex flex-col items-start overflow-clip relative rounded-[inherit] size-full">
-        <TieuDChiTit />
-        <NiDungDim />
+        {/* Tiêu đề */}
+        <div className="h-[49px] relative shrink-0 w-full border-b border-[#dce4ea] flex items-center justify-between px-[20px]">
+          <p className="font-['Inter:Regular',sans-serif] font-normal text-[#18252f] text-[13px] whitespace-nowrap">
+            Vì sao khớp {selectedOrder.matchPercent}%?
+          </p>
+          <ScanLine />
+        </div>
+
+        {/* Nội dung điểm */}
+        <div className="content-stretch flex flex-col gap-[15px] items-start p-[20px] relative shrink-0 w-full">
+          <div className="content-stretch flex items-center justify-between overflow-clip relative shrink-0 w-full">
+            <div className="content-stretch flex flex-col gap-[7px] items-start overflow-clip relative shrink-0">
+              <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold text-[#18252f] text-[12px] whitespace-nowrap">{selectedOrder.id}</p>
+              {selectedOrder.isUrgent && (
+                <div className="content-stretch flex gap-[5px] items-center overflow-clip relative shrink-0">
+                  <Flag />
+                  <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#d14343] text-[12px] whitespace-nowrap">SLA {selectedOrder.slaTime}</p>
+                </div>
+              )}
+            </div>
+            <p className="font-['Inter:Regular',sans-serif] font-normal text-[#087f8c] tracking-[-1.7px] whitespace-nowrap">
+              <span className="text-[36px] font-bold">{selectedOrder.matchPercent}</span>
+              <span className="text-[21px]">%</span>
+            </p>
+          </div>
+
+          <div className="bg-[#dce4ea] h-px relative shrink-0 w-full" />
+
+          {/* w1 Trùng tuyến */}
+          <div className="content-stretch flex flex-col gap-[7px] items-start overflow-clip relative shrink-0 w-full">
+            <div className="content-stretch flex items-center justify-between leading-[1.45] overflow-clip relative shrink-0 text-[12px] w-full">
+              <p className="font-['Inter:Regular',sans-serif] text-[#657684]">Trùng tuyến địa bàn · w1</p>
+              <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold text-[#18252f]">{selectedOrder.breakdown.w1} / 50</p>
+            </div>
+            <div className="bg-[#dce4ea] content-stretch flex h-[4px] items-start overflow-clip relative rounded-[2px] shrink-0 w-full">
+              <div
+                className="bg-[#087f8c] h-[4px] relative rounded-[2px] shrink-0 transition-all"
+                style={{ width: `${(selectedOrder.breakdown.w1 / 50) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* w2 SLA */}
+          <div className="content-stretch flex flex-col gap-[7px] items-start overflow-clip relative shrink-0 w-full">
+            <div className="content-stretch flex items-center justify-between leading-[1.45] overflow-clip relative shrink-0 text-[12px] w-full">
+              <p className="font-['Inter:Regular',sans-serif] text-[#657684]">Độ cấp bách SLA · w2</p>
+              <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold text-[#18252f]">{selectedOrder.breakdown.w2} / 30</p>
+            </div>
+            <div className="bg-[#dce4ea] content-stretch flex h-[4px] items-start overflow-clip relative rounded-[2px] shrink-0 w-full">
+              <div
+                className="bg-[#087f8c] h-[4px] relative rounded-[2px] shrink-0 transition-all"
+                style={{ width: `${(selectedOrder.breakdown.w2 / 30) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* w3 Cân bằng tải */}
+          <div className="content-stretch flex flex-col gap-[7px] items-start overflow-clip relative shrink-0 w-full">
+            <div className="content-stretch flex items-center justify-between leading-[1.45] overflow-clip relative shrink-0 text-[12px] w-full">
+              <p className="font-['Inter:Regular',sans-serif] text-[#657684]">Cân bằng tải · w3</p>
+              <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold text-[#18252f]">{selectedOrder.breakdown.w3} / 20</p>
+            </div>
+            <div className="bg-[#dce4ea] content-stretch flex h-[4px] items-start overflow-clip relative rounded-[2px] shrink-0 w-full">
+              <div
+                className="bg-[#087f8c] h-[4px] relative rounded-[2px] shrink-0 transition-all"
+                style={{ width: `${(selectedOrder.breakdown.w3 / 20) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Diễn giải */}
+          <div className="[word-break:break-word] bg-[#e7f4f3] content-stretch flex flex-col font-['Inter:Regular',sans-serif] font-normal gap-[7px] items-start leading-[1.45] p-[12px] relative rounded-[6px] shrink-0 text-[12px] w-full">
+            <p className="relative shrink-0 text-[#066361] w-full">{selectedOrder.breakdown.explanation}</p>
+            <p className="relative shrink-0 text-[#657684] w-full">{selectedOrder.breakdown.note || "Vị trí gần hỗ trợ; không cộng thêm vào 3 trọng số."}</p>
+          </div>
+        </div>
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[10px]" />
-    </div>
-  );
-}
-
-function NhanTrngThai4() {
-  return (
-    <div className="bg-[#e7f4f3] content-stretch flex items-start overflow-clip px-[8px] py-[5px] relative rounded-[4px] shrink-0" data-name="Nhãn trạng thái">
-      <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">Đang trực ca</p>
-    </div>
-  );
-}
-
-function TieuDDiuChnh() {
-  return (
-    <div className="content-stretch flex items-center justify-between overflow-clip relative shrink-0 w-full" data-name="Tiêu đề điều chỉnh">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#18252f] text-[13px] whitespace-nowrap">Tài xế đề xuất</p>
-      <NhanTrngThai4 />
-    </div>
-  );
-}
-
-function ChevronDown9() {
-  return (
-    <div className="relative shrink-0 size-[15px]" data-name="chevron-down">
-      <svg className="absolute block inset-0 size-full" fill="none" height="15" preserveAspectRatio="none" viewBox="0 0 15 15" width="15">
-        <g id="chevron-down">
-          <path d={svgPaths.p236c5700} id="Vector" stroke="#087F8C" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function DiTaiXThCong() {
-  return (
-    <div className="h-[43px] relative rounded-[6px] shrink-0 w-full" data-name="Đổi tài xế thủ công">
-      <div className="content-stretch flex items-center justify-between overflow-clip px-[12px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">Nguyễn Văn An · DRV-01</p>
-        <ChevronDown9 />
-      </div>
-      <div aria-hidden className="absolute border border-[#087f8c] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
   );
 }
@@ -2153,100 +1414,87 @@ function History2() {
   );
 }
 
-function GhiNhnDiuChnh() {
-  return (
-    <div className="content-stretch flex gap-[7px] items-center overflow-clip relative shrink-0" data-name="Ghi nhận điều chỉnh">
-      <History2 />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Đổi tài xế sẽ được ghi nhận.</p>
-    </div>
-  );
-}
-
 function DiuChnhTaiX() {
+  const { selectedOrder, changeDriver } = useContext(DispatchActionContext);
+
   return (
     <div className="bg-white relative rounded-[10px] shrink-0 w-full" data-name="Điều chỉnh tài xế">
       <div className="content-stretch flex flex-col gap-[12px] items-start overflow-clip p-[20px] relative rounded-[inherit] size-full">
-        <TieuDDiuChnh />
-        <DiTaiXThCong />
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-full not-italic relative shrink-0 text-[#657684] text-[12px] w-[min-content]">Nhấn tên tài xế để đổi nếu có vấn đề thực tế.</p>
-        <GhiNhnDiuChnh />
+        {/* Header */}
+        <div className="content-stretch flex items-center justify-between overflow-clip relative shrink-0 w-full">
+          <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] text-[#18252f] text-[13px] whitespace-nowrap">Tài xế đề xuất</p>
+          <div className="bg-[#e7f4f3] content-stretch flex items-start overflow-clip px-[8px] py-[5px] relative rounded-[4px] shrink-0">
+            <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#087f8c] text-[12px] whitespace-nowrap">Đang trực ca</p>
+          </div>
+        </div>
+
+        {/* Dropdown đổi tài xế */}
+        <select
+          value={selectedOrder.driverId}
+          onChange={(e) => changeDriver(selectedOrder.id, e.target.value)}
+          className="w-full bg-[#f6f8fa] border border-[#087f8c] rounded-[6px] h-[43px] px-[12px] font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#087f8c] text-[13px] outline-none cursor-pointer"
+          title="Chọn tài xế khác cho đơn đang xem"
+        >
+          {DRIVER_OPTIONS.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.name} · {d.code} ({d.route})
+            </option>
+          ))}
+        </select>
+
+        <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] text-[#657684] text-[12px]">
+          Nhấn tên tài xế để đổi nếu có vấn đề thực tế.
+        </p>
+
+        <div className="content-stretch flex gap-[7px] items-center overflow-clip relative shrink-0">
+          <History2 />
+          <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] text-[#657684] text-[12px] whitespace-nowrap">
+            Đổi tài xế sẽ được ghi nhận vào Audit Log.
+          </p>
+        </div>
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[10px]" />
     </div>
   );
 }
 
-function TomTtTaiX() {
-  return (
-    <div className="content-stretch flex font-['Inter:Regular',sans-serif] font-normal items-start justify-between not-italic overflow-clip relative shrink-0 w-full" data-name="Tóm tắt tài xế">
-      <p className="leading-[normal] relative shrink-0 text-[#18252f]">Tải sau phê duyệt</p>
-      <p className="leading-[1.45] relative shrink-0 text-[#657684]">3 tài xế · 4 đơn</p>
-    </div>
-  );
-}
-
-function TangTi() {
-  return (
-    <div className="content-stretch flex gap-[12px] items-center overflow-clip relative shrink-0" data-name="Tăng tải">
-      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold not-italic relative shrink-0 text-[#087f8c]">+2</p>
-      <p className="font-['Roboto_Mono:Regular','Noto_Sans:Regular','Noto_Sans_Math:Regular','Noto_Sans_Symbols:Regular','Noto_Sans_Symbols2:Regular',sans-serif] font-normal relative shrink-0 text-[#18252f]">4 → 6/15</p>
-    </div>
-  );
-}
-
-function TiDKin() {
-  return (
-    <div className="content-stretch flex items-center justify-between leading-[1.45] overflow-clip relative shrink-0 w-full" data-name="Tải dự kiến">
-      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Nguyễn Văn An</p>
-      <TangTi />
-    </div>
-  );
-}
-
-function TangTi1() {
-  return (
-    <div className="content-stretch flex gap-[12px] items-center overflow-clip relative shrink-0" data-name="Tăng tải">
-      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold not-italic relative shrink-0 text-[#087f8c]">+1</p>
-      <p className="font-['Roboto_Mono:Regular','Noto_Sans:Regular','Noto_Sans_Math:Regular','Noto_Sans_Symbols:Regular','Noto_Sans_Symbols2:Regular',sans-serif] font-normal relative shrink-0 text-[#18252f]">6 → 7/15</p>
-    </div>
-  );
-}
-
-function TiDKin1() {
-  return (
-    <div className="content-stretch flex items-center justify-between leading-[1.45] overflow-clip relative shrink-0 w-full" data-name="Tải dự kiến">
-      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Trần Quốc Bình</p>
-      <TangTi1 />
-    </div>
-  );
-}
-
-function TangTi2() {
-  return (
-    <div className="content-stretch flex gap-[12px] items-center overflow-clip relative shrink-0" data-name="Tăng tải">
-      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold not-italic relative shrink-0 text-[#087f8c]">+1</p>
-      <p className="font-['Roboto_Mono:Regular','Noto_Sans:Regular','Noto_Sans_Math:Regular','Noto_Sans_Symbols:Regular','Noto_Sans_Symbols2:Regular',sans-serif] font-normal relative shrink-0 text-[#18252f]">8 → 9/15</p>
-    </div>
-  );
-}
-
-function TiDKin2() {
-  return (
-    <div className="content-stretch flex items-center justify-between leading-[1.45] overflow-clip relative shrink-0 w-full" data-name="Tải dự kiến">
-      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Lê Thị Chi</p>
-      <TangTi2 />
-    </div>
-  );
-}
-
 function TiDKinTheoLaChn() {
+  const { orders, checkedCount } = useContext(DispatchActionContext);
+
+  // Group load additions for checked orders
+  const checkedOrders = orders.filter((o) => o.checked);
+  const driverAdditions = DRIVER_OPTIONS.map((driver) => {
+    const assignedCount = checkedOrders.filter((o) => o.driverId === driver.id).length;
+    return {
+      driver,
+      added: assignedCount,
+      newLoad: driver.baseLoad + assignedCount,
+    };
+  }).filter((item) => item.added > 0);
+
   return (
     <div className="bg-white relative rounded-[10px] shrink-0 w-full" data-name="Tải dự kiến theo lựa chọn">
-      <div className="[word-break:break-word] content-stretch flex flex-col gap-[11px] items-start overflow-clip px-[20px] py-[16px] relative rounded-[inherit] size-full text-[12px] whitespace-nowrap">
-        <TomTtTaiX />
-        <TiDKin />
-        <TiDKin1 />
-        <TiDKin2 />
+      <div className="content-stretch flex flex-col gap-[11px] items-start overflow-clip px-[20px] py-[16px] relative rounded-[inherit] size-full text-[12px] whitespace-nowrap">
+        <div className="content-stretch flex font-['Inter:Regular',sans-serif] font-normal items-start justify-between not-italic overflow-clip relative shrink-0 w-full" data-name="Tóm tắt tài xế">
+          <p className="leading-[normal] relative shrink-0 text-[#18252f] font-semibold">Tải sau phê duyệt</p>
+          <p className="leading-[1.45] relative shrink-0 text-[#657684]">{driverAdditions.length} tài xế · {checkedCount} đơn</p>
+        </div>
+
+        {driverAdditions.length === 0 ? (
+          <p className="text-[#8fa0b3] text-[12px] py-2">Chưa chọn đơn hàng nào để tính tải.</p>
+        ) : (
+          driverAdditions.map(({ driver, added, newLoad }) => (
+            <div key={driver.id} className="content-stretch flex items-center justify-between leading-[1.45] overflow-clip relative shrink-0 w-full">
+              <p className="font-['Inter:Regular',sans-serif] font-normal text-[#657684]">{driver.name}</p>
+              <div className="content-stretch flex gap-[12px] items-center overflow-clip relative shrink-0">
+                <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[#087f8c]">+{added}</p>
+                <p className="font-['Roboto_Mono:Regular',sans-serif] font-normal text-[#18252f]">
+                  {driver.baseLoad} → {newLoad}/{driver.maxLoad}
+                </p>
+              </div>
+            </div>
+          ))
+        )}
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[10px]" />
     </div>
@@ -2293,10 +1541,20 @@ function BiuTngLaChn() {
 }
 
 function PhngAn() {
+  const { checkedCount, orders } = useContext(DispatchActionContext);
+  const checkedOrders = orders.filter((o) => o.checked);
+  const urgentCount = checkedOrders.filter((o) => o.isUrgent).length;
+  const driverCount = new Set(checkedOrders.map((o) => o.driverId)).size;
+  const manualCount = checkedOrders.filter((o) => o.intervention.includes("thủ công")).length;
+
   return (
     <div className="[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular',sans-serif] font-normal gap-[7px] items-start leading-[1.45] not-italic overflow-clip relative shrink-0 whitespace-nowrap" data-name="Phương án">
-      <p className="relative shrink-0 text-[#18252f] text-[15px]">4 đơn đã chọn · Sẵn sàng phê duyệt</p>
-      <p className="relative shrink-0 text-[#657684] text-[12px]">2 đơn SLA khẩn cấp · 3 tài xế · 1 thay đổi</p>
+      <p className="relative shrink-0 text-[#18252f] text-[15px] font-semibold">
+        {checkedCount} đơn đã chọn · Sẵn sàng phê duyệt
+      </p>
+      <p className="relative shrink-0 text-[#657684] text-[12px]">
+        {urgentCount} đơn SLA khẩn cấp · {driverCount} tài xế · {manualCount} thay đổi
+      </p>
     </div>
   );
 }
@@ -2310,41 +1568,44 @@ function TomTtLaChn() {
   );
 }
 
-function Check4() {
-  return (
-    <div className="relative shrink-0 size-[16px]" data-name="check">
-      <svg className="absolute block inset-0 size-full" fill="none" height="16" preserveAspectRatio="none" viewBox="0 0 16 16" width="16">
-        <g id="check">
-          <path d={svgPaths.p221839c0} id="Vector" stroke="white" strokeLinecap="round" strokeWidth="1.7" />
-        </g>
-      </svg>
-    </div>
-  );
-}
-
 function PheDuytPhanCongDaChn() {
-  const { onApprove, isApproving } = useContext(DispatchActionContext);
+  const { onApprove, isApproving, checkedCount } = useContext(DispatchActionContext);
+  const isDisabled = checkedCount === 0 || isApproving;
+
   return (
-    <div
-      onClick={onApprove}
-      className="bg-[#087f8c] hover:bg-[#066570] h-[40px] relative rounded-[6px] shrink-0 cursor-pointer transition-colors"
+    <button
+      type="button"
+      onClick={isDisabled ? undefined : onApprove}
+      disabled={isDisabled}
+      className={`${
+        isDisabled ? "bg-[#94a1ac] cursor-not-allowed opacity-60" : "bg-[#087f8c] hover:bg-[#066570] cursor-pointer"
+      } h-[40px] relative rounded-[6px] shrink-0 transition-colors border border-transparent`}
       data-name="Phê duyệt phân công đã chọn"
     >
       <div className="content-stretch flex gap-[8px] items-center justify-center overflow-clip px-[16px] relative rounded-[inherit] size-full">
-        <Check4 />
+        <Check />
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[13px] text-white whitespace-nowrap">
           {isApproving ? "Đang phê duyệt..." : "Phê duyệt"}
         </p>
       </div>
-      <div aria-hidden className="absolute border border-[#087f8c] border-solid inset-0 pointer-events-none rounded-[6px]" />
-    </div>
+    </button>
   );
 }
 
 function ThaoTacPheDuyt() {
+  const { uncheckAll, checkedCount } = useContext(DispatchActionContext);
   return (
     <div className="content-stretch flex gap-[24px] items-center overflow-clip relative shrink-0" data-name="Thao tác phê duyệt">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Bỏ chọn</p>
+      <button
+        type="button"
+        onClick={uncheckAll}
+        disabled={checkedCount === 0}
+        className={`[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal text-[12px] whitespace-nowrap ${
+          checkedCount === 0 ? "text-[#b0bcc5] cursor-not-allowed" : "text-[#657684] hover:text-[#18252f] cursor-pointer hover:underline"
+        }`}
+      >
+        Bỏ chọn
+      </button>
       <PheDuytPhanCongDaChn />
     </div>
   );
@@ -2375,11 +1636,11 @@ function CamKtPheDuyt() {
   return (
     <div className="content-stretch flex gap-[14px] items-center overflow-clip relative shrink-0 w-full" data-name="Cam kết phê duyệt">
       <ShieldCheck />
-      <p className="[word-break:break-word] font-['Roboto_Mono:SemiBold','Noto_Sans:SemiBold','Noto_Sans_Math:Regular','Noto_Sans_Symbols:SemiBold','Noto_Sans_Symbols2:Regular',sans-serif] font-semibold leading-[1.45] relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">READY_TO_DISPATCH → ASSIGNED</p>
+      <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold leading-[1.45] text-[#18252f] text-[12px] whitespace-nowrap">READY_TO_DISPATCH → ASSIGNED</p>
       <div className="bg-[#dce4ea] h-[12px] relative shrink-0 w-px" data-name="Phân cách" />
-      <p className="[word-break:break-word] font-['Roboto_Mono:Regular',sans-serif] font-normal leading-[1.45] relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">currentLoad += 1 / đơn</p>
+      <p className="font-['Roboto_Mono:Regular',sans-serif] font-normal leading-[1.45] text-[#18252f] text-[12px] whitespace-nowrap">currentLoad += 1 / đơn</p>
       <div className="bg-[#dce4ea] h-[12px] relative shrink-0 w-px" data-name="Phân cách" />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Kiểm tra sức chứa · Giao dịch nguyên tử, lỗi sẽ hoàn tác.</p>
+      <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] text-[#657684] text-[12px] whitespace-nowrap">Kiểm tra sức chứa · Giao dịch nguyên tử, lỗi sẽ hoàn tác.</p>
     </div>
   );
 }
@@ -2396,17 +1657,18 @@ function FileClock() {
   );
 }
 
-function KhongTrng1() {
-  return <div className="flex-[1_0_0] h-px min-w-px relative" data-name="Khoảng trống" />;
-}
-
 function DuVtKimToan() {
   return (
     <div className="content-stretch flex gap-[14px] items-center overflow-clip relative shrink-0 w-full" data-name="Dấu vết kiểm toán">
       <FileClock />
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">AuditLog lưu: người duyệt, thời gian, thuật toán v2.4 và thay đổi.</p>
-      <KhongTrng1 />
-      <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">Lịch sử ↗</p>
+      <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] text-[#657684] text-[12px] whitespace-nowrap">AuditLog lưu: người duyệt, thời gian, thuật toán v2.4 và thay đổi.</p>
+      <div className="flex-[1_0_0] h-px min-w-px relative" />
+      <p
+        onClick={() => { window.location.hash = "audit"; }}
+        className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] text-[#087f8c] hover:underline text-[12px] whitespace-nowrap cursor-pointer"
+      >
+        Lịch sử ↗
+      </p>
     </div>
   );
 }
@@ -2455,52 +1717,129 @@ function KhongGianDiuPhi() {
 }
 
 export default function Scr05GiYPhanCongTiu() {
+  const [orders, setOrders] = useState<DispatchOrder[]>(INITIAL_DISPATCH_ORDERS);
+  const [selectedOrderId, setSelectedOrderId] = useState<string>("MNX000001");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterSla, setFilterSla] = useState("all");
+  const [filterIntervention, setFilterIntervention] = useState("all");
   const [isApproving, setIsApproving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
+  const toggleCheck = (id: string) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === id ? { ...o, checked: !o.checked } : o))
+    );
+  };
+
+  const toggleCheckAll = () => {
+    setOrders((prev) => {
+      const allChecked = prev.every((o) => o.checked);
+      return prev.map((o) => ({ ...o, checked: !allChecked }));
+    });
+  };
+
+  const uncheckAll = () => {
+    setOrders((prev) => prev.map((o) => ({ ...o, checked: false })));
+  };
+
+  const changeDriver = (orderId: string, driverId: string) => {
+    const driver = DRIVER_OPTIONS.find((d) => d.id === driverId);
+    if (!driver) return;
+
+    setOrders((prev) =>
+      prev.map((o) => {
+        if (o.id === orderId) {
+          return {
+            ...o,
+            driverId: driver.id,
+            driverName: driver.name,
+            route: driver.route,
+            currentLoad: driver.baseLoad + 1,
+            maxLoad: driver.maxLoad,
+            intervention: `Đã đổi thủ công (${driver.name})`,
+          };
+        }
+        return o;
+      })
+    );
+    setToast(`Đã đổi tài xế đơn ${orderId} sang ${driver.name} (${driver.code})`);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // Filter logic
+  const filteredOrders = orders.filter((o) => {
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      const matchId = o.id.toLowerCase().includes(q);
+      const matchAddr = o.address.toLowerCase().includes(q) || o.ward.toLowerCase().includes(q);
+      const matchDriver = o.driverName.toLowerCase().includes(q);
+      if (!matchId && !matchAddr && !matchDriver) return false;
+    }
+
+    if (filterSla === "urgent" && !o.isUrgent) return false;
+    if (filterSla === "checked" && !o.checked) return false;
+    if (filterSla === "unchecked" && o.checked) return false;
+
+    if (filterIntervention === "manual" && !o.intervention.includes("thủ công")) return false;
+    if (filterIntervention === "rule" && o.intervention.includes("thủ công")) return false;
+
+    return true;
+  });
+
+  const selectedOrder = orders.find((o) => o.id === selectedOrderId) || orders[0];
+  const checkedCount = orders.filter((o) => o.checked).length;
+
   const handleApprove = async () => {
-    if (isApproving) return;
+    if (isApproving || checkedCount === 0) return;
     setIsApproving(true);
     try {
-      const suggestions = await Promise.race([
-        dispatchService.getSuggestions(),
-        new Promise<any[]>((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000))
-      ]).catch(() => []);
+      const checkedList = orders.filter((o) => o.checked);
+      const primary = checkedList[0];
 
-      const lastCreatedId = sessionStorage.getItem("lastCreatedOrderId");
-      const target = (lastCreatedId ? suggestions.find(s => s.orderId === lastCreatedId) : null) || suggestions[0] || {
-        assignmentId: "ASG-001",
-        orderId: "ORD-019",
-        trackingCode: "VN241109086",
-        driverName: "Nguyễn Văn An",
-        driverId: "DRV-02"
-      };
+      await Promise.race([
+        dispatchService.approveSuggestion(primary.id),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1000)),
+      ]).catch(() => null);
 
-      if (target && target.assignmentId) {
-        await Promise.race([
-          dispatchService.approveSuggestion(target.assignmentId),
-          new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000))
-        ]).catch(() => null);
-      }
-
-      sessionStorage.setItem("lastAssignedOrderId", target.orderId || "ORD-019");
-      sessionStorage.setItem("lastAssignedDriverId", target.driverId || "DRV-02");
-      setToast(`Đã duyệt phân công đơn ${target.trackingCode || target.orderId} cho tài xế ${target.driverName || "Nguyễn Văn An"}!`);
+      sessionStorage.setItem("lastAssignedOrderId", primary.id);
+      sessionStorage.setItem("lastAssignedDriverId", primary.driverId);
+      setToast(`Đã duyệt phân công thành công ${checkedCount} đơn hàng!`);
       setTimeout(() => {
         window.location.hash = "driver";
-      }, 1000);
+      }, 900);
     } catch {
-      setToast("Đã duyệt phân công cho tài xế!");
+      setToast(`Đã duyệt phân công thành công ${checkedCount} đơn!`);
       setTimeout(() => {
         window.location.hash = "driver";
-      }, 1000);
+      }, 900);
     } finally {
       setIsApproving(false);
     }
   };
 
   return (
-    <DispatchActionContext.Provider value={{ onApprove: handleApprove, isApproving }}>
+    <DispatchActionContext.Provider
+      value={{
+        orders,
+        selectedOrderId,
+        setSelectedOrderId,
+        toggleCheck,
+        toggleCheckAll,
+        uncheckAll,
+        changeDriver,
+        searchQuery,
+        setSearchQuery,
+        filterSla,
+        setFilterSla,
+        filterIntervention,
+        setFilterIntervention,
+        onApprove: handleApprove,
+        isApproving,
+        checkedCount,
+        filteredOrders,
+        selectedOrder,
+      }}
+    >
       <div className="bg-[#f0f4f7] content-stretch flex items-start relative size-full" data-name="SCR-05 · Gợi ý phân công tối ưu">
         {toast && (
           <div className="fixed top-16 right-8 z-50 bg-[#15803d] text-white px-5 py-3 rounded-lg shadow-xl font-bold text-[13px] animate-bounce">
