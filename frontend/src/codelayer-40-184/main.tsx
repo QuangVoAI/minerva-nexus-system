@@ -1,4 +1,5 @@
 import svgPaths from "./svg-oz9anbhy43";
+import { DiuHngHub as DiuHngHubShared } from "../components/DiuHngHub";
 
 function Boxes() {
   return (
@@ -337,16 +338,7 @@ function PhienTrc() {
 }
 
 function DiuHngHub() {
-  return (
-    <div className="bg-[#082e40] content-stretch flex flex-col gap-[28px] items-start min-h-[1120px] overflow-clip pb-[20px] pt-[24px] px-[16px] relative self-stretch shrink-0 w-[204px]" data-name="Điều hướng Hub">
-      <NhnDin />
-      <HubHinTi />
-      <NghipV />
-      <QunTr />
-      <KhongDm />
-      <PhienTrc />
-    </div>
-  );
+  return <DiuHngHubShared />;
 }
 
 function ChevronRight() {

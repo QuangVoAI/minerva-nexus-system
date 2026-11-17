@@ -1,6 +1,7 @@
 import { useState } from "react";
 import svgPaths from "./svg-fotlugvvbo";
 import { orderService } from "../services";
+import { DiuHngHub as DiuHngHubShared } from "../components/DiuHngHub";
 
 function Boxes() {
   return (
@@ -400,17 +401,7 @@ function PhienTrc() {
 }
 
 function DiuHngHub() {
-  return (
-    <div className="bg-[#082e40] content-stretch flex flex-col gap-[28px] h-full items-start min-h-[1120px] overflow-clip pb-[20px] pt-[24px] px-[16px] relative shrink-0 w-[204px]" data-name="Điều hướng Hub">
-      <NhnDin />
-      <HubHinTi />
-      <NghipV />
-      <QunTr />
-      <KhongDm />
-      <HTrVnHanh />
-      <PhienTrc />
-    </div>
-  );
+  return <DiuHngHubShared />;
 }
 
 function ChevronRight() {
@@ -2408,10 +2399,12 @@ export default function Scr03ToDnGiLThCong() {
         serviceLevel: "STANDARD",
         codAmount: 320000,
       });
+      sessionStorage.setItem("lastCreatedOrderId", res.orderId);
+      sessionStorage.setItem("lastCreatedTrackingCode", res.trackingCode);
       setSuccessToast(`Tạo đơn thành công! Mã vận đơn: ${res.trackingCode}`);
       setTimeout(() => {
-        window.location.hash = "orders";
-      }, 1500);
+        window.location.hash = "dispatch";
+      }, 1200);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Tạo đơn thất bại.";
       alert(`Lỗi: ${msg}`);

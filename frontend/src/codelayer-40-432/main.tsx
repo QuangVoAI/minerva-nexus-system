@@ -1,4 +1,12 @@
+import { useState, createContext, useContext } from "react";
 import svgPaths from "./svg-mmw8u2i6ev";
+import { dispatchService } from "../services";
+import { DiuHngHub as DiuHngHubShared } from "../components/DiuHngHub";
+
+const DispatchActionContext = createContext<{
+  onApprove?: () => void;
+  isApproving?: boolean;
+}>({});
 
 function Boxes() {
   return (
@@ -337,16 +345,7 @@ function PhienTrc() {
 }
 
 function DiuHngHub() {
-  return (
-    <div className="bg-[#082e40] content-stretch flex flex-col gap-[28px] h-full items-start min-h-[1120px] overflow-clip pb-[20px] pt-[24px] px-[16px] relative shrink-0 w-[204px]" data-name="Điều hướng Hub">
-      <NhnDin />
-      <HubHinTi />
-      <NghipV />
-      <QunTr />
-      <KhongDm />
-      <PhienTrc />
-    </div>
-  );
+  return <DiuHngHubShared />;
 }
 
 function ChevronRight() {
@@ -664,7 +663,7 @@ function CongThc() {
     <div className="content-stretch flex gap-[10px] items-center overflow-clip relative shrink-0" data-name="Công thức">
       <Workflow />
       <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#18252f] text-[12px] whitespace-nowrap">Điểm khớp</p>
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Khu vực + SLA + sức chứa + tải</p>
+      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">w1 × tuyến + w2 × SLA + w3 × tải</p>
     </div>
   );
 }
@@ -672,7 +671,7 @@ function CongThc() {
 function CuHinh() {
   return (
     <div className="[word-break:break-word] content-stretch flex gap-[16px] items-center leading-[1.45] overflow-clip relative shrink-0 text-[12px] whitespace-nowrap" data-name="Cấu hình">
-      <p className="font-['Roboto_Mono:Regular',sans-serif] font-normal relative shrink-0 text-[#657684]">Quy tắc cấu hình · có thể giải thích</p>
+      <p className="font-['Roboto_Mono:Regular',sans-serif] font-normal relative shrink-0 text-[#657684]">w1 = 0.5 · w2 = 0.3 · w3 = 0.2</p>
       <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold not-italic relative shrink-0 text-[#087f8c]">Cấu hình ↗</p>
     </div>
   );
@@ -1970,7 +1969,7 @@ function DimVaDn() {
 function ChSVaDim() {
   return (
     <div className="[word-break:break-word] content-stretch flex items-start justify-between leading-[1.45] overflow-clip relative shrink-0 text-[12px] w-full whitespace-nowrap" data-name="Chỉ số và điểm">
-      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Đúng khu vực phục vụ</p>
+      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Trùng tuyến địa bàn · w1</p>
       <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold relative shrink-0 text-[#18252f]">50 / 50</p>
     </div>
   );
@@ -1996,7 +1995,7 @@ function ThanhPhnDim() {
 function ChSVaDim1() {
   return (
     <div className="[word-break:break-word] content-stretch flex items-start justify-between leading-[1.45] overflow-clip relative shrink-0 text-[12px] w-full whitespace-nowrap" data-name="Chỉ số và điểm">
-      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Mức ưu tiên và SLA</p>
+      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Độ cấp bách SLA · w2</p>
       <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold relative shrink-0 text-[#18252f]">30 / 30</p>
     </div>
   );
@@ -2022,7 +2021,7 @@ function ThanhPhnDim1() {
 function ChSVaDim2() {
   return (
     <div className="[word-break:break-word] content-stretch flex items-start justify-between leading-[1.45] overflow-clip relative shrink-0 text-[12px] w-full whitespace-nowrap" data-name="Chỉ số và điểm">
-      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Sức chứa và tải đang xử lý</p>
+      <p className="font-['Inter:Regular',sans-serif] font-normal not-italic relative shrink-0 text-[#657684]">Cân bằng tải · w3</p>
       <p className="font-['Roboto_Mono:SemiBold',sans-serif] font-semibold relative shrink-0 text-[#18252f]">16 / 20</p>
     </div>
   );
@@ -2307,11 +2306,18 @@ function Check4() {
 }
 
 function PheDuytPhanCongDaChn() {
+  const { onApprove, isApproving } = useContext(DispatchActionContext);
   return (
-    <div className="bg-[#087f8c] h-[40px] relative rounded-[6px] shrink-0" data-name="Phê duyệt phân công đã chọn">
+    <div
+      onClick={onApprove}
+      className="bg-[#087f8c] hover:bg-[#066570] h-[40px] relative rounded-[6px] shrink-0 cursor-pointer transition-colors"
+      data-name="Phê duyệt phân công đã chọn"
+    >
       <div className="content-stretch flex gap-[8px] items-center justify-center overflow-clip px-[16px] relative rounded-[inherit] size-full">
         <Check4 />
-        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[13px] text-white whitespace-nowrap">Phê duyệt</p>
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[13px] text-white whitespace-nowrap">
+          {isApproving ? "Đang phê duyệt..." : "Phê duyệt"}
+        </p>
       </div>
       <div aria-hidden className="absolute border border-[#087f8c] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
@@ -2432,10 +2438,45 @@ function KhongGianDiuPhi() {
 }
 
 export default function Scr05GiYPhanCongTiu() {
+  const [isApproving, setIsApproving] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const handleApprove = async () => {
+    setIsApproving(true);
+    try {
+      const suggestions = await dispatchService.getSuggestions();
+      const lastCreatedId = sessionStorage.getItem("lastCreatedOrderId");
+      const target = (lastCreatedId ? suggestions.find(s => s.orderId === lastCreatedId) : null) || suggestions[0];
+      if (target) {
+        await dispatchService.approveSuggestion(target.assignmentId);
+        sessionStorage.setItem("lastAssignedOrderId", target.orderId);
+        sessionStorage.setItem("lastAssignedDriverId", target.driverId || "DRV-02");
+        setToast(`Đã duyệt phân công đơn ${target.trackingCode || target.orderId} cho tài xế ${target.driverName}!`);
+        setTimeout(() => {
+          window.location.hash = "driver";
+        }, 1200);
+      } else {
+        setToast("Hiện không có đề xuất nào chờ duyệt.");
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Phê duyệt thất bại";
+      alert(`Lỗi: ${msg}`);
+    } finally {
+      setIsApproving(false);
+    }
+  };
+
   return (
-    <div className="bg-[#f0f4f7] content-stretch flex items-start relative size-full" data-name="SCR-05 · Gợi ý phân công tối ưu">
-      <DiuHngHub />
-      <KhongGianDiuPhi />
-    </div>
+    <DispatchActionContext.Provider value={{ onApprove: handleApprove, isApproving }}>
+      <div className="bg-[#f0f4f7] content-stretch flex items-start relative size-full" data-name="SCR-05 · Gợi ý phân công tối ưu">
+        {toast && (
+          <div className="fixed top-16 right-8 z-50 bg-[#15803d] text-white px-5 py-3 rounded-lg shadow-xl font-bold text-[13px] animate-bounce">
+            ✓ {toast}
+          </div>
+        )}
+        <DiuHngHub />
+        <KhongGianDiuPhi />
+      </div>
+    </DispatchActionContext.Provider>
   );
 }
