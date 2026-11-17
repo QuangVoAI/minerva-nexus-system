@@ -42,7 +42,7 @@ Tài liệu này là kịch bản để cả nhóm chạy đúng **một hệ th
 2. **Tiếp nhận:** ở `#orders`, chọn đơn mới tạo và xác nhận đơn đủ điều kiện phát. Trạng thái phải đổi `PENDING → READY_TO_DISPATCH`; timeline có người thao tác và thời điểm.
 3. **Điều phối:** ở `#dispatch`, xem lý do gợi ý: khu vực, ca có mặt, dịch vụ, sức chứa/tải và mức SLA. Duyệt một gợi ý. Trạng thái thành `ASSIGNED`.
 4. **Tài xế:** vào `#driver`, chọn đúng tài xế được gán, bấm **Nhận đơn**, rồi **Bắt đầu đi giao** và **Giao thành công**. Trạng thái tuần tự là `DRIVER_ACCEPTED → IN_TRANSIT → DELIVERED`.
-5. **Kiểm chứng:** mở `#order-detail` hoặc `#tracking`, đối chiếu timeline. Mở dashboard để chứng minh KPI được tính lại từ dữ liệu hiện tại.
+5. **Kiểm chứng:** mở `#order-detail`, đối chiếu timeline nội bộ và nhật ký audit. Mở dashboard để chứng minh KPI được tính lại từ dữ liệu hiện tại.
 
 Không nói “AI”, “machine learning”, “tối ưu tuyến đường” hay “GPS thời gian thực”. Cách gọi đúng là **gợi ý phân công theo quy tắc nghiệp vụ, có người vận hành duyệt**.
 
@@ -73,7 +73,7 @@ Sau khi tài xế đã nhận đơn, UI/API phải từ chối hủy trực ti�
 - Ảnh/video luồng chính, có address bar/API health hoặc console backend đang chạy.
 - Một ảnh mỗi nhánh ngoại lệ: lần thất bại thứ nhất, lần thứ ba/Chờ hoàn, hủy đơn đã gán.
 - Ảnh `./mvnw test` thành công và `npm run build` thành công.
-- Ảnh public tracking với mã vận đơn thật tạo trong demo.
+- Ảnh timeline nội bộ và audit log của chính mã vận đơn tạo trong demo.
 - Một trang dự phòng: danh sách endpoint trong `docs/M1_API.md` và giải thích 15 đơn/ca chỉ tính các trạng thái `ASSIGNED`, `DRIVER_ACCEPTED`, `IN_TRANSIT`.
 
 ## 5. Checklist trả lời phản biện

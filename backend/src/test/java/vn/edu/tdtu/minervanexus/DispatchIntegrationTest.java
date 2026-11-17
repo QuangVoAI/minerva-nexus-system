@@ -25,7 +25,9 @@ import vn.edu.tdtu.minervanexus.service.*;
 @TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
 @EnabledIfEnvironmentVariable(named = "M2_TEST_MONGO", matches = ".+")
 class DispatchIntegrationTest {
-  static final String db = "m2_test_" + UUID.randomUUID().toString().replace("-", "");
+  // Atlas limits database names to 38 bytes. Keep this isolated test database
+  // short while retaining sufficient uniqueness for concurrent CI/demo runs.
+  static final String db = "m2t_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
 
   @DynamicPropertySource
   static void mongo(DynamicPropertyRegistry p) {

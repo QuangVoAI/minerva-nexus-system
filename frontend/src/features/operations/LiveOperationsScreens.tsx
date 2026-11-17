@@ -7,12 +7,6 @@ import type { DeliveryOrder, Driver } from '../../types';
 const card = 'bg-white rounded-xl border border-[#dbe4ea] p-5 shadow-sm font-sans';
 const btn = 'px-3 py-2 rounded-md text-[12px] font-semibold cursor-pointer';
 
-export const LiveTracking: React.FC = () => {
-  const [code, setCode] = useState(''); const [data, setData] = useState<any>(null); const [error, setError] = useState('');
-  const search = async () => { setError(''); setData(null); try { setData(await apiClient.get(`/api/tracking/${encodeURIComponent(code.trim())}`)); } catch { setError('Không tìm thấy thông tin phù hợp. Vui lòng kiểm tra lại mã vận đơn.'); } };
-  return <div className={`${card} max-w-3xl mx-auto`}><h2 className="text-xl font-bold text-[#142b3b]">Tra cứu hành trình đơn hàng</h2><p className="text-[13px] text-[#657684] mt-1">Nhập mã vận đơn để xem trạng thái rút gọn.</p><div className="flex gap-2 mt-5"><input value={code} onChange={e=>setCode(e.target.value)} placeholder="Ví dụ: MNX000001" className="flex-1 border border-[#cbd5e1] rounded-md px-3 py-2 text-sm"/><button onClick={search} className={`${btn} bg-[#087f8c] text-white`}>Tra cứu</button></div>{error && <p className="mt-4 text-sm text-red-600">{error}</p>}{data && <div className="mt-5 border-t pt-4"><div className="grid grid-cols-2 gap-3 text-sm"><p>Mã vận đơn: <strong>{data.trackingCode}</strong></p><p>Trạng thái: <strong>{data.statusLabel}</strong></p><p>Khu vực: <strong>{data.areaId}</strong></p><p>Cập nhật: <strong>{data.updatedAt || '—'}</strong></p></div><ol className="mt-5 space-y-3 border-l border-[#8cc9ca] pl-5">{(data.timeline || []).map((m:any, i:number)=><li key={i}><strong>{m.statusLabel}</strong><div className="text-xs text-[#657684]">{m.changedAt}</div></li>)}</ol><p className="mt-5 text-xs text-[#657684]">Thông tin hiển thị tối thiểu để bảo vệ dữ liệu người nhận.</p></div>}</div>;
-};
-
 export const LiveCancelOrder: React.FC = () => {
   const [orders, setOrders] = useState<DeliveryOrder[]>([]); const [selected, setSelected] = useState(''); const [reason, setReason] = useState('Người gửi yêu cầu hủy'); const [message, setMessage] = useState('');
   const load = async () => setOrders(await orderService.getOrders()); useEffect(()=>{load().catch(e=>setMessage(e.message));},[]);

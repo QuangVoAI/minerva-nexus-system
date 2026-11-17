@@ -52,6 +52,9 @@ Tạo biến môi trường `MONGODB_URI` trong máy cục bộ, sau đó chạy
 
 ```bash
 cd backend
+# If macOS has Homebrew OpenJDK 21 but `java` is not linked globally:
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21
+export PATH="$JAVA_HOME/bin:$PATH"
 ./mvnw test
 ./mvnw spring-boot:run
 ```
@@ -62,7 +65,7 @@ Tài liệu cấu trúc MongoDB và quy tắc trạng thái nằm tại [docs/DA
 
 Để chạy các panel API đã tích hợp mà vẫn giữ nguyên màn hình Figma, mở frontend với query `?mode=live`, ví dụ `/react/?mode=live#orders`. Không có query này, runtime hiển thị đúng các frame Figma gốc.
 
-Các panel live bổ sung dùng cho nghiệm thu MVP: `#tracking`, `#cancel`, `#audit`, `#reports`, `#drivers`. Sau `bootstrap.js`, có thể chạy thêm `docs/mongodb/seed-demo.js` để tạo tài xế và ca giao mẫu cho luồng điều phối.
+Các panel live bổ sung dùng cho nghiệm thu MVP: `#cancel`, `#audit`, `#reports`, `#drivers`. Tra cứu đơn công khai không thuộc phạm vi MVP; timeline đơn chỉ hiển thị trong giao diện vận hành nội bộ. Sau `bootstrap.js`, có thể chạy thêm `docs/mongodb/seed-demo.js` để tạo tài xế và ca giao mẫu cho luồng điều phối.
 
 Kịch bản chạy, các nhánh ngoại lệ và checklist bằng chứng trước khi nộp nằm tại [docs/DEMO_RUNBOOK.md](docs/DEMO_RUNBOOK.md). Khi backend đang chạy với MongoDB, có thể kiểm tra toàn bộ luồng chính không phụ thuộc dữ liệu mẫu bằng `cd frontend && npm run test:e2e`.
 

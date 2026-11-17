@@ -7,7 +7,7 @@ Mục tiêu của nhóm là làm chắc một luồng có thể demo: **tạo/ti
 | Mốc | Trạng thái | Kết quả cần có | Owner |
 | --- | --- | --- | --- |
 | M0 — Chốt phạm vi và nền tảng | **Hoàn thành** | BRS/SRS chốt trong repo; React/Figma có sẵn; MongoDB `minerva_nexus` đã khởi tạo; backend Spring Boot có khung kết nối, đơn hàng và SLA | Võ Xuân Quang |
-| M1 — Luồng đơn hàng và SLA | **Sẵn sàng thực hiện** | Tạo/tiếp nhận/hủy hợp lệ, cảnh báo SLA có lý do, timeline/audit, failure count, tra cứu công khai đã che dữ liệu | Nguyễn Gia Nhật Khánh |
+| M1 — Luồng đơn hàng và SLA | **Sẵn sàng thực hiện** | Tạo/tiếp nhận/hủy hợp lệ, cảnh báo SLA có lý do, timeline/audit nội bộ, failure count | Nguyễn Gia Nhật Khánh |
 | M2 — Ca giao và điều phối | **Chờ M1 chốt contract** | Tài xế, ca/điểm danh, kiểm tra sức chứa 15 đơn, đề xuất theo quy tắc, duyệt/chỉnh/gán lại | Phạm Trung Nghĩa |
 | M3 — Nối giao diện có sẵn với API | **Chờ API M1/M2** | Giữ nguyên Figma; thay đúng các dữ liệu mẫu trong luồng demo bằng dữ liệu API, hiển thị loading/lỗi | Hoàng Xuân Thành |
 | M4 — Tích hợp và kiểm thử luồng demo | **Chờ M1–M3** | Một kịch bản chạy thật từ tạo đơn đến KPI/lịch sử; seed demo; kiểm thử API và build React | Võ Xuân Quang + cả nhóm |
@@ -71,7 +71,7 @@ Mục tiêu của nhóm là làm chắc một luồng có thể demo: **tạo/ti
 - Hoàn thiện validation cho tạo/tiếp nhận/hủy đơn; đảm bảo mã vận đơn duy nhất, SLA hợp lệ và hủy đơn chỉ trước khi phát.
 - Hoàn thiện đánh giá SLA theo ngưỡng đã chốt, lưu `ruleVersion`, thời điểm, số phút còn lại và lý do.
 - Hoàn thiện status history/audit log; mọi thay đổi trạng thái phải có tác nhân, thời gian, trạng thái trước/sau và ghi chú.
-- Cung cấp hoặc hoàn thiện API cho danh sách, tìm kiếm, chi tiết, timeline, chuyển trạng thái, báo thất bại và tra cứu công khai đã che dữ liệu nhạy cảm.
+- Cung cấp hoặc hoàn thiện API nội bộ cho danh sách, tìm kiếm, chi tiết, timeline, chuyển trạng thái và báo thất bại.
 
 ### Không làm
 

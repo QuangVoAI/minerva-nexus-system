@@ -41,12 +41,12 @@ async function run() {
   assert(inTransit.status === 'IN_TRANSIT', 'Tài xế phải bắt đầu giao được.');
   const delivered = await request(`/api/orders/${orderId}/status?target=DELIVERED`, {method: 'PATCH', headers: {'X-Actor-Id': driver.id}, body: JSON.stringify({})});
   assert(delivered.status === 'DELIVERED', 'Đơn phải giao thành công được.');
-  const tracking = await request(`/api/tracking/${trackingCode}`);
-  assert(tracking.statusLabel === 'DELIVERED' && tracking.timeline.length >= 5, 'Public tracking phải hiển thị timeline hoàn tất.');
   const timeline = await request(`/api/orders/${orderId}/timeline`);
-  assert(timeline.at(-1).toStatus === 'DELIVERED', 'Timeline nội bộ phải kết thúc DELIVERED.');
+  assert(timeline.length >= 5 && timeline.at(-1).toStatus === 'DELIVERED', 'Timeline nội bộ phải kết thúc DELIVERED.');
   const metrics = await request('/api/analytics');
   assert(metrics.deliveredCount >= 1, 'KPI phải phản ánh đơn đã giao.');
-  console.log(`✓ PASS: ${trackingCode}; ${timeline.length} mốc; KPI delivered=${metrics.deliveredCount}.`);
+  const audit = await request(`/api/audit?q=${encodeURIComponent(trackingCode)}`);
+  assert(audit.length >= 1, 'Audit nội bộ phải truy vết được đơn đã hoàn tất.');
+  console.log(`✓ PASS: ${trackingCode}; ${timeline.length} mốc; ${audit.length} audit record; KPI delivered=${metrics.deliveredCount}.`);
 }
 run().catch((error) => { console.error(`✗ LIVE CHECK FAILED: ${error.message}`); process.exit(1); });

@@ -25,7 +25,6 @@ import {
   LiveDriverActionCard,
   LiveOrderDetailTimeline,
   LiveOrderIntake,
-  LiveTracking,
   LiveCancelOrder,
   LiveAuditLog,
   LiveReports,
@@ -55,7 +54,6 @@ const screens: Screen[] = [
   { id: "failed", title: "SCR-08 · FAILED chờ phát lại", group: "Mobile", Component: FailedPending },
   { id: "refused", title: "SCR-08 · Từ chối nhận lần ba", group: "Mobile", Component: RefusedThird },
   { id: "returned", title: "SCR-08 · RETURNED chuyển hoàn", group: "Mobile", Component: Returned }
-  ,{ id: "tracking", title: "UC-24 · Tra cứu hành trình công khai", group: "Công khai", Component: EmptyScreen }
   ,{ id: "cancel", title: "UC-23 · Hủy đơn hàng", group: "Đơn hàng", Component: EmptyScreen }
   ,{ id: "audit", title: "UC-22 · Nhật ký hệ thống", group: "Hệ thống", Component: EmptyScreen }
   ,{ id: "reports", title: "UC-20 · Báo cáo vận hành", group: "Báo cáo", Component: EmptyScreen }
@@ -81,7 +79,6 @@ function LiveScreen({ id }: { id: string }): JSX.Element | null {
       return <LiveOrderDetailTimeline orderId={new URLSearchParams(window.location.search).get("orderId")} />;
     case "driver":
       return <LiveDriverActionCard />;
-    case "tracking": return <LiveTracking />;
     case "cancel": return <LiveCancelOrder />;
     case "audit": return <LiveAuditLog />;
     case "reports": return <LiveReports />;
@@ -111,7 +108,7 @@ export default function App() {
   };
 
   const ScreenComponent = active.Component;
-  const liveOnlyIds = new Set(["tracking", "cancel", "audit", "reports", "drivers"]);
+  const liveOnlyIds = new Set(["cancel", "audit", "reports", "drivers"]);
   const isExtendedScreen = liveOnlyIds.has(active.id);
   const content = (liveMode || isExtendedScreen) ? (<LiveScreen id={active.id} /> ?? <ScreenComponent />) : <ScreenComponent />;
 

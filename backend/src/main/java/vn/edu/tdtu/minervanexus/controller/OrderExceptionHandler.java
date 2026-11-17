@@ -9,7 +9,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import vn.edu.tdtu.minervanexus.service.OrderProblem;
 import java.util.Map;
 
-@RestControllerAdvice(assignableTypes={OrderController.class,OrderTrackingController.class})
+@RestControllerAdvice(assignableTypes={OrderController.class})
 public class OrderExceptionHandler {
     @ExceptionHandler(OrderProblem.class) public ResponseEntity<Map<String,Object>> domain(OrderProblem e) {return response(e.getStatus(),e.getMessage());}
     @ExceptionHandler({DuplicateKeyException.class,OptimisticLockingFailureException.class}) public ResponseEntity<Map<String,Object>> conflict(Exception e) {return response(409,"Dữ liệu đã thay đổi hoặc mã vận đơn đã tồn tại. Vui lòng tải lại.");}
