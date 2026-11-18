@@ -26,7 +26,6 @@ const SCREENS = [
   { id: "failed", name: "SCR-08 · FAILED chờ phát lại", category: "Mobile Tài xế" },
   { id: "refused", name: "SCR-08 · Từ chối nhận lần ba", category: "Mobile Tài xế" },
   { id: "returned", name: "SCR-08 · RETURNED chuyển hoàn", category: "Mobile Tài xế" },
-  { id: "tracking", name: "UC-24 · Tra cứu hành trình công khai", category: "Tiện ích & Mở rộng" },
   { id: "cancel", name: "UC-23 · Hủy đơn hàng", category: "Tiện ích & Mở rộng" },
   { id: "audit", name: "UC-22 · Nhật ký hệ thống", category: "Tiện ích & Mở rộng" },
   { id: "reports", name: "UC-20 · Báo cáo vận hành", category: "Tiện ích & Mở rộng" },
@@ -35,7 +34,7 @@ const SCREENS = [
 
 async function runTest() {
   console.log("========================================================================");
-  console.log("   MINERVA NEXUS — KIỂM THỬ TOÀN DIỆN 23 TÍNH NĂNG & MÀN HÌNH TRỰC TIẾP ");
+  console.log("   MINERVA NEXUS — KIỂM THỬ TOÀN DIỆN 22 TÍNH NĂNG & MÀN HÌNH TRỰC TIẾP ");
   console.log("   Chụp ảnh màn hình, kiểm tra tương tác từng nút/form như người dùng   ");
   console.log("========================================================================\n");
 
@@ -118,15 +117,6 @@ async function runTest() {
         if (await reason.isVisible()) {
           await reason.click();
           interactionDetail = "Chọn lý do thất bại thành công";
-        }
-      } else if (screen.id === "tracking") {
-        const input = page.locator('input[placeholder*="MNX"]').first();
-        if (await input.isVisible()) {
-          await input.fill("MNX000001");
-          const searchBtn = page.locator('button:has-text("Tra cứu")').first();
-          await searchBtn.click();
-          await page.waitForTimeout(500);
-          interactionDetail = "Tra cứu MNX000001 trả về thông tin trạng thái & timeline";
         }
       } else if (screen.id === "cancel") {
         const select = page.locator('select').first();

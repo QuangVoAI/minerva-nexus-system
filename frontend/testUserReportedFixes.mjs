@@ -65,22 +65,14 @@ import path from 'path';
     console.log('✓ Saved screenshot verify_fix_driver_scrolled.png after scrolling down');
   }
 
-  console.log('--- 4. Testing #tracking: Tra cứu MNX000001 ---');
-  await page.goto('http://localhost:8080/react/#tracking', { waitUntil: 'networkidle' });
+  console.log('--- 4. Testing #audit: Nhật ký kiểm toán nội bộ ---');
+  await page.goto('http://localhost:8080/react/#audit', { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
 
-  const trackingInput = page.locator('input[placeholder*="MNX"]').first();
-  if (await trackingInput.isVisible()) {
-    await trackingInput.fill('MNX000001');
-    const searchBtn = page.locator('button:has-text("Tra cứu")').first();
-    await searchBtn.click();
-    await page.waitForTimeout(1000);
-
-    const trackingBody = await page.textContent('body');
-    console.log('✓ Tracking result for MNX000001 found:', trackingBody.includes('MNX000001') && !trackingBody.includes('Không tìm thấy'));
-    await page.screenshot({ path: 'screenshots/verify_fix_tracking.png', fullPage: false });
-    console.log('✓ Saved screenshot verify_fix_tracking.png');
-  }
+  const auditBody = await page.textContent('body');
+  console.log('✓ Internal Audit Log loaded:', auditBody.includes('Nhật ký hệ thống'));
+  await page.screenshot({ path: 'screenshots/verify_fix_audit.png', fullPage: false });
+  console.log('✓ Saved screenshot verify_fix_audit.png');
 
   await browser.close();
   console.log('ALL VERIFICATION CHECKS PASSED SUCCESSFULLY!');

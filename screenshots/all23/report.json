@@ -163,47 +163,38 @@
   },
   {
     "idx": "19",
-    "id": "tracking",
-    "name": "UC-24 · Tra cứu hành trình công khai",
-    "category": "Tiện ích & Mở rộng",
-    "status": "PASS",
-    "detail": "Tra cứu MNX000001 trả về thông tin trạng thái & timeline",
-    "screenshot": "19_tracking.png"
-  },
-  {
-    "idx": "20",
     "id": "cancel",
     "name": "UC-23 · Hủy đơn hàng",
     "category": "Tiện ích & Mở rộng",
     "status": "PASS",
     "detail": "Dropdown chọn đơn cần hủy sẵn sàng",
-    "screenshot": "20_cancel.png"
+    "screenshot": "19_cancel.png"
   },
   {
-    "idx": "21",
+    "idx": "20",
     "id": "audit",
     "name": "UC-22 · Nhật ký hệ thống",
     "category": "Tiện ích & Mở rộng",
     "status": "PASS",
     "detail": "Lọc nhật ký audit log theo mã MNX thành công",
-    "screenshot": "21_audit.png"
+    "screenshot": "20_audit.png"
   },
   {
-    "idx": "22",
+    "idx": "21",
     "id": "reports",
     "name": "UC-20 · Báo cáo vận hành",
     "category": "Tiện ích & Mở rộng",
     "status": "PASS",
     "detail": "Nút xuất CSV sẵn sàng (true)",
-    "screenshot": "22_reports.png"
+    "screenshot": "21_reports.png"
   },
   {
-    "idx": "23",
+    "idx": "22",
     "id": "drivers",
     "name": "UC-03 · Tài xế và khu vực",
     "category": "Tiện ích & Mở rộng",
     "status": "PASS",
     "detail": "Bảng danh sách tài xế & tải khả dụng sẵn sàng (true)",
-    "screenshot": "23_drivers.png"
+    "screenshot": "22_drivers.png"
   }
 ]

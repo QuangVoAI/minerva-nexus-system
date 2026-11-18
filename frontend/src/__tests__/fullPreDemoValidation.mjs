@@ -131,8 +131,8 @@ async function runPreDemoWalkthrough() {
     }
 
     const dispatchText = await page.textContent("body");
-    const hasAiExplain = dispatchText.includes("Vì sao khớp") || dispatchText.includes("w1") || dispatchText.includes("88%") || dispatchText.includes("96%");
-    logStep(5, "Xem giải trình thuật toán AI bên phải", hasAiExplain, "Hiển thị 3 trọng số w1, w2, w3");
+    const hasRuleExplain = dispatchText.includes("Vì sao khớp") || dispatchText.includes("w1") || dispatchText.includes("88%") || dispatchText.includes("96%");
+    logStep(5, "Xem giải trình quy tắc nghiệp vụ bên phải", hasRuleExplain, "Hiển thị 3 trọng số w1, w2, w3");
 
     // Click nút Phê duyệt
     const approveBtn = page.locator('button:has-text("Phê duyệt")').first();
@@ -210,24 +210,16 @@ async function runPreDemoWalkthrough() {
     }
 
     // ---------------------------------------------------------
-    // BƯỚC 9: Tra cứu hành trình công khai (#tracking)
+    // BƯỚC 9: Hủy đơn hàng trước khi phát (#cancel)
     // ---------------------------------------------------------
-    console.log("\n--- BƯỚC 9: Tra cứu hành trình công khai (#tracking) ---");
-    await page.goto("http://localhost:3000/react/#tracking", { waitUntil: "networkidle" });
+    console.log("\n--- BƯỚC 9: Hủy đơn hàng (#cancel) ---");
+    await page.goto("http://localhost:3000/react/#cancel", { waitUntil: "networkidle" });
     await page.waitForTimeout(1000);
 
-    const trackingInput = page.locator('input[placeholder*="MNX"]').first();
-    if (await trackingInput.isVisible()) {
-      await trackingInput.fill("MNX000001");
-      const searchBtn = page.locator('button:has-text("Tra cứu")').first();
-      await searchBtn.click();
-      await page.waitForTimeout(1000);
-
-      const trackingResult = await page.textContent("body");
-      const found = trackingResult.includes("MNX000001") && !trackingResult.includes("Không tìm thấy");
-      logStep(9, "Tra cứu hành trình đơn MNX000001", found, "Hiển thị Timeline và trạng thái");
-    }
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, "09_public_tracking.png"), fullPage: false });
+    const cancelBody = await page.textContent("body");
+    const hasCancel = cancelBody.includes("Hủy đơn hàng") && cancelBody.includes("Xác nhận hủy đơn");
+    logStep(9, "Mở màn hình Hủy đơn hàng (#cancel)", hasCancel, "Dropdown chọn đơn và lý do hủy sẵn sàng");
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, "09_cancel_order.png"), fullPage: false });
 
     // ---------------------------------------------------------
     // BƯỚC 10: Hồ sơ chi tiết đơn hàng (#order-detail)
