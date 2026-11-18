@@ -52,6 +52,28 @@ async function handleResponse<T>(response: Response): Promise<T> {
   }
 }
 
+function getAuthHeaders(extra?: Record<string, string>, includeActor = true): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Accept': 'application/json',
+  };
+  let actorId = 'DISPATCHER_WEB';
+  try {
+    const token = localStorage.getItem('minerva_jwt_token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    const rawUser = localStorage.getItem('minerva_auth_user');
+    if (rawUser) {
+      const user = JSON.parse(rawUser);
+      if (user?.userId) actorId = user.userId;
+    }
+  } catch {}
+  if (includeActor) {
+    headers['X-Actor-Id'] = actorId;
+  }
+  return { ...headers, ...extra };
+}
+
 export const apiClient = {
   async get<T>(endpoint: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {
     let url = `${API_BASE}${endpoint}`;
@@ -71,9 +93,7 @@ export const apiClient = {
     try {
       const response = await fetch(url, {
         method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-        },
+        headers: getAuthHeaders(undefined, false),
       });
       return await handleResponse<T>(response);
     } catch (err: unknown) {
@@ -94,9 +114,7 @@ export const apiClient = {
         method: 'POST',
         headers: {
           ...(isJsonBody ? { 'Content-Type': 'application/json' } : {}),
-          'Accept': 'application/json',
-          'X-Actor-Id': 'DISPATCHER_WEB',
-          ...headers,
+          ...getAuthHeaders(headers, true),
         },
         body: isJsonBody ? JSON.stringify(body) : (body as BodyInit),
       });
@@ -118,9 +136,7 @@ export const apiClient = {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-Actor-Id': 'DISPATCHER_WEB',
-          ...headers,
+          ...getAuthHeaders(headers, true),
         },
         body: body ? JSON.stringify(body) : undefined,
       });
@@ -137,7 +153,7 @@ export const apiClient = {
   async put<T>(endpoint: string, body?: unknown, headers?: Record<string, string>): Promise<T> {
     const response = await fetch(`${API_BASE}${endpoint}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-Actor-Id': 'DISPATCHER_WEB', ...headers },
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders(headers, true) },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
     return await handleResponse<T>(response);

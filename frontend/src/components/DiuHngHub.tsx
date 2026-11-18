@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import svgPaths from "../codelayer-40-128/svg-pwzfn0yyu6";
+import { authService, AUTH_EVENT, type AuthUser } from "../services/authService";
 
 function Boxes() {
   return (
@@ -66,6 +67,26 @@ export function DiuHngHub() {
     setHubToast(`Đã chuyển sang điểm vận hành: ${hub.name} (${hub.code})`);
     setTimeout(() => setHubToast(null), 3000);
   };
+
+  const [authUser, setAuthUser] = useState<AuthUser | null>(() => authService.getCurrentUser());
+
+  useEffect(() => {
+    const syncAuth = () => setAuthUser(authService.getCurrentUser());
+    window.addEventListener(AUTH_EVENT, syncAuth);
+    return () => window.removeEventListener(AUTH_EVENT, syncAuth);
+  }, []);
+
+  const handleLogout = async () => {
+    await authService.logout();
+    window.location.hash = "login";
+  };
+
+  const roleLabel =
+    authUser?.role === "HUB_MANAGER"
+      ? "Quản lý Hub"
+      : authUser?.role === "DRIVER"
+      ? "Tài xế giao hàng"
+      : "Điều phối viên";
 
   const navigate = (hash: string) => {
     window.location.hash = hash;
@@ -252,19 +273,28 @@ export function DiuHngHub() {
 
       <div className="flex-1 min-h-[40px] w-full" />
 
-      {/* Phiên trực (Bấm để đăng xuất) */}
+      {/* Phiên trực (Bấm để đăng xuất JWT) */}
       <div
-        onClick={() => navigate("login")}
+        onClick={() => void handleLogout()}
         className="relative shrink-0 w-full cursor-pointer hover:bg-[#10243a] transition-colors rounded-[8px]"
         data-name="Phiên trực"
-        title="Bấm để đăng xuất"
+        title="Bấm để đăng xuất phiên JWT"
       >
         <div className="content-stretch flex flex-col gap-[8px] items-start overflow-clip p-[12px] relative rounded-[inherit] size-full">
-          <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] text-[#8fa0b3] text-[12px]">Điều phối viên</p>
-          <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] text-[14px] text-white">Trần Văn Bình</p>
+          <div className="flex items-center justify-between w-full">
+            <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] text-[#8fa0b3] text-[12px]">{roleLabel}</p>
+            {authService.isAuthenticated() && (
+              <span className="text-[10px] font-mono bg-[#0f4c5c] text-[#7ee8fa] px-1.5 py-0.5 rounded">JWT</span>
+            )}
+          </div>
+          <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] text-[14px] text-white">
+            {authUser?.fullName || "Trần Văn Bình"}
+          </p>
           <div className="content-stretch flex gap-[6px] items-center overflow-clip relative shrink-0">
             <Radio />
-            <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] text-[#55ceca] text-[12px]">Đang trong ca trực</p>
+            <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] text-[#55ceca] text-[12px]">
+              {authService.isAuthenticated() ? "Đã xác thực · Đăng xuất" : "Đang trong ca trực"}
+            </p>
           </div>
         </div>
         <div aria-hidden className="absolute border-[#1e3a4e] border-solid border-t inset-0 pointer-events-none" />

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import svgPaths from "./svg-jhj2h66zpj";
 import imgTrungTamLogistics from "./f338b339f48cced41b3fa9472c89c49e07de2306.png";
+import { authService } from "../services/authService";
 
 function Boxes() {
   return (
@@ -267,6 +268,8 @@ function FormDangNhp() {
   const [password, setPassword] = useState("password123");
   const [showPassword, setShowPassword] = useState(false);
   const [selectedHub, setSelectedHub] = useState(() => localStorage.getItem("minerva_current_hub") || "Hub Quận 7");
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleHubChange = (val: string) => {
     setSelectedHub(val);
@@ -274,15 +277,22 @@ function FormDangNhp() {
     window.dispatchEvent(new Event("minerva_hub_changed"));
   };
 
-  const handleSubmit = (e?: React.FormEvent) => {
+  const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    localStorage.setItem("minerva_current_hub", selectedHub);
-    window.dispatchEvent(new Event("minerva_hub_changed"));
-    const uname = username.trim().toUpperCase();
-    if (uname.startsWith("TX") || uname.includes("DRIVER")) {
-      window.location.hash = "driver";
-    } else {
-      window.location.hash = "dashboard";
+    if (isLoading) return;
+    setErrorMsg(null);
+    setIsLoading(true);
+    try {
+      const res = await authService.login(username, password, selectedHub);
+      if (res.user.role === "DRIVER") {
+        window.location.hash = "driver";
+      } else {
+        window.location.hash = "dashboard";
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || "Đăng nhập thất bại. Vui lòng kiểm tra tên đăng nhập và mật khẩu.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -348,12 +358,21 @@ function FormDangNhp() {
         </div>
       </div>
 
+      {errorMsg && (
+        <div className="bg-[#fef2f2] border border-[#fecaca] text-[#b91c1c] rounded-[10px] px-[14px] py-[10px] text-[13px] font-medium w-full">
+          {errorMsg}
+        </div>
+      )}
+
       <button
         type="submit"
-        className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex gap-[10px] h-[50px] items-center justify-center overflow-clip relative rounded-[12px] shrink-0 w-full border-none"
+        disabled={isLoading}
+        className="bg-[#087f8c] hover:bg-[#066570] disabled:opacity-60 cursor-pointer transition-colors content-stretch flex gap-[10px] h-[50px] items-center justify-center overflow-clip relative rounded-[12px] shrink-0 w-full border-none"
         data-name="Đăng nhập"
       >
-        <span className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[15px] text-white whitespace-nowrap">Đăng nhập</span>
+        <span className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[15px] text-white whitespace-nowrap">
+          {isLoading ? "Đang xác thực JWT..." : "Đăng nhập"}
+        </span>
         <ArrowRight />
       </button>
     </form>
