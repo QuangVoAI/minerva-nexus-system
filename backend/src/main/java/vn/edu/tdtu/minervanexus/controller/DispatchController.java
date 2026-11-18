@@ -5,7 +5,10 @@ import static vn.edu.tdtu.minervanexus.service.DispatchPlan.*;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.tdtu.minervanexus.common.ServiceLevel;
 import vn.edu.tdtu.minervanexus.document.DispatchManifest;
@@ -98,6 +101,57 @@ public class DispatchController {
   @GetMapping("/shifts/{id}/attendance")
   public Map<String, Boolean> listAttendance(@PathVariable String id) {
     return get(store.read(hub()).shifts, id).attendance();
+  }
+
+  /** Read model used by the live Shift & Attendance screen. Attendance is stored in the
+   * dispatch aggregate so the availability check and dispatch decision are consistent. */
+  public record ShiftDriverSummary(
+      String driverId,
+      String name,
+      String assignedAreaId,
+      int currentLoad,
+      int capacityPerShift,
+      boolean checkedIn,
+      boolean availableForNewAssignments,
+      Set<ServiceLevel> services) {}
+
+  @GetMapping("/shifts/{id}/drivers")
+  public List<ShiftDriverSummary> shiftDrivers(
+      @PathVariable String id,
+      @RequestParam(required = false) String attendance,
+      @RequestParam(required = false) String area,
+      @RequestParam(required = false) String query) {
+    var state = store.read(hub());
+    var shift = get(state.shifts, id);
+    String needle = query == null ? "" : query.trim().toLowerCase(Locale.ROOT);
+    return state.drivers.values().stream()
+        .map(d -> new ShiftDriverSummary(
+            d.id(), d.name(), d.area(), DispatchRules.load(state, id, d.id()),
+            Math.min(15, d.capacity()), Boolean.TRUE.equals(shift.attendance().get(d.id())),
+            d.active(), d.services()))
+        .filter(d -> area == null || area.isBlank() || area.equalsIgnoreCase(d.assignedAreaId()))
+        .filter(d -> needle.isBlank() || d.driverId().toLowerCase(Locale.ROOT).contains(needle)
+            || d.name().toLowerCase(Locale.ROOT).contains(needle))
+        .filter(d -> attendance == null || attendance.isBlank() || "all".equals(attendance)
+            || ("checked_in".equals(attendance) && d.checkedIn())
+            || ("not_checked_in".equals(attendance) && !d.checkedIn()))
+        .toList();
+  }
+
+  @GetMapping("/shifts/{id}/attendance/export")
+  public ResponseEntity<String> exportAttendance(@PathVariable String id) {
+    var rows = shiftDrivers(id, "all", null, null);
+    String csv = "driverId,name,area,checkedIn,availableForNewAssignments,currentLoad,capacityPerShift\n"
+        + rows.stream().map(d -> String.join(",", csv(d.driverId()), csv(d.name()), csv(d.assignedAreaId()),
+                String.valueOf(d.checkedIn()), String.valueOf(d.availableForNewAssignments()),
+                String.valueOf(d.currentLoad()), String.valueOf(d.capacityPerShift())))
+            .collect(Collectors.joining("\n"));
+    return ResponseEntity.ok().contentType(MediaType.parseMediaType("text/csv;charset=UTF-8"))
+        .header("Content-Disposition", "attachment; filename=attendance-" + id + ".csv").body(csv);
+  }
+
+  private static String csv(String value) {
+    return "\"" + Objects.toString(value, "").replace("\"", "\"\"") + "\"";
   }
 
   public record DriverForm(

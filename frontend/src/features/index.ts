@@ -5,3 +5,4 @@ export * from './detail/LiveOrderDetailTimeline';
 export * from './driver/LiveDriverActionCard';
 export * from './dashboard/LiveDashboardKpi';
 export * from './operations/LiveOperationsScreens';
+export { default as LiveShiftAttendance } from './operations/LiveShiftAttendance';
