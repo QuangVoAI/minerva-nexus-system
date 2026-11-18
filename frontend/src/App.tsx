@@ -29,6 +29,7 @@ import {
   LiveAuditLog,
   LiveReports,
   LiveDriverManagement,
+  LiveShiftAttendance,
 } from "./features";
 import "./styles/globals.css";
 
@@ -83,6 +84,7 @@ function LiveScreen({ id }: { id: string }): JSX.Element | null {
     case "audit": return <LiveAuditLog />;
     case "reports": return <LiveReports />;
     case "drivers": return <LiveDriverManagement />;
+    case "shifts": return <LiveShiftAttendance />;
     default:
       return null;
   }
@@ -108,7 +110,9 @@ export default function App() {
   };
 
   const ScreenComponent = active.Component;
-  const liveOnlyIds = new Set(["cancel", "audit", "reports", "drivers"]);
+  // SCR-04 is a transactional screen: opening it must never silently fall back to the
+  // Figma mockup, otherwise attendance and availability buttons would not persist.
+  const liveOnlyIds = new Set(["cancel", "audit", "reports", "drivers", "shifts"]);
   const isExtendedScreen = liveOnlyIds.has(active.id);
   const content = (liveMode || isExtendedScreen) ? (<LiveScreen id={active.id} /> ?? <ScreenComponent />) : <ScreenComponent />;
 
