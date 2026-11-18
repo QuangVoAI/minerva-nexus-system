@@ -3,22 +3,7 @@
  * Cung cấp kết nối REST API tới backend Java (port 8081 mặc định) qua endpoint chuẩn /api.
  */
 
-/**
- * In local development this remains empty and Vite proxies /api to Spring Boot.
- * In Vercel set VITE_API_BASE to the public HTTPS URL of the Java backend.
- * Never place MONGODB_URI in a VITE_ variable: those variables are exposed to browsers.
- */
-const API_BASE = (import.meta.env.VITE_API_BASE ?? '').trim().replace(/\/+$/, '');
-
-function unavailableBackendMessage(status: number): string | null {
-  if (status === 404 && !API_BASE && window.location.hostname.endsWith('vercel.app')) {
-    return 'Backend Java chưa được cấu hình cho bản Vercel. Hãy thiết lập VITE_API_BASE bằng URL HTTPS của dịch vụ Spring Boot rồi deploy lại frontend.';
-  }
-  if (status === 502 || status === 503 || status === 504) {
-    return 'Dịch vụ backend Minerva Nexus hiện chưa sẵn sàng. Vui lòng thử lại sau ít phút.';
-  }
-  return null;
-}
+const API_BASE = ''; // Rỗng để tận dụng Vite proxy /api -> http://localhost:8081 trong dev và cùng origin trong build
 
 export class ApiError extends Error {
   public statusCode?: number;
@@ -37,19 +22,17 @@ async function handleResponse<T>(response: Response): Promise<T> {
   const isJson = contentType.includes('application/json');
 
   if (!response.ok) {
-    let errorMessage = unavailableBackendMessage(response.status)
-      ?? `Yêu cầu thất bại với mã lỗi HTTP ${response.status} (${response.statusText})`;
+    let errorMessage = `Yêu cầu thất bại với mã lỗi HTTP ${response.status} (${response.statusText})`;
     let details: unknown = null;
     try {
       if (isJson) {
         const errorData = await response.json();
         details = errorData;
-        if (typeof errorData.message === 'string') errorMessage = errorData.message;
-        else if (typeof errorData.error === 'string') errorMessage = errorData.error;
+        if (errorData.message) errorMessage = errorData.message;
+        else if (errorData.error) errorMessage = errorData.error;
       } else {
         const text = await response.text();
-        // Never render a Vercel HTML/text 404 dump into the UI.
-        if (text && !unavailableBackendMessage(response.status)) errorMessage = text;
+        if (text) errorMessage = text;
       }
     } catch {
       // Bỏ qua lỗi parse response
