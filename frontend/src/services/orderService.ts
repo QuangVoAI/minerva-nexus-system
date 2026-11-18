@@ -62,22 +62,27 @@ export const orderService = {
 
 function normalizeOrder(row: any): DeliveryOrder {
   const recipient = row.recipient || {};
+  const rawRisk = row.slaAssessment?.riskLevel || row.riskLevel || 'UNKNOWN';
+  const mappedRisk =
+    rawRisk === 'HIGH' ? 'HIGH_RISK' :
+    rawRisk === 'MEDIUM' ? 'AT_RISK' :
+    rawRisk === 'LOW' ? 'SAFE' : rawRisk;
   return {
     orderId: row.id || row.orderId,
     trackingCode: row.trackingCode,
-    recipientName: recipient.name || '',
-    recipientPhone: recipient.phone || '',
-    address: recipient.address || '',
+    recipientName: recipient.name || row.recipientName || '',
+    recipientPhone: recipient.phone || row.recipientPhone || '',
+    address: recipient.address || row.address || '',
     areaId: row.areaId,
     serviceLevel: row.serviceLevel,
-    serviceLevelDisplay: row.serviceLevel,
+    serviceLevelDisplay: row.serviceLevelDisplay || row.serviceLevel,
     slaDeadline: row.slaDeadline,
-    codAmount: 0,
+    codAmount: typeof row.codAmount === 'number' ? row.codAmount : Number(row.codAmount || 0),
     status: row.status,
-    statusDisplay: row.status,
-    assignedDriverId: row.currentAssignment?.driverId || null,
+    statusDisplay: row.statusDisplay || row.status,
+    assignedDriverId: row.currentAssignment?.driverId || row.assignedDriverId || null,
     failureCount: row.failureCount || 0,
-    riskLevel: row.slaAssessment?.riskLevel || 'UNKNOWN',
-    riskExplanation: row.slaAssessment?.reasons?.join(' ') || '',
+    riskLevel: mappedRisk,
+    riskExplanation: row.slaAssessment?.reasons?.join(' ') || row.riskExplanation || '',
   };
 }

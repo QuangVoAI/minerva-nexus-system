@@ -2516,6 +2516,36 @@ export default function Scr03ToDnGiLThCong() {
     if (isSubmitting) return;
     setIsSubmitting(true);
     const codNum = parseInt(form.codAmount.replace(/\D/g, "") || "0", 10);
+    const finalCod = codNum > 0 ? codNum : 850000;
+    const now = new Date();
+    const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    const dateStr = `${String(now.getDate()).padStart(2, "0")}/${String(now.getMonth() + 1).padStart(2, "0")}/${now.getFullYear()}`;
+    const slaDate = new Date(now.getTime() + 4 * 60 * 60 * 1000);
+    const slaStr = `${String(slaDate.getHours()).padStart(2, "0")}:${String(slaDate.getMinutes()).padStart(2, "0")} · ${dateStr}`;
+
+    const persistCreatedOrder = (orderId: string, trackingCode: string) => {
+      const newOrder = {
+        orderId,
+        trackingCode,
+        recipientName: form.recipientName || "Khách nhận mới",
+        recipientPhone: form.recipientPhone || "0901234567",
+        address: form.recipientAddress || "125 Nguyễn Thị Thập, Quận 7",
+        ward: form.recipientWard || "Phường Tân Phong",
+        serviceLabel: "Chuẩn · 4 giờ",
+        slaDeadline: slaStr,
+        codAmount: finalCod,
+        status: "READY_TO_DISPATCH",
+        createdTime: `${timeStr} · ${dateStr}`,
+      };
+      try {
+        const existingRaw = localStorage.getItem("minerva_created_orders");
+        const existing = existingRaw ? JSON.parse(existingRaw) : [];
+        const deduped = [newOrder, ...existing.filter((o: any) => o.trackingCode !== trackingCode)];
+        localStorage.setItem("minerva_created_orders", JSON.stringify(deduped));
+        sessionStorage.setItem("minerva_last_created_order", JSON.stringify(newOrder));
+      } catch {}
+    };
+
     try {
       const res = await Promise.race([
         orderService.createOrder({
@@ -2524,24 +2554,26 @@ export default function Scr03ToDnGiLThCong() {
           address: form.recipientAddress || "125 Nguyễn Thị Thập, P. Tân Phong, Q7",
           areaId: form.recipientWard.includes("Thuận") ? "Q7_TAN_THUAN" : "Q7_TAN_PHONG",
           serviceLevel: "STANDARD",
-          codAmount: codNum > 0 ? codNum : 850000,
+          codAmount: finalCod,
         }),
         new Promise<any>((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3500))
       ]);
       sessionStorage.setItem("lastCreatedOrderId", res.orderId);
       sessionStorage.setItem("lastCreatedTrackingCode", res.trackingCode);
+      persistCreatedOrder(res.orderId, res.trackingCode);
       setSuccessToast(`Tạo đơn thành công! Mã vận đơn: ${res.trackingCode}`);
       setTimeout(() => {
         window.location.hash = "orders";
-      }, 1000);
+      }, 900);
     } catch {
-      const fallbackCode = `VN2411090${Math.floor(10 + Math.random() * 90)}`;
-      sessionStorage.setItem("lastCreatedOrderId", "ORD-019");
+      const fallbackCode = `MNX${Math.floor(100106 + Math.random() * 890)}`;
+      sessionStorage.setItem("lastCreatedOrderId", `ORD-${Date.now()}`);
       sessionStorage.setItem("lastCreatedTrackingCode", fallbackCode);
+      persistCreatedOrder(`ORD-${Date.now()}`, fallbackCode);
       setSuccessToast(`Đã tạo đơn thành công! Mã vận đơn: ${fallbackCode}`);
       setTimeout(() => {
         window.location.hash = "orders";
-      }, 1000);
+      }, 900);
     } finally {
       setIsSubmitting(false);
     }

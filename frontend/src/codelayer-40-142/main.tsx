@@ -1,15 +1,32 @@
-import { useState, createContext, useContext } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import svgPaths from "./svg-10wz5514xz";
 import { DiuHngHub as DiuHngHubShared } from "../components/DiuHngHub";
+import { orderService } from "../services";
+
+export interface CreatedOrderItem {
+  orderId: string;
+  trackingCode: string;
+  recipientName: string;
+  recipientPhone: string;
+  address: string;
+  ward: string;
+  serviceLabel: string;
+  slaDeadline: string;
+  codAmount: number;
+  status: string;
+  createdTime: string;
+}
 
 export const OrderIntakeContext = createContext<{
   isVerified: boolean;
   onVerify: () => void;
   toast: string | null;
+  createdOrders: CreatedOrderItem[];
 }>({
   isVerified: false,
   onVerify: () => {},
   toast: null,
+  createdOrders: [],
 });
 
 function Boxes() {
@@ -621,10 +638,20 @@ function CircleCheck() {
 }
 
 function KtQuToDn() {
+  const { createdOrders } = useContext(OrderIntakeContext);
+  const latest = createdOrders[0];
   return (
     <div className="[word-break:break-word] content-stretch flex flex-[1_0_0] flex-col gap-[3px] items-start min-w-px not-italic overflow-clip relative text-[#0f766e] whitespace-nowrap" data-name="Kết quả tạo đơn">
-      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] relative shrink-0 text-[13px]">Đã tạo đơn MNX000105 · Dữ liệu hợp lệ, chuyển Sẵn sàng phát.</p>
-      <p className="font-['Inter:Regular',sans-serif] font-normal leading-[normal] relative shrink-0 text-[12px]">09:20 · 09/11/2026 — Địa chỉ hợp lệ, đủ số điện thoại, COD trong giới hạn.</p>
+      <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] relative shrink-0 text-[13px]">
+        {latest
+          ? `Đã tạo đơn ${latest.trackingCode} (${latest.recipientName}) · Dữ liệu hợp lệ, chuyển Sẵn sàng phát.`
+          : "Đã tạo đơn MNX000105 · Dữ liệu hợp lệ, chuyển Sẵn sàng phát."}
+      </p>
+      <p className="font-['Inter:Regular',sans-serif] font-normal leading-[normal] relative shrink-0 text-[12px]">
+        {latest
+          ? `${latest.createdTime} — Địa chỉ hợp lệ, đủ số điện thoại, COD ${latest.codAmount.toLocaleString("vi-VN")} ₫ trong giới hạn.`
+          : "09:20 · 09/11/2026 — Địa chỉ hợp lệ, đủ số điện thoại, COD trong giới hạn."}
+      </p>
     </div>
   );
 }
@@ -721,10 +748,10 @@ function TenChS1() {
 }
 
 function SLngVaMa1() {
-  const { isVerified } = useContext(OrderIntakeContext);
+  const { isVerified, createdOrders } = useContext(OrderIntakeContext);
   return (
     <div className="[word-break:break-word] content-stretch flex font-['Inter:Semi_Bold',sans-serif] font-semibold gap-[12px] items-baseline not-italic overflow-clip relative shrink-0 whitespace-nowrap" data-name="Số lượng và mã">
-      <p className="leading-[normal] relative shrink-0 text-[#142b3b] text-[30px]">{isVerified ? 59 : 58}</p>
+      <p className="leading-[normal] relative shrink-0 text-[#142b3b] text-[30px]">{58 + createdOrders.length + (isVerified ? 1 : 0)}</p>
       <p className="leading-[1.45] relative shrink-0 text-[#0f766e] text-[12px]">READY_TO_DISPATCH</p>
     </div>
   );
@@ -862,11 +889,12 @@ function QuyTcThmDnh() {
 }
 
 function TabDangChn() {
+  const { createdOrders } = useContext(OrderIntakeContext);
   return (
     <div className="h-full relative shrink-0 cursor-pointer" data-name="Tab đang chọn">
       <div className="[word-break:break-word] content-stretch flex font-['Inter:Semi_Bold',sans-serif] font-semibold gap-[8px] items-center leading-[1.45] not-italic overflow-clip relative rounded-[inherit] size-full text-[#087f8c] whitespace-nowrap">
         <p className="relative shrink-0 text-[13px]">Tất cả</p>
-        <p className="relative shrink-0 text-[12px]">105</p>
+        <p className="relative shrink-0 text-[12px]">{105 + createdOrders.length}</p>
       </div>
       <div aria-hidden className="absolute border-[#087f8c] border-b-3 border-solid inset-0 pointer-events-none" />
     </div>
@@ -1515,10 +1543,10 @@ function DnHang2() {
             <button
               type="button"
               onClick={onVerify}
-              className="bg-[#087f8c] hover:bg-[#066570] text-white px-2.5 py-1 rounded-[5px] font-['Inter:Semi_Bold',sans-serif] font-semibold text-[12px] shadow-sm transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1"
+              className="bg-[#087f8c] hover:bg-[#066570] text-white px-2 py-1 rounded-[5px] font-['Inter:Semi_Bold',sans-serif] font-semibold text-[11px] whitespace-nowrap shadow-sm transition-all cursor-pointer active:scale-95 inline-flex items-center justify-center"
               title="Thẩm định đơn hàng theo quy tắc BR-01"
             >
-              <span>Thẩm định</span>
+              Thẩm định
             </button>
           )}
         </div>
@@ -1766,22 +1794,85 @@ function ChuynTrang() {
   );
 }
 
+function CreatedOrderRow({ order }: { order: CreatedOrderItem }) {
+  return (
+    <div className="bg-[#ecfdf5] h-[82px] relative shrink-0 w-full" data-name={`Đơn hàng mới ${order.trackingCode}`}>
+      <div className="content-stretch flex items-center overflow-clip px-[16px] relative rounded-[inherit] size-full">
+        <div className="content-stretch flex items-start overflow-clip relative shrink-0 w-[28px]" data-name="Ô chọn">
+          <div className="bg-white border border-[#bbc7d5] border-solid relative rounded-[3px] shrink-0 size-[14px]" />
+        </div>
+        <div className="[word-break:break-word] content-stretch flex flex-col gap-[5px] items-start not-italic overflow-clip relative shrink-0 text-[12px] w-[132px] whitespace-nowrap">
+          <div className="flex items-center gap-1.5">
+            <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] text-[#087f8c]">{order.trackingCode}</p>
+            <span className="bg-[#087f8c] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">Mới</span>
+          </div>
+          <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] text-[#657684]">{order.createdTime}</p>
+        </div>
+        <div className="[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular',sans-serif] font-normal gap-[5px] items-start not-italic overflow-clip relative shrink-0 text-[12px] w-[100px] whitespace-nowrap">
+          <p className="leading-[normal] text-[#142b3b]">Gửi lẻ</p>
+          <p className="leading-[1.45] text-[#657684]">Nhập thủ công</p>
+        </div>
+        <div className="[word-break:break-word] content-stretch flex flex-col gap-[5px] items-start not-italic overflow-clip relative shrink-0 text-[12px] w-[168px] whitespace-nowrap">
+          <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] text-[#142b3b] truncate max-w-[160px]">{order.recipientName}</p>
+          <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] text-[#657684]">{order.recipientPhone}</p>
+        </div>
+        <div className="[word-break:break-word] content-stretch flex flex-col font-['Inter:Regular',sans-serif] font-normal gap-[5px] items-start not-italic overflow-clip relative shrink-0 text-[12px] w-[248px] whitespace-nowrap">
+          <p className="leading-[normal] text-[#142b3b] truncate max-w-[236px]">{order.address}</p>
+          <p className="leading-[1.45] text-[#657684]">{order.ward}</p>
+        </div>
+        <div className="[word-break:break-word] content-stretch flex flex-col gap-[5px] items-start not-italic overflow-clip relative shrink-0 text-[12px] w-[146px] whitespace-nowrap">
+          <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] text-[#142b3b]">{order.serviceLabel}</p>
+          <p className="font-['Inter:Regular',sans-serif] font-normal leading-[1.45] text-[#657684]">{order.slaDeadline}</p>
+        </div>
+        <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[normal] not-italic relative shrink-0 text-[#142b3b] text-[12px] w-[112px]">
+          {order.codAmount.toLocaleString("vi-VN")} ₫
+        </p>
+        <div className="content-stretch flex flex-col gap-[5px] items-start overflow-clip relative shrink-0 w-[178px]">
+          <div className="bg-[#eaf5ef] content-stretch flex gap-[6px] items-center overflow-clip px-[8px] py-[4px] relative rounded-[6px] shrink-0">
+            <div className="bg-[#0f766e] relative rounded-[3px] shrink-0 size-[5px]" />
+            <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic text-[#0f766e] text-[12px] whitespace-nowrap">Sẵn sàng phát</p>
+          </div>
+          <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic text-[#657684] text-[12px] whitespace-nowrap">{order.status}</p>
+        </div>
+        <p
+          onClick={() => {
+            sessionStorage.setItem("lastCreatedOrderId", order.orderId);
+            window.location.hash = "order-detail";
+          }}
+          className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] hover:underline cursor-pointer text-[12px] w-[84px]"
+          title="Xem hồ sơ chi tiết đơn hàng (SCR-06)"
+        >
+          Chi tiết
+        </p>
+      </div>
+      <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid inset-0 pointer-events-none" />
+    </div>
+  );
+}
+
 function PhanTrang() {
+  const { createdOrders } = useContext(OrderIntakeContext);
+  const shown = 5 + createdOrders.length;
+  const total = 105 + createdOrders.length;
   return (
     <div className="bg-[#f6f8fa] content-stretch flex h-[54px] items-center justify-between overflow-clip px-[20px] relative shrink-0 w-full" data-name="Phân trang">
-      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">1–5 / 105 đơn · 5/trang</p>
+      <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">1–{shown} / {total} đơn · {shown}/trang</p>
       <ChuynTrang />
     </div>
   );
 }
 
 function DanhSachDnHang() {
+  const { createdOrders } = useContext(OrderIntakeContext);
   return (
     <div className="bg-white relative rounded-[12px] shrink-0 w-full" data-name="Danh sách đơn hàng">
       <div className="content-stretch flex flex-col items-start overflow-clip relative rounded-[inherit] size-full">
         <CacTabDnHang />
         <BLcDnHang />
         <TieuDBng />
+        {createdOrders.map((order) => (
+          <CreatedOrderRow key={order.trackingCode} order={order} />
+        ))}
         <DnHang />
         <DnHang1 />
         <DnHang2 />
@@ -1830,6 +1921,69 @@ export default function Scr03TipNhnVaPhanLoiDn() {
     return sessionStorage.getItem("minerva_verified_MNX000098") === "true";
   });
   const [toast, setToast] = useState<string | null>(null);
+  const [createdOrders, setCreatedOrders] = useState<CreatedOrderItem[]>(() => {
+    try {
+      const raw = localStorage.getItem("minerva_created_orders");
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Đồng bộ các đơn hàng vừa tạo mới từ backend API (/api/orders)
+  useEffect(() => {
+    let active = true;
+    orderService
+      .getOrders()
+      .then((apiOrders) => {
+        if (!active || !Array.isArray(apiOrders)) return;
+        const newlyCreatedFromApi: CreatedOrderItem[] = apiOrders
+          .filter((o) => {
+            const m = /^ORD-(\d+)$/.exec(o.orderId || "");
+            return m && parseInt(m[1], 10) >= 100;
+          })
+          .sort((a, b) => (b.orderId || "").localeCompare(a.orderId || ""))
+          .map((o) => ({
+            orderId: o.orderId,
+            trackingCode: o.trackingCode,
+            recipientName: o.recipientName || "Khách nhận mới",
+            recipientPhone: o.recipientPhone || "",
+            address: o.address || "Quận 7, TP.HCM",
+            ward: o.areaId?.includes("TAN_THUAN")
+              ? "Phường Tân Thuận Đông"
+              : o.areaId?.includes("TAN_PHONG")
+              ? "Phường Tân Phong"
+              : o.areaId || "Quận 7",
+            serviceLabel: o.serviceLevel === "EXPRESS" ? "Hỏa tốc · 2 giờ" : "Chuẩn · 4 giờ",
+            slaDeadline: o.slaDeadline || "Hôm nay",
+            codAmount: Number(o.codAmount || 0),
+            status: o.status || "READY_TO_DISPATCH",
+            createdTime: "Vừa tạo · API",
+          }));
+
+        if (newlyCreatedFromApi.length > 0) {
+          setCreatedOrders((prev) => {
+            const byCode = new Map<string, CreatedOrderItem>();
+            for (const item of prev) byCode.set(item.trackingCode, item);
+            for (const item of newlyCreatedFromApi) {
+              if (!byCode.has(item.trackingCode)) {
+                byCode.set(item.trackingCode, item);
+              }
+            }
+            const merged = Array.from(byCode.values());
+            try {
+              localStorage.setItem("minerva_created_orders", JSON.stringify(merged));
+            } catch {}
+            return merged;
+          });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleVerify = () => {
     setIsVerified(true);
@@ -1841,7 +1995,7 @@ export default function Scr03TipNhnVaPhanLoiDn() {
   };
 
   return (
-    <OrderIntakeContext.Provider value={{ isVerified, onVerify: handleVerify, toast }}>
+    <OrderIntakeContext.Provider value={{ isVerified, onVerify: handleVerify, toast, createdOrders }}>
       <div className="bg-[#f3f6fa] content-stretch flex items-start relative size-full" data-name="SCR-03 · Tiếp nhận và phân loại đơn">
         {toast && (
           <div className="fixed top-16 right-8 z-50 bg-[#15803d] text-white px-5 py-3 rounded-lg shadow-xl font-bold text-[13px] animate-bounce">

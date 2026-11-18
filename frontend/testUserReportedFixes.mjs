@@ -7,6 +7,24 @@ import path from 'path';
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
 
+  console.log('--- 0. Testing #create-order -> #orders persistence ---');
+  await page.goto('http://localhost:3000/react/#create-order', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(800);
+  const recipientInput = page.locator('input').nth(3);
+  await recipientInput.fill('Trần Hoàng Minh Demo');
+  const saveBtn = page.locator('text=Lưu & tạo vận đơn').first();
+  await saveBtn.click();
+  await page.waitForTimeout(1600);
+  const createdUrl = page.url();
+  const createdBody = await page.textContent('body');
+  console.log('✓ Redirected to #orders:', createdUrl.includes('#orders'));
+  console.log('✓ New order visible immediately:', createdBody.includes('Trần Hoàng Minh Demo'));
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.waitForTimeout(800);
+  const reloadedBody = await page.textContent('body');
+  console.log('✓ New order persists after reload:', reloadedBody.includes('Trần Hoàng Minh Demo'));
+  await page.screenshot({ path: 'screenshots/verify_fix_created_order.png', fullPage: false });
+
   console.log('--- 1. Testing #orders: Thẩm định MNX000098 ---');
   await page.goto('http://localhost:8080/react/#orders', { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
