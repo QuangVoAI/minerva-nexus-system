@@ -93,27 +93,46 @@ async function runPreDemoWalkthrough() {
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, "02_orders_verified.png"), fullPage: false });
 
     // ---------------------------------------------------------
-    // BƯỚC 3: Tạo đơn gửi lẻ (#create-order)
+    // BƯỚC 3: Tạo đơn gửi lẻ (#create-order) và kiểm tra lưu bền
     // ---------------------------------------------------------
     console.log("\n--- BƯỚC 3: Tạo đơn gửi lẻ (#create-order) ---");
     await page.goto("http://localhost:3000/react/#create-order", { waitUntil: "networkidle" });
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(800);
 
     const formInputs = page.locator("input");
     const inputCount = await formInputs.count();
     logStep(3, "Mở màn hình Tạo đơn gửi lẻ", inputCount >= 4, `Có ${inputCount} ô nhập liệu`);
+    await formInputs.nth(3).fill("Nguyễn Kiểm Thử E2E");
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, "03_create_order.png"), fullPage: false });
+    await page.locator('text=Lưu & tạo vận đơn').first().click();
+    await page.waitForTimeout(1400);
+    const createdVisible = (await page.textContent("body")).includes("Nguyễn Kiểm Thử E2E");
+    logStep(3.1, "Tạo đơn mới và hiển thị ngay đầu bảng #orders", createdVisible);
 
     // ---------------------------------------------------------
-    // BƯỚC 4: Lập ca & Điểm danh tài xế (#shifts)
+    // BƯỚC 4: Lập ca & Điểm danh tài xế (#shifts - LiveShiftAttendance)
     // ---------------------------------------------------------
     console.log("\n--- BƯỚC 4: Lập ca & Điểm danh (#shifts) ---");
     await page.goto("http://localhost:3000/react/#shifts", { waitUntil: "networkidle" });
     await page.waitForTimeout(1000);
 
     const shiftsBody = await page.textContent("body");
-    const hasShifts = shiftsBody.includes("Ca") || shiftsBody.includes("Tài xế") || shiftsBody.includes("Điểm danh");
-    logStep(4, "Mở Lập ca & Điểm danh", hasShifts);
+    const hasShifts = shiftsBody.includes("Lập ca giao & điểm danh tài xế") && shiftsBody.includes("4/6");
+    logStep(4, "Mở Lập ca & Điểm danh (hiển thị 4/6 đã điểm danh)", hasShifts);
+
+    // Test modal Điểm danh tài xế chọn đích danh từng người
+    await page.locator('button:has-text("Điểm danh tài xế")').click();
+    await page.waitForTimeout(500);
+    const firstModalCheckbox = page.locator('input[type="checkbox"]').first();
+    const hasCheckbox = await firstModalCheckbox.isVisible();
+    if (hasCheckbox) {
+      await firstModalCheckbox.check();
+      await page.waitForTimeout(300);
+      await page.locator('button:has-text("Xác nhận (1)")').click();
+      await page.waitForTimeout(800);
+    }
+    const shiftsAfterCheckIn = await page.textContent("body");
+    logStep(4.1, "Điểm danh tài xế qua hộp thoại chọn từng người", shiftsAfterCheckIn.includes("5/6"), "Cập nhật 4/6 -> 5/6");
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, "04_shifts.png"), fullPage: false });
 
     // ---------------------------------------------------------
@@ -234,20 +253,36 @@ async function runPreDemoWalkthrough() {
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, "10_order_detail.png"), fullPage: false });
 
     // ---------------------------------------------------------
-    // BƯỚC 11: Nhật ký kiểm toán & Báo cáo (#audit & #reports)
+    // BƯỚC 11: Nhật ký kiểm toán, Báo cáo & Quản lý tài xế (#audit, #reports, #drivers)
     // ---------------------------------------------------------
-    console.log("\n--- BƯỚC 11: Nhật ký kiểm toán & Báo cáo (#audit, #reports) ---");
+    console.log("\n--- BƯỚC 11: Nhật ký kiểm toán, Báo cáo & Tài xế (#audit, #reports, #drivers) ---");
     await page.goto("http://localhost:3000/react/#audit", { waitUntil: "networkidle" });
     await page.waitForTimeout(1000);
-    const auditText = await page.textContent("body");
-    logStep(11, "Mở Nhật ký hệ thống (#audit)", auditText.includes("Nhật ký") || auditText.includes("Audit"));
+    const auditRowsCount = await page.locator("tbody tr").count();
+    const auditOverlapCheck = await page.evaluate(() => {
+      const sub = document.querySelector("p");
+      const inp = document.querySelector("input");
+      if (!sub || !inp) return { ok: false, gap: -1 };
+      const r1 = sub.getBoundingClientRect();
+      const r2 = inp.getBoundingClientRect();
+      // Either separated horizontally (gap >= 16px) or stacked vertically
+      const gap = Math.round(r2.left - r1.right);
+      return { ok: gap >= 16 || r2.top >= r1.bottom, gap };
+    });
+    logStep(11, "Mở Nhật ký hệ thống (#audit) có dữ liệu & không đè chữ", auditRowsCount > 0 && auditOverlapCheck.ok, `${auditRowsCount} dòng, khoảng cách tới ô lọc: ${auditOverlapCheck.gap}px`);
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, "11_audit_log.png"), fullPage: false });
 
     await page.goto("http://localhost:3000/react/#reports", { waitUntil: "networkidle" });
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(800);
     const reportsText = await page.textContent("body");
-    logStep(11.1, "Mở Báo cáo vận hành (#reports)", reportsText.includes("Báo cáo") || reportsText.includes("Xuất CSV"));
+    logStep(11.1, "Mở Báo cáo vận hành (#reports)", reportsText.includes("Báo cáo") && reportsText.includes("Xuất CSV"));
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, "12_reports.png"), fullPage: false });
+
+    await page.goto("http://localhost:3000/react/#drivers", { waitUntil: "networkidle" });
+    await page.waitForTimeout(800);
+    const driversCount = await page.locator("tbody tr").count();
+    logStep(11.2, "Mở Quản lý tài xế & khu vực (#drivers)", driversCount >= 6, `${driversCount} tài xế`);
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, "13_drivers.png"), fullPage: false });
 
   } catch (err) {
     console.error("Lỗi trong quá trình kiểm thử pre-demo:", err);

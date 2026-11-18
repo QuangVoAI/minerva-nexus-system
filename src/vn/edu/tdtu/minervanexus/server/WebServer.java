@@ -643,8 +643,9 @@ public class WebServer {
         public void handle(HttpExchange exchange) throws IOException {
             String query = exchange.getRequestURI().getQuery();
             String q = "";
-            if (query != null && query.contains("q=")) {
-                q = URLDecoder.decode(query.split("q=")[1].split("&")[0], StandardCharsets.UTF_8).trim().toLowerCase();
+            if (query != null && !query.isEmpty()) {
+                Map<String, String> qMap = parseFormOrJson(query);
+                q = qMap.getOrDefault("q", "").trim().toLowerCase(Locale.ROOT);
             }
 
             List<DeliveryOrder> allOrders = orderService.getAllOrders();
