@@ -7,7 +7,6 @@ import Dashboard from "./codelayer-40-128/main";
 import OrderIntake from "./codelayer-40-142/main";
 import ImportErrors from "./codelayer-40-154/main";
 import CreateOrder from "./codelayer-40-168/main";
-import ShiftCheckIn from "./codelayer-40-184/main";
 import OrderDetail from "./codelayer-40-204/main";
 import Exceptions from "./codelayer-40-224/main";
 import DriverTasks from "./codelayer-40-246/main";
@@ -19,12 +18,6 @@ import Returned from "./codelayer-40-398/main";
 import Dispatch from "./codelayer-40-432/main";
 
 import {
-  LiveCreateOrderForm,
-  LiveDashboardKpi,
-  LiveDispatchView,
-  LiveDriverActionCard,
-  LiveOrderDetailTimeline,
-  LiveOrderIntake,
   LiveCancelOrder,
   LiveAuditLog,
   LiveReports,
@@ -34,7 +27,6 @@ import {
 import "./styles/globals.css";
 
 type Screen = { id: string; title: string; group: string; Component: () => JSX.Element };
-const EmptyScreen = () => <div />;
 
 const screens: Screen[] = [
   { id: "login", title: "SCR-01 · Đăng nhập desktop", group: "Xác thực", Component: LoginDesktop },
@@ -45,7 +37,7 @@ const screens: Screen[] = [
   { id: "orders", title: "SCR-03 · Tiếp nhận & phân loại đơn", group: "Đơn hàng", Component: OrderIntake },
   { id: "import-errors", title: "SCR-03 · Kết quả nhập & đơn lỗi", group: "Đơn hàng", Component: ImportErrors },
   { id: "create-order", title: "SCR-03 · Tạo đơn gửi lẻ", group: "Đơn hàng", Component: CreateOrder },
-  { id: "shifts", title: "SCR-04 · Lập ca & điểm danh", group: "Điều phối", Component: ShiftCheckIn },
+  { id: "shifts", title: "SCR-04 · Lập ca & điểm danh", group: "Điều phối", Component: LiveShiftAttendance },
   { id: "dispatch", title: "SCR-05 · Gợi ý phân công", group: "Điều phối", Component: Dispatch },
   { id: "order-detail", title: "SCR-06 · Hồ sơ chi tiết đơn", group: "Điều phối", Component: OrderDetail },
   { id: "exceptions", title: "SCR-06 · Ngoại lệ giao hàng", group: "Điều phối", Component: Exceptions },
@@ -55,10 +47,10 @@ const screens: Screen[] = [
   { id: "failed", title: "SCR-08 · FAILED chờ phát lại", group: "Mobile", Component: FailedPending },
   { id: "refused", title: "SCR-08 · Từ chối nhận lần ba", group: "Mobile", Component: RefusedThird },
   { id: "returned", title: "SCR-08 · RETURNED chuyển hoàn", group: "Mobile", Component: Returned }
-  ,{ id: "cancel", title: "UC-23 · Hủy đơn hàng", group: "Đơn hàng", Component: EmptyScreen }
-  ,{ id: "audit", title: "UC-22 · Nhật ký hệ thống", group: "Hệ thống", Component: EmptyScreen }
-  ,{ id: "reports", title: "UC-20 · Báo cáo vận hành", group: "Báo cáo", Component: EmptyScreen }
-  ,{ id: "drivers", title: "UC-03 · Tài xế và khu vực", group: "Tài xế", Component: EmptyScreen }
+  ,{ id: "cancel", title: "UC-23 · Hủy đơn hàng", group: "Đơn hàng", Component: LiveCancelOrder }
+  ,{ id: "audit", title: "UC-22 · Nhật ký hệ thống", group: "Hệ thống", Component: LiveAuditLog }
+  ,{ id: "reports", title: "UC-20 · Báo cáo vận hành", group: "Báo cáo", Component: LiveReports }
+  ,{ id: "drivers", title: "UC-03 · Tài xế và khu vực", group: "Tài xế", Component: LiveDriverManagement }
 ];
 
 function getScreenFromHash() {
@@ -66,36 +58,9 @@ function getScreenFromHash() {
   return screens.some((screen) => screen.id === value) ? value : "dashboard";
 }
 
-function LiveScreen({ id }: { id: string }): JSX.Element | null {
-  switch (id) {
-    case "dashboard":
-      return <LiveDashboardKpi />;
-    case "orders":
-      return <LiveOrderIntake />;
-    case "create-order":
-      return <LiveCreateOrderForm />;
-    case "dispatch":
-      return <LiveDispatchView />;
-    case "order-detail":
-      return <LiveOrderDetailTimeline orderId={new URLSearchParams(window.location.search).get("orderId")} />;
-    case "driver":
-      return <LiveDriverActionCard />;
-    case "cancel": return <LiveCancelOrder />;
-    case "audit": return <LiveAuditLog />;
-    case "reports": return <LiveReports />;
-    case "drivers": return <LiveDriverManagement />;
-    case "shifts": return <LiveShiftAttendance />;
-    default:
-      return null;
-  }
-}
-
 export default function App() {
   const [screenId, setScreenId] = useState(getScreenFromHash);
   const [showQuickMenu, setShowQuickMenu] = useState(false);
-  const [liveMode, setLiveMode] = useState(() => {
-    return new URLSearchParams(window.location.search).get("mode") === "live" || localStorage.getItem("minerva_mode") === "live";
-  });
   const active = useMemo(() => screens.find((screen) => screen.id === screenId) ?? screens[4], [screenId]);
 
   useEffect(() => {
@@ -110,39 +75,21 @@ export default function App() {
   };
 
   const ScreenComponent = active.Component;
-  // SCR-04 is a transactional screen: opening it must never silently fall back to the
-  // Figma mockup, otherwise attendance and availability buttons would not persist.
-  const liveOnlyIds = new Set(["cancel", "audit", "reports", "drivers", "shifts"]);
-  const isExtendedScreen = liveOnlyIds.has(active.id);
-  const content = (liveMode || isExtendedScreen) ? (<LiveScreen id={active.id} /> ?? <ScreenComponent />) : <ScreenComponent />;
 
   return (
     <main className="min-h-screen bg-[#edf2f5] flex justify-center relative">
       {/* Khung hiển thị giao diện thuần Figma 100%, không bị trùng thanh điều hướng ngoài */}
       <div className="w-full flex justify-center">
-        {content}
+        <ScreenComponent />
       </div>
 
       {/* Nút điều khiển nổi góc dưới bên phải */}
       <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2">
         <button
           type="button"
-          onClick={() => {
-            const next = !liveMode;
-            setLiveMode(next);
-            localStorage.setItem("minerva_mode", next ? "live" : "figma");
-          }}
-          className={`${liveMode ? "bg-[#15803d] hover:bg-[#166534] border-[#86efac] text-white" : "bg-[#082e40] hover:bg-[#0f1b2a] border-[#1e3a4e] text-[#b8d0db]"} text-[11px] font-semibold px-3 py-1.5 rounded-full shadow-lg border flex items-center gap-1.5 cursor-pointer transition-colors`}
-          title="Chuyển đổi giữa Chế độ xem Bản vẽ Figma (Mockup) và Dữ liệu thực từ Backend (Live Mode)"
-        >
-          <span>{liveMode ? "🟢 Dữ liệu sống (Live Mode)" : "🎨 Bản vẽ Figma (Mockup)"}</span>
-        </button>
-
-        <button
-          type="button"
           onClick={() => setShowQuickMenu(!showQuickMenu)}
           className="bg-[#082e40] hover:bg-[#0f1b2a] text-[#b8d0db] hover:text-white text-[11px] font-semibold px-3 py-1.5 rounded-full shadow-lg border border-[#1e3a4e] flex items-center gap-1.5 cursor-pointer transition-colors"
-          title="Chọn nhanh màn hình Figma (18 màn) hoặc tính năng mở rộng"
+          title="Chọn nhanh màn hình demo"
         >
           <span>⚡ Chọn màn hình</span>
           <span className="text-[9px]">▾</span>
@@ -153,23 +100,6 @@ export default function App() {
             <div className="text-[11px] font-bold text-white mb-2 px-2 pb-1 border-b border-[#1e3a4e] flex justify-between items-center">
               <span>Danh sách màn hình demo</span>
               <button onClick={() => setShowQuickMenu(false)} className="text-[#8fa0b3] hover:text-white text-[12px] cursor-pointer">✕</button>
-            </div>
-            <div className="mb-2 px-1">
-              <button
-                type="button"
-                onClick={() => {
-                  const next = !liveMode;
-                  setLiveMode(next);
-                  localStorage.setItem("minerva_mode", next ? "live" : "figma");
-                }}
-                className={`w-full py-1.5 px-2 rounded-md text-[11px] font-bold text-center border cursor-pointer transition-colors ${
-                  liveMode
-                    ? "bg-[#15803d] border-[#86efac] text-white"
-                    : "bg-[#1e3a4e] border-[#2e526e] text-[#c2dde5]"
-                }`}
-              >
-                {liveMode ? "🟢 Đang xem Dữ liệu sống (Live)" : "🎨 Chuyển sang Dữ liệu sống (Live)"}
-              </button>
             </div>
             {screens.map((screen) => (
               <button

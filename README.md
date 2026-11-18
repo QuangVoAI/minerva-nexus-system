@@ -63,7 +63,7 @@ Sau khi chạy, kiểm tra kết nối tại `GET http://localhost:8081/api/heal
 
 Tài liệu cấu trúc MongoDB và quy tắc trạng thái nằm tại [docs/DATA_STRUCTURE.md](docs/DATA_STRUCTURE.md). Phân công, ownership thư mục và quy ước merge của nhóm nằm tại [docs/TEAM_TASKS.md](docs/TEAM_TASKS.md).
 
-Để chạy các panel API đã tích hợp mà vẫn giữ nguyên màn hình Figma, mở frontend với query `?mode=live`, ví dụ `/react/?mode=live#orders`. Không có query này, runtime hiển thị đúng các frame Figma gốc.
+Frontend chỉ hiển thị các màn Figma. Riêng Ca giao, Nhật ký, Báo cáo, Hủy đơn và Tài xế lấy dữ liệu thật từ backend.
 
 Các panel live bổ sung dùng cho nghiệm thu MVP: `#cancel`, `#audit`, `#reports`, `#drivers`. Tra cứu đơn công khai không thuộc phạm vi MVP; timeline đơn chỉ hiển thị trong giao diện vận hành nội bộ. Sau `bootstrap.js`, có thể chạy thêm `docs/mongodb/seed-demo.js` để tạo tài xế và ca giao mẫu cho luồng điều phối.
 

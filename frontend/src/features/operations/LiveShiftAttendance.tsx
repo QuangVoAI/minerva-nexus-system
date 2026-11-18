@@ -109,7 +109,7 @@ export default function LiveShiftAttendance() {
     <div className="mx-auto max-w-7xl space-y-5">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div><p className="text-sm text-teal-700 font-semibold">Điều phối / Ca giao</p><h1 className="text-3xl font-bold">Lập ca giao & điểm danh tài xế</h1>
-          <p className="mt-1 text-sm text-slate-600">Dữ liệu sống từ Spring Boot và MongoDB. Chỉ tài xế đã điểm danh, sẵn sàng, đúng khu vực và còn tải mới được dispatch.</p></div>
+          <p className="mt-1 text-sm text-slate-600">Chỉ tài xế đã điểm danh, đang nhận đơn, đúng khu vực và còn tải mới được gợi ý phân công.</p></div>
         <div className="flex gap-2"><button disabled={busy || !shiftId} onClick={exportCsv} className="rounded-lg border px-4 py-2 font-semibold disabled:opacity-50">Xuất danh sách</button>
           <button disabled={busy || !shiftId} onClick={openAttendancePicker} className="rounded-lg bg-teal-700 px-4 py-2 font-semibold text-white disabled:opacity-50">Điểm danh tài xế</button></div>
       </div>

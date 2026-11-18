@@ -34,7 +34,7 @@ Tài liệu này là kịch bản để cả nhóm chạy đúng **một hệ th
    npm run dev
    ```
 
-5. Kiểm tra `http://localhost:8081/api/health`, sau đó mở URL Vite có `?mode=live`, ví dụ `http://localhost:5173/react/?mode=live#orders`.
+5. Kiểm tra `http://localhost:8081/api/health`, sau đó mở URL Vite, ví dụ `http://localhost:5173/react/#orders`.
 
 ## 2. Luồng chính bắt buộc (3–5 phút)
 
