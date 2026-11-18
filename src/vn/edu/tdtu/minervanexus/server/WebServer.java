@@ -68,6 +68,7 @@ public class WebServer {
         server.createContext("/", new StaticFileHandler());
 
         // API Endpoints
+        server.createContext("/api/auth", new AuthHandler());
         server.createContext("/api/orders", new OrdersHandler());
         server.createContext("/api/drivers", new DriversHandler());
         server.createContext("/api/shifts", new ShiftsHandler());
@@ -92,6 +93,93 @@ public class WebServer {
     }
 
     // --- Handlers ---
+
+    private class AuthHandler implements HttpHandler {
+        private final Map<String, String[]> accounts = Map.ofEntries(
+                Map.entry("NV0128", new String[]{"DISPATCHER_NV0128", "NV0128", "password123", "Trần Văn Bình", "DISPATCHER", "Hub Quận 7"}),
+                Map.entry("DISPATCHER", new String[]{"DISPATCHER_WEB", "DISPATCHER", "password123", "Trần Văn Bình", "DISPATCHER", "Hub Quận 7"}),
+                Map.entry("ADMIN", new String[]{"HUB_MANAGER_ADMIN", "ADMIN", "admin123", "Võ Xuân Quang", "HUB_MANAGER", "Hub Quận 7"}),
+                Map.entry("TX045", new String[]{"DRV-01", "TX045", "password123", "Nguyễn Văn An", "DRIVER", "Hub Quận 7"}),
+                Map.entry("DRV-01", new String[]{"DRV-01", "DRV-01", "password123", "Nguyễn Văn An", "DRIVER", "Hub Quận 7"}),
+                Map.entry("DRV-02", new String[]{"DRV-02", "DRV-02", "password123", "Trần Thị Minh Châu", "DRIVER", "Hub Quận 7"}),
+                Map.entry("DRV-03", new String[]{"DRV-03", "DRV-03", "password123", "Lê Hoàng Nam", "DRIVER", "Hub Quận 7"}),
+                Map.entry("DRV-04", new String[]{"DRV-04", "DRV-04", "password123", "Phạm Quốc Huy", "DRIVER", "Hub Quận 7"}),
+                Map.entry("DRV-05", new String[]{"DRV-05", "DRV-05", "password123", "Võ Minh Đức", "DRIVER", "Hub Quận 7"}),
+                Map.entry("DRV-06", new String[]{"DRV-06", "DRV-06", "password123", "Đặng Thu Hà", "DRIVER", "Hub Quận 7"})
+        );
+
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String method = exchange.getRequestMethod();
+            String path = exchange.getRequestURI().getPath();
+
+            if ("POST".equalsIgnoreCase(method) && path.endsWith("/login")) {
+                String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                Map<String, String> params = parseFormOrJson(body);
+                String username = params.getOrDefault("username", "").trim();
+                String password = params.getOrDefault("password", "");
+                String reqHub = params.getOrDefault("hub", "").trim();
+
+                if (username.isEmpty() || password.isEmpty()) {
+                    sendJson(exchange, 400, "{\"error\":\"Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.\"}");
+                    return;
+                }
+
+                String[] acc = accounts.get(username.toUpperCase(Locale.ROOT));
+                if (acc == null || !acc[2].equals(password)) {
+                    sendJson(exchange, 401, "{\"error\":\"Sai tên đăng nhập hoặc mật khẩu. Vui lòng kiểm tra lại.\"}");
+                    return;
+                }
+
+                String hub = reqHub.isEmpty() ? acc[5] : reqHub;
+                String token = JwtUtil.generateToken(acc[0], acc[1], acc[3], acc[4], hub);
+                String json = "{"
+                        + "\"accessToken\":\"" + escape(token) + "\","
+                        + "\"tokenType\":\"Bearer\","
+                        + "\"expiresIn\":" + JwtUtil.TTL_SECONDS + ","
+                        + "\"user\":{"
+                        + "\"userId\":\"" + escape(acc[0]) + "\","
+                        + "\"username\":\"" + escape(acc[1]) + "\","
+                        + "\"fullName\":\"" + escape(acc[3]) + "\","
+                        + "\"role\":\"" + escape(acc[4]) + "\","
+                        + "\"hub\":\"" + escape(hub) + "\""
+                        + "}}";
+                sendJson(exchange, 200, json);
+                return;
+            }
+
+            if ("GET".equalsIgnoreCase(method) && path.endsWith("/me")) {
+                String auth = exchange.getRequestHeaders().getFirst("Authorization");
+                if (auth == null || !auth.startsWith("Bearer ")) {
+                    sendJson(exchange, 401, "{\"error\":\"Thiếu mã xác thực JWT (Authorization: Bearer <token>).\"}");
+                    return;
+                }
+                Optional<Map<String, String>> verified = JwtUtil.verifyToken(auth.substring(7).trim());
+                if (verified.isEmpty()) {
+                    sendJson(exchange, 401, "{\"error\":\"Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.\"}");
+                    return;
+                }
+                Map<String, String> c = verified.get();
+                String json = "{"
+                        + "\"userId\":\"" + escape(c.getOrDefault("sub", "")) + "\","
+                        + "\"username\":\"" + escape(c.getOrDefault("username", "")) + "\","
+                        + "\"fullName\":\"" + escape(c.getOrDefault("name", "")) + "\","
+                        + "\"role\":\"" + escape(c.getOrDefault("role", "")) + "\","
+                        + "\"hub\":\"" + escape(c.getOrDefault("hub", "")) + "\","
+                        + "\"exp\":" + c.getOrDefault("exp", "0")
+                        + "}";
+                sendJson(exchange, 200, json);
+                return;
+            }
+
+            if ("POST".equalsIgnoreCase(method) && path.endsWith("/logout")) {
+                sendJson(exchange, 200, "{\"success\":true,\"message\":\"Đã đăng xuất thành công.\"}");
+                return;
+            }
+
+            sendJson(exchange, 404, "{\"error\":\"Not Found: " + escape(path) + "\"}");
+        }
+    }
 
     private class StaticFileHandler implements HttpHandler {
         @Override

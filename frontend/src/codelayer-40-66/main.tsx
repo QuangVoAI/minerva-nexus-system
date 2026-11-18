@@ -1,5 +1,6 @@
 import { useState } from "react";
 import svgPaths from "./svg-m20rp2w9f2";
+import { authService } from "../services/authService";
 
 function IosSignal() {
   return (
@@ -224,10 +225,26 @@ function FormDangNhp() {
   const [username, setUsername] = useState("TX045");
   const [password, setPassword] = useState("password123");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleSubmit = (e?: React.FormEvent) => {
+  const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    window.location.hash = "driver";
+    if (isLoading) return;
+    setErrorMsg(null);
+    setIsLoading(true);
+    try {
+      const res = await authService.login(username, password);
+      if (res.user.role === "DRIVER") {
+        window.location.hash = "driver";
+      } else {
+        window.location.hash = "dashboard";
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || "Đăng nhập thất bại. Vui lòng kiểm tra thông tin.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -272,12 +289,21 @@ function FormDangNhp() {
         </div>
       </div>
 
+      {errorMsg && (
+        <div className="bg-[#fef2f2] border border-[#fecaca] text-[#b91c1c] rounded-[10px] px-[14px] py-[10px] text-[13px] font-medium w-full">
+          {errorMsg}
+        </div>
+      )}
+
       <button
         type="submit"
-        className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex gap-[10px] h-[50px] items-center justify-center overflow-clip relative rounded-[12px] shrink-0 w-full border-none"
+        disabled={isLoading}
+        className="bg-[#087f8c] hover:bg-[#066570] disabled:opacity-60 cursor-pointer transition-colors content-stretch flex gap-[10px] h-[50px] items-center justify-center overflow-clip relative rounded-[12px] shrink-0 w-full border-none"
         data-name="Đăng nhập"
       >
-        <span className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[14px] text-white whitespace-nowrap">Đăng nhập</span>
+        <span className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[14px] text-white whitespace-nowrap">
+          {isLoading ? "Đang xác thực..." : "Đăng nhập"}
+        </span>
         <ArrowRight />
       </button>
     </form>
