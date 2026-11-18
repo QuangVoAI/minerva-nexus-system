@@ -31,6 +31,7 @@ public class WebServer {
     private final IDriverShiftService driverShiftService;
     private final IDispatchEngine dispatchEngine;
     private final IAnalyticsService analyticsService;
+    private final Map<String, Map<String, Boolean>> shiftAttendance = new HashMap<>();
     private HttpServer server;
 
     public WebServer(int port,
@@ -43,6 +44,21 @@ public class WebServer {
         this.driverShiftService = driverShiftService;
         this.dispatchEngine = dispatchEngine;
         this.analyticsService = analyticsService;
+        initShiftAttendance();
+    }
+
+    private void initShiftAttendance() {
+        Map<String, Boolean> ca1 = new HashMap<>();
+        Map<String, Boolean> ca2 = new HashMap<>();
+        List<Driver> drivers = driverShiftService.getAllDrivers();
+        for (int i = 0; i < drivers.size(); i++) {
+            String id = drivers.get(i).getDriverId();
+            // First 4 drivers checked in for Ca 1; remaining unchecked so attendance picker has candidates
+            ca1.put(id, i < 4);
+            ca2.put(id, i < 2);
+        }
+        shiftAttendance.put("SHIFT-01", ca1);
+        shiftAttendance.put("SHIFT-02", ca2);
     }
 
     public void start() throws IOException {
@@ -54,6 +70,7 @@ public class WebServer {
         // API Endpoints
         server.createContext("/api/orders", new OrdersHandler());
         server.createContext("/api/drivers", new DriversHandler());
+        server.createContext("/api/shifts", new ShiftsHandler());
         server.createContext("/api/dispatch/suggestions", new DispatchSuggestionsHandler());
         server.createContext("/api/dispatch/approve", new DispatchApproveHandler());
         server.createContext("/api/dispatch/reject", new DispatchRejectHandler());
@@ -242,6 +259,23 @@ public class WebServer {
     private class DriversHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            String method = exchange.getRequestMethod();
+            String path = exchange.getRequestURI().getPath();
+
+            if ("PUT".equalsIgnoreCase(method) && path.startsWith("/api/drivers/")) {
+                String driverId = path.substring("/api/drivers/".length()).trim();
+                String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                boolean active = body.contains("\"active\":true") || body.contains("\"active\": true");
+                Optional<Driver> opt = driverShiftService.getDriverById(driverId);
+                if (opt.isEmpty()) {
+                    sendJson(exchange, 404, "{\"error\":\"Không tìm thấy tài xế " + escape(driverId) + "\"}");
+                    return;
+                }
+                opt.get().setActive(active);
+                sendJson(exchange, 200, "{\"success\":true,\"driverId\":\"" + escape(driverId) + "\",\"active\":" + active + "}");
+                return;
+            }
+
             List<Driver> drivers = driverShiftService.getAllDrivers();
             StringBuilder sb = new StringBuilder("[");
             for (int i = 0; i < drivers.size(); i++) {
@@ -261,6 +295,108 @@ public class WebServer {
             }
             sb.append("]");
             sendJson(exchange, 200, sb.toString());
+        }
+    }
+
+    private class ShiftsHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String method = exchange.getRequestMethod();
+            String path = exchange.getRequestURI().getPath();
+            String query = exchange.getRequestURI().getQuery();
+
+            // GET /api/shifts
+            if ("GET".equalsIgnoreCase(method) && ("/api/shifts".equals(path) || "/api/shifts/".equals(path))) {
+                String json = "["
+                        + "{\"id\":\"SHIFT-01\",\"name\":\"Ca 1 · Sáng\",\"area\":\"Hub Quận 7\",\"start\":\"2026-11-18T01:00:00Z\",\"end\":\"2026-11-18T05:00:00Z\"},"
+                        + "{\"id\":\"SHIFT-02\",\"name\":\"Ca 2 · Chiều\",\"area\":\"Hub Quận 7\",\"start\":\"2026-11-18T06:30:00Z\",\"end\":\"2026-11-18T10:30:00Z\"}"
+                        + "]";
+                sendJson(exchange, 200, json);
+                return;
+            }
+
+            // Parse shift id from /api/shifts/{id}/...
+            String rest = path.startsWith("/api/shifts/") ? path.substring("/api/shifts/".length()) : "";
+            String[] segs = rest.split("/");
+            String shiftId = segs.length > 0 && !segs[0].isEmpty() ? segs[0] : "SHIFT-01";
+            Map<String, Boolean> attMap = shiftAttendance.computeIfAbsent(shiftId, k -> new HashMap<>());
+
+            // GET /api/shifts/{id}/drivers
+            if ("GET".equalsIgnoreCase(method) && segs.length >= 2 && "drivers".equals(segs[1])) {
+                Map<String, String> qMap = parseFormOrJson(query == null ? "" : query);
+                String attFilter = qMap.getOrDefault("attendance", "all");
+                String areaFilter = qMap.getOrDefault("area", "");
+                String needle = qMap.getOrDefault("query", "").trim().toLowerCase(Locale.ROOT);
+
+                List<Driver> drivers = driverShiftService.getAllDrivers();
+                StringBuilder sb = new StringBuilder("[");
+                boolean first = true;
+                for (Driver d : drivers) {
+                    boolean checkedIn = Boolean.TRUE.equals(attMap.get(d.getDriverId()));
+                    if ("checked_in".equals(attFilter) && !checkedIn) continue;
+                    if ("not_checked_in".equals(attFilter) && checkedIn) continue;
+                    if (!areaFilter.isEmpty() && !areaFilter.equalsIgnoreCase(d.getAssignedAreaId())) continue;
+                    if (!needle.isEmpty()
+                            && !d.getDriverId().toLowerCase(Locale.ROOT).contains(needle)
+                            && !d.getName().toLowerCase(Locale.ROOT).contains(needle)) continue;
+
+                    if (!first) sb.append(",");
+                    first = false;
+                    sb.append("{")
+                            .append("\"driverId\":\"").append(escape(d.getDriverId())).append("\",")
+                            .append("\"name\":\"").append(escape(d.getName())).append("\",")
+                            .append("\"assignedAreaId\":\"").append(escape(d.getAssignedAreaId())).append("\",")
+                            .append("\"currentLoad\":").append(d.getCurrentLoad()).append(",")
+                            .append("\"capacityPerShift\":").append(Math.min(15, d.getCapacityPerShift())).append(",")
+                            .append("\"checkedIn\":").append(checkedIn).append(",")
+                            .append("\"availableForNewAssignments\":").append(d.isActive()).append(",")
+                            .append("\"services\":[\"STANDARD\",\"EXPRESS\"]")
+                            .append("}");
+                }
+                sb.append("]");
+                sendJson(exchange, 200, sb.toString());
+                return;
+            }
+
+            // POST /api/shifts/{id}/attendance
+            if ("POST".equalsIgnoreCase(method) && segs.length >= 2 && "attendance".equals(segs[1])) {
+                String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                Map<String, String> params = parseFormOrJson(body);
+                String driverId = params.getOrDefault("driverId", "");
+                boolean present = body.contains("\"present\":true") || body.contains("\"present\": true");
+                if (driverId.isEmpty()) {
+                    sendJson(exchange, 400, "{\"error\":\"Thiếu driverId\"}");
+                    return;
+                }
+                attMap.put(driverId, present);
+                sendJson(exchange, 200, "{\"success\":true,\"shiftId\":\"" + escape(shiftId) + "\",\"driverId\":\"" + escape(driverId) + "\",\"present\":" + present + "}");
+                return;
+            }
+
+            // GET /api/shifts/{id}/attendance/export
+            if ("GET".equalsIgnoreCase(method) && segs.length >= 3 && "attendance".equals(segs[1]) && "export".equals(segs[2])) {
+                StringBuilder csv = new StringBuilder("driverId,name,area,checkedIn,availableForNewAssignments,currentLoad,capacityPerShift\n");
+                for (Driver d : driverShiftService.getAllDrivers()) {
+                    boolean checkedIn = Boolean.TRUE.equals(attMap.get(d.getDriverId()));
+                    csv.append("\"").append(escape(d.getDriverId())).append("\",")
+                            .append("\"").append(escape(d.getName())).append("\",")
+                            .append("\"").append(escape(d.getAssignedAreaId())).append("\",")
+                            .append(checkedIn).append(",")
+                            .append(d.isActive()).append(",")
+                            .append(d.getCurrentLoad()).append(",")
+                            .append(Math.min(15, d.getCapacityPerShift())).append("\n");
+                }
+                byte[] bytes = csv.toString().getBytes(StandardCharsets.UTF_8);
+                exchange.getResponseHeaders().set("Content-Type", "text/csv; charset=UTF-8");
+                exchange.getResponseHeaders().set("Content-Disposition", "attachment; filename=attendance-" + shiftId + ".csv");
+                exchange.sendResponseHeaders(200, bytes.length);
+                try (OutputStream os = exchange.getResponseBody()) {
+                    os.write(bytes);
+                }
+                return;
+            }
+
+            sendJson(exchange, 404, "{\"error\":\"Not Found: " + escape(path) + "\"}");
         }
     }
 
