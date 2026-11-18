@@ -57,7 +57,12 @@ function ThanhTrngThai() {
 
 function ArrowLeft() {
   return (
-    <div className="relative shrink-0 size-[24px]" data-name="arrow-left">
+    <div
+      onClick={() => { window.location.hash = "driver"; }}
+      className="relative shrink-0 size-[24px] cursor-pointer hover:opacity-80 transition-opacity"
+      data-name="arrow-left"
+      title="Quay lại danh sách tác vụ tài xế"
+    >
       <svg className="absolute block inset-0 size-full" fill="none" height="24" preserveAspectRatio="none" viewBox="0 0 24 24" width="24">
         <g id="arrow-left">
           <path d={svgPaths.p177d0d00} id="Vector" stroke="white" strokeLinecap="round" strokeWidth="1.8" />
@@ -468,7 +473,11 @@ function ChiTitChuynHoan() {
 
 function XemPhiuHoanHang() {
   return (
-    <div className="bg-[#087f8c] content-stretch flex h-[54px] items-center justify-center overflow-clip px-[14px] relative rounded-[12px] shrink-0 w-full" data-name="Xem phiếu hoàn hàng">
+    <div
+      onClick={() => { window.location.hash = "order-detail"; }}
+      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors content-stretch flex h-[54px] items-center justify-center overflow-clip px-[14px] relative rounded-[12px] shrink-0 w-full"
+      data-name="Xem phiếu hoàn hàng"
+    >
       <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[15px] text-white whitespace-nowrap">Xem phiếu hoàn hàng</p>
     </div>
   );
@@ -476,7 +485,11 @@ function XemPhiuHoanHang() {
 
 function VDanhSachGiaoHang() {
   return (
-    <div className="bg-white h-[54px] relative rounded-[12px] shrink-0 w-full" data-name="Về danh sách giao hàng">
+    <div
+      onClick={() => { window.location.hash = "driver"; }}
+      className="bg-white hover:bg-[#f8fafc] cursor-pointer transition-colors h-[54px] relative rounded-[12px] shrink-0 w-full"
+      data-name="Về danh sách giao hàng"
+    >
       <div className="content-stretch flex items-center justify-center overflow-clip px-[14px] relative rounded-[inherit] size-full">
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#142b3b] text-[15px] whitespace-nowrap">Về danh sách giao hàng</p>
       </div>

@@ -33,14 +33,39 @@ function Radio() {
   );
 }
 
+const AVAILABLE_HUBS = [
+  { id: "HUB_Q7", code: "Hub Q7-01", name: "Hub Quận 7", desc: "KCX Tân Thuận (SRS MVP)" },
+  { id: "HUB_Q1", code: "Hub Q1-01", name: "Hub Quận 1", desc: "Trung tâm Bến Nghé" },
+  { id: "HUB_BT", code: "Hub BT-02", name: "Hub Bình Thạnh", desc: "Hàng Xanh Phước Long" },
+  { id: "HUB_CG", code: "Hub CG-01", name: "Hub Cầu Giấy", desc: "Dịch Vọng Hậu, Hà Nội" },
+];
+
 export function DiuHngHub() {
   const [currentHash, setCurrentHash] = useState(() => window.location.hash.replace("#", "") || "dashboard");
+  const [selectedHub, setSelectedHub] = useState(() => localStorage.getItem("minerva_current_hub") || "Hub Quận 7");
+  const [isHubDropdownOpen, setIsHubDropdownOpen] = useState(false);
+  const [hubToast, setHubToast] = useState<string | null>(null);
 
   useEffect(() => {
     const handleHash = () => setCurrentHash(window.location.hash.replace("#", "") || "dashboard");
+    const handleHubChange = () => setSelectedHub(localStorage.getItem("minerva_current_hub") || "Hub Quận 7");
     window.addEventListener("hashchange", handleHash);
-    return () => window.removeEventListener("hashchange", handleHash);
+    window.addEventListener("minerva_hub_changed", handleHubChange);
+    return () => {
+      window.removeEventListener("hashchange", handleHash);
+      window.removeEventListener("minerva_hub_changed", handleHubChange);
+    };
   }, []);
+
+  const handleSelectHub = (hub: typeof AVAILABLE_HUBS[0]) => {
+    setSelectedHub(hub.name);
+    localStorage.setItem("minerva_current_hub", hub.name);
+    localStorage.setItem("minerva_current_hub_code", hub.code);
+    setIsHubDropdownOpen(false);
+    window.dispatchEvent(new Event("minerva_hub_changed"));
+    setHubToast(`Đã chuyển sang điểm vận hành: ${hub.name} (${hub.code})`);
+    setTimeout(() => setHubToast(null), 3000);
+  };
 
   const navigate = (hash: string) => {
     window.location.hash = hash;
@@ -62,7 +87,14 @@ export function DiuHngHub() {
   const isPermissions = currentHash === "permissions";
 
   return (
-    <div className="bg-[#082e40] content-stretch flex flex-col gap-[24px] items-start min-h-[1120px] overflow-clip pb-[20px] pt-[24px] px-[16px] relative self-stretch shrink-0 w-[204px]" data-name="Điều hướng Hub">
+    <div className="bg-[#082e40] content-stretch flex flex-col gap-[24px] items-start min-h-[1120px] overflow-visible pb-[20px] pt-[24px] px-[16px] relative self-stretch shrink-0 w-[204px] z-30" data-name="Điều hướng Hub">
+      {hubToast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#087f8c] text-white px-4 py-2 rounded-lg shadow-xl text-[12px] font-semibold animate-fade-in flex items-center gap-2">
+          <span>✓</span>
+          <span>{hubToast}</span>
+        </div>
+      )}
+
       {/* Brand Logo */}
       <div
         onClick={() => navigate("dashboard")}
@@ -78,16 +110,58 @@ export function DiuHngHub() {
         </div>
       </div>
 
-      {/* Điểm vận hành */}
-      <div className="bg-[#1b2d43] relative rounded-[8px] shrink-0 w-full" data-name="Hub hiện tại">
-        <div className="content-stretch flex flex-col gap-[7px] items-start overflow-clip p-[12px] relative rounded-[inherit] size-full">
+      {/* Điểm vận hành (Hub Switcher) */}
+      <div className="bg-[#1b2d43] relative rounded-[8px] shrink-0 w-full z-40" data-name="Hub hiện tại">
+        <div className="content-stretch flex flex-col gap-[7px] items-start p-[12px] relative rounded-[inherit] size-full">
           <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] text-[#b8d0db] text-[12px] tracking-[0.5px]">Điểm vận hành</p>
-          <div className="bg-[#0f1b2a] content-stretch flex items-center justify-between overflow-clip p-[8px] relative rounded-[8px] shrink-0 w-full">
-            <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[14px] text-white">Hub Quận 7</p>
+          <button
+            type="button"
+            onClick={() => setIsHubDropdownOpen(!isHubDropdownOpen)}
+            className="bg-[#0f1b2a] hover:bg-[#152438] transition-colors content-stretch flex items-center justify-between p-[8px] relative rounded-[8px] shrink-0 w-full cursor-pointer text-left border border-transparent hover:border-[#2e526e]"
+            title="Nhấn để đổi điểm vận hành / Hub"
+          >
+            <p className="font-['Inter:Semi_Bold',sans-serif] font-semibold text-[13px] text-white truncate">{selectedHub}</p>
             <ChevronsUpDown />
-          </div>
+          </button>
         </div>
         <div aria-hidden className="absolute border border-[#1e3a4e] border-solid inset-0 pointer-events-none rounded-[8px]" />
+
+        {/* Dropdown danh sách Hub */}
+        {isHubDropdownOpen && (
+          <div className="absolute top-[calc(100%+4px)] left-0 w-[240px] bg-[#0f1b2a] border border-[#2e526e] rounded-xl shadow-2xl p-2 z-50 text-white animate-fade-in">
+            <div className="px-2 py-1 text-[11px] font-bold text-[#8fa0b3] border-b border-[#1e3a4e] flex justify-between items-center mb-1">
+              <span>CHỌN ĐIỂM VẬN HÀNH</span>
+              <button
+                type="button"
+                onClick={() => setIsHubDropdownOpen(false)}
+                className="text-[#8fa0b3] hover:text-white text-[12px] cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            {AVAILABLE_HUBS.map((hub) => {
+              const isSelected = selectedHub === hub.name;
+              return (
+                <button
+                  key={hub.id}
+                  type="button"
+                  onClick={() => handleSelectHub(hub)}
+                  className={`w-full text-left p-2 rounded-lg text-[12px] transition-colors mb-1 cursor-pointer flex flex-col ${
+                    isSelected
+                      ? "bg-[#087f8c] text-white font-semibold shadow"
+                      : "hover:bg-[#1a2c42] text-[#d1e0e8]"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold">{hub.name}</span>
+                    <span className="text-[10px] opacity-80 font-mono">{hub.code}</span>
+                  </div>
+                  <span className="text-[10px] opacity-75 mt-0.5">{hub.desc}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Menu Vận hành ca trực */}

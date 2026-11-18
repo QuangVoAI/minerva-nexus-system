@@ -134,4 +134,12 @@ export const apiClient = {
       );
     }
   },
+  async put<T>(endpoint: string, body?: unknown, headers?: Record<string, string>): Promise<T> {
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-Actor-Id': 'DISPATCHER_WEB', ...headers },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    return await handleResponse<T>(response);
+  },
 };

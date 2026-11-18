@@ -1,0 +1,200 @@
+[
+  {
+    "idx": "01",
+    "id": "login",
+    "name": "SCR-01 · Đăng nhập desktop",
+    "category": "Xác thực",
+    "status": "PASS",
+    "detail": "Nhập tài khoản điều phối viên",
+    "screenshot": "01_login.png"
+  },
+  {
+    "idx": "02",
+    "id": "login-driver",
+    "name": "SCR-01 · Đăng nhập mobile tài xế",
+    "category": "Xác thực",
+    "status": "PASS",
+    "detail": "Nhập SĐT tài xế di động",
+    "screenshot": "02_login-driver.png"
+  },
+  {
+    "idx": "03",
+    "id": "login-states",
+    "name": "SCR-01 · Các trạng thái đăng nhập",
+    "category": "Xác thực",
+    "status": "PASS",
+    "detail": "Hiển thị nội dung đầy đủ",
+    "screenshot": "03_login-states.png"
+  },
+  {
+    "idx": "04",
+    "id": "permissions",
+    "name": "SCR-01 · Phân quyền & chuyển tiếp",
+    "category": "Xác thực",
+    "status": "PASS",
+    "detail": "Hiển thị nội dung đầy đủ",
+    "screenshot": "04_permissions.png"
+  },
+  {
+    "idx": "05",
+    "id": "dashboard",
+    "name": "SCR-02 · Bàn điều hành Hub",
+    "category": "Điều hành Hub",
+    "status": "PASS",
+    "detail": "Kiểm tra mở/đóng menu chọn Hub thành công",
+    "screenshot": "05_dashboard.png"
+  },
+  {
+    "idx": "06",
+    "id": "orders",
+    "name": "SCR-03 · Tiếp nhận & phân loại đơn",
+    "category": "Đơn hàng",
+    "status": "PASS",
+    "detail": "Có 4 nút điều khiển/bộ lọc hoạt động",
+    "screenshot": "06_orders.png"
+  },
+  {
+    "idx": "07",
+    "id": "import-errors",
+    "name": "SCR-03 · Kết quả nhập & đơn lỗi",
+    "category": "Đơn hàng",
+    "status": "PASS",
+    "detail": "Hiển thị nội dung đầy đủ",
+    "screenshot": "07_import-errors.png"
+  },
+  {
+    "idx": "08",
+    "id": "create-order",
+    "name": "SCR-03 · Tạo đơn gửi lẻ",
+    "category": "Đơn hàng",
+    "status": "PASS",
+    "detail": "Form tạo đơn có 7 ô nhập dữ liệu",
+    "screenshot": "08_create-order.png"
+  },
+  {
+    "idx": "09",
+    "id": "shifts",
+    "name": "SCR-04 · Lập ca & điểm danh",
+    "category": "Điều phối",
+    "status": "PASS",
+    "detail": "Chuyển tab Ca 1 / Ca 2 mượt mà",
+    "screenshot": "09_shifts.png"
+  },
+  {
+    "idx": "10",
+    "id": "dispatch",
+    "name": "SCR-05 · Gợi ý phân công",
+    "category": "Điều phối",
+    "status": "PASS",
+    "detail": "Click dòng đơn cập nhật bảng phân tích độ khớp bên phải",
+    "screenshot": "10_dispatch.png"
+  },
+  {
+    "idx": "11",
+    "id": "order-detail",
+    "name": "SCR-06 · Hồ sơ chi tiết đơn",
+    "category": "Điều phối",
+    "status": "PASS",
+    "detail": "Hiển thị nội dung đầy đủ",
+    "screenshot": "11_order-detail.png"
+  },
+  {
+    "idx": "12",
+    "id": "exceptions",
+    "name": "SCR-06 · Ngoại lệ giao hàng",
+    "category": "Điều phối",
+    "status": "PASS",
+    "detail": "Hiển thị nội dung đầy đủ",
+    "screenshot": "12_exceptions.png"
+  },
+  {
+    "idx": "13",
+    "id": "driver",
+    "name": "SCR-07 · Tác vụ tài xế",
+    "category": "Mobile Tài xế",
+    "status": "PASS",
+    "detail": "Nút Xuất kho (true), Nút Giao (true), Nút Gọi (true)",
+    "screenshot": "13_driver.png"
+  },
+  {
+    "idx": "14",
+    "id": "failed-1",
+    "name": "SCR-08 · Báo thất bại lần đầu",
+    "category": "Mobile Tài xế",
+    "status": "PASS",
+    "detail": "Chọn lý do thất bại thành công",
+    "screenshot": "14_failed-1.png"
+  },
+  {
+    "idx": "15",
+    "id": "redelivery",
+    "name": "SCR-08 · Khách hẹn giao lại",
+    "category": "Mobile Tài xế",
+    "status": "PASS",
+    "detail": "Hiển thị nội dung đầy đủ",
+    "screenshot": "15_redelivery.png"
+  },
+  {
+    "idx": "16",
+    "id": "failed",
+    "name": "SCR-08 · FAILED chờ phát lại",
+    "category": "Mobile Tài xế",
+    "status": "PASS",
+    "detail": "Hiển thị nội dung đầy đủ",
+    "screenshot": "16_failed.png"
+  },
+  {
+    "idx": "17",
+    "id": "refused",
+    "name": "SCR-08 · Từ chối nhận lần ba",
+    "category": "Mobile Tài xế",
+    "status": "PASS",
+    "detail": "Hiển thị nội dung đầy đủ",
+    "screenshot": "17_refused.png"
+  },
+  {
+    "idx": "18",
+    "id": "returned",
+    "name": "SCR-08 · RETURNED chuyển hoàn",
+    "category": "Mobile Tài xế",
+    "status": "PASS",
+    "detail": "Hiển thị nội dung đầy đủ",
+    "screenshot": "18_returned.png"
+  },
+  {
+    "idx": "19",
+    "id": "cancel",
+    "name": "UC-23 · Hủy đơn hàng",
+    "category": "Tiện ích & Mở rộng",
+    "status": "PASS",
+    "detail": "Dropdown chọn đơn cần hủy sẵn sàng",
+    "screenshot": "19_cancel.png"
+  },
+  {
+    "idx": "20",
+    "id": "audit",
+    "name": "UC-22 · Nhật ký hệ thống",
+    "category": "Tiện ích & Mở rộng",
+    "status": "PASS",
+    "detail": "Lọc nhật ký audit log theo mã MNX thành công",
+    "screenshot": "20_audit.png"
+  },
+  {
+    "idx": "21",
+    "id": "reports",
+    "name": "UC-20 · Báo cáo vận hành",
+    "category": "Tiện ích & Mở rộng",
+    "status": "PASS",
+    "detail": "Nút xuất CSV sẵn sàng (true)",
+    "screenshot": "21_reports.png"
+  },
+  {
+    "idx": "22",
+    "id": "drivers",
+    "name": "UC-03 · Tài xế và khu vực",
+    "category": "Tiện ích & Mở rộng",
+    "status": "PASS",
+    "detail": "Bảng danh sách tài xế & tải khả dụng sẵn sàng (true)",
+    "screenshot": "22_drivers.png"
+  }
+]

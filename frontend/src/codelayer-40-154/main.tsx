@@ -1,3 +1,4 @@
+import { useState } from "react";
 import svgPaths from "./svg-0nwlklxcr1";
 import { DiuHngHub as DiuHngHubShared } from "../components/DiuHngHub";
 
@@ -552,7 +553,11 @@ function Upload() {
 
 function NutThaoTac1() {
   return (
-    <div className="bg-[#087f8c] h-[42px] relative rounded-[8px] shrink-0" data-name="Nút thao tác">
+    <div
+      onClick={() => { window.location.hash = "orders"; }}
+      className="bg-[#087f8c] hover:bg-[#066570] cursor-pointer transition-colors h-[42px] relative rounded-[8px] shrink-0"
+      data-name="Nút thao tác"
+    >
       <div className="content-stretch flex gap-[8px] items-center justify-center overflow-clip px-[16px] relative rounded-[inherit] size-full">
         <Upload />
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[13px] text-white whitespace-nowrap">Nạp danh sách đơn (Import CSV/Excel)</p>
@@ -623,7 +628,11 @@ function Download() {
 
 function NutThaoTac2() {
   return (
-    <div className="bg-white h-[42px] relative rounded-[8px] shrink-0" data-name="Nút thao tác">
+    <div
+      onClick={() => { window.location.hash = "reports"; }}
+      className="bg-white hover:bg-slate-50 cursor-pointer transition-colors h-[42px] relative rounded-[8px] shrink-0"
+      data-name="Nút thao tác"
+    >
       <div className="content-stretch flex gap-[8px] items-center justify-center overflow-clip px-[16px] relative rounded-[inherit] size-full">
         <Download />
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[13px] whitespace-nowrap">Tải báo cáo kiểm tra</p>
@@ -805,9 +814,21 @@ function TabKtQu() {
   return (
     <div className="h-[54px] relative shrink-0 w-full" data-name="Tab kết quả">
       <div className="content-stretch flex gap-[28px] items-center overflow-clip px-[20px] relative rounded-[inherit] size-full">
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[13px] whitespace-nowrap">Tất cả đơn hàng 104</p>
+        <p
+          onClick={() => { window.location.hash = "orders"; }}
+          className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] hover:text-[#087f8c] text-[13px] whitespace-nowrap cursor-pointer transition-colors"
+          title="Bấm để quay về danh sách Tất cả đơn hàng"
+        >
+          Tất cả đơn hàng 104
+        </p>
         <TabDnLiDangChn />
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[13px] whitespace-nowrap">Lịch sử nhập liệu</p>
+        <p
+          onClick={() => { window.location.hash = "audit"; }}
+          className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] hover:text-[#087f8c] text-[13px] whitespace-nowrap cursor-pointer transition-colors"
+          title="Xem nhật ký lịch sử nhập liệu"
+        >
+          Lịch sử nhập liệu
+        </p>
       </div>
       <div aria-hidden className="absolute border-[#dce4ea] border-b border-solid inset-0 pointer-events-none" />
     </div>
@@ -819,7 +840,7 @@ function Search() {
     <div className="relative shrink-0 size-[16px]" data-name="search">
       <svg className="absolute block inset-0 size-full" fill="none" height="16" preserveAspectRatio="none" viewBox="0 0 16 16" width="16">
         <g id="search">
-          <path d={svgPaths.p3f6e0f00} id="Vector" stroke="#657684" strokeLinecap="round" />
+          <path d={svgPaths.p3f6e0f00} id="Vector" stroke="#65758A" strokeLinecap="round" />
         </g>
       </svg>
     </div>
@@ -827,11 +848,18 @@ function Search() {
 }
 
 function TimDn() {
+  const [kw, setKw] = useState("");
   return (
     <div className="h-[38px] relative rounded-[6px] shrink-0 w-[330px]" data-name="Tìm đơn">
       <div className="content-stretch flex gap-[9px] items-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
         <Search />
-        <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] not-italic relative shrink-0 text-[#657684] text-[12px] whitespace-nowrap">Tìm mã vận đơn, tên hoặc số điện thoại</p>
+        <input
+          type="text"
+          value={kw}
+          onChange={(e) => setKw(e.target.value)}
+          placeholder="Tìm mã vận đơn, tên hoặc số điện thoại"
+          className="w-full bg-transparent font-['Inter:Regular',sans-serif] text-[12px] text-[#142b3b] outline-none"
+        />
       </div>
       <div aria-hidden className="absolute border border-[#dce4ea] border-solid inset-0 pointer-events-none rounded-[6px]" />
     </div>
@@ -1207,7 +1235,12 @@ function SquarePen() {
 
 function NutThaoTac3() {
   return (
-    <div className="bg-white h-[32px] relative rounded-[8px] shrink-0" data-name="Nút thao tác">
+    <div
+      onClick={() => { window.location.hash = "create-order"; }}
+      className="bg-white hover:bg-slate-50 cursor-pointer transition-colors h-[32px] relative rounded-[8px] shrink-0"
+      data-name="Nút thao tác"
+      title="Bấm để chỉnh sửa và kiểm tra lại đơn này"
+    >
       <div className="content-stretch flex gap-[8px] items-center justify-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
         <SquarePen />
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">{`Sửa & kiểm tra lại`}</p>
@@ -1312,7 +1345,12 @@ function SquarePen1() {
 
 function NutThaoTac4() {
   return (
-    <div className="bg-white h-[32px] relative rounded-[8px] shrink-0" data-name="Nút thao tác">
+    <div
+      onClick={() => { window.location.hash = "create-order"; }}
+      className="bg-white hover:bg-slate-50 cursor-pointer transition-colors h-[32px] relative rounded-[8px] shrink-0"
+      data-name="Nút thao tác"
+      title="Bấm để chỉnh sửa và kiểm tra lại đơn này"
+    >
       <div className="content-stretch flex gap-[8px] items-center justify-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
         <SquarePen1 />
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">{`Sửa & kiểm tra lại`}</p>
@@ -1417,7 +1455,12 @@ function SquarePen2() {
 
 function NutThaoTac5() {
   return (
-    <div className="bg-white h-[32px] relative rounded-[8px] shrink-0" data-name="Nút thao tác">
+    <div
+      onClick={() => { window.location.hash = "create-order"; }}
+      className="bg-white hover:bg-slate-50 cursor-pointer transition-colors h-[32px] relative rounded-[8px] shrink-0"
+      data-name="Nút thao tác"
+      title="Bấm để chỉnh sửa và kiểm tra lại đơn này"
+    >
       <div className="content-stretch flex gap-[8px] items-center justify-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
         <SquarePen2 />
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">{`Sửa & kiểm tra lại`}</p>
@@ -1466,7 +1509,12 @@ function Download1() {
 
 function NutThaoTac6() {
   return (
-    <div className="bg-white h-[32px] relative rounded-[8px] shrink-0" data-name="Nút thao tác">
+    <div
+      onClick={() => { window.location.hash = "reports"; }}
+      className="bg-white hover:bg-slate-50 cursor-pointer transition-colors h-[32px] relative rounded-[8px] shrink-0"
+      data-name="Nút thao tác"
+      title="Bấm để tải hoặc xuất danh sách đơn lỗi"
+    >
       <div className="content-stretch flex gap-[8px] items-center justify-center overflow-clip px-[12px] relative rounded-[inherit] size-full">
         <Download1 />
         <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[1.45] not-italic relative shrink-0 text-[#087f8c] text-[12px] whitespace-nowrap">Tải danh sách lỗi</p>

@@ -25,11 +25,11 @@ import {
   LiveDriverActionCard,
   LiveOrderDetailTimeline,
   LiveOrderIntake,
-  LiveTracking,
   LiveCancelOrder,
   LiveAuditLog,
   LiveReports,
   LiveDriverManagement,
+  LiveShiftAttendance,
 } from "./features";
 import "./styles/globals.css";
 
@@ -55,7 +55,6 @@ const screens: Screen[] = [
   { id: "failed", title: "SCR-08 · FAILED chờ phát lại", group: "Mobile", Component: FailedPending },
   { id: "refused", title: "SCR-08 · Từ chối nhận lần ba", group: "Mobile", Component: RefusedThird },
   { id: "returned", title: "SCR-08 · RETURNED chuyển hoàn", group: "Mobile", Component: Returned }
-  ,{ id: "tracking", title: "UC-24 · Tra cứu hành trình công khai", group: "Công khai", Component: EmptyScreen }
   ,{ id: "cancel", title: "UC-23 · Hủy đơn hàng", group: "Đơn hàng", Component: EmptyScreen }
   ,{ id: "audit", title: "UC-22 · Nhật ký hệ thống", group: "Hệ thống", Component: EmptyScreen }
   ,{ id: "reports", title: "UC-20 · Báo cáo vận hành", group: "Báo cáo", Component: EmptyScreen }
@@ -81,11 +80,11 @@ function LiveScreen({ id }: { id: string }): JSX.Element | null {
       return <LiveOrderDetailTimeline orderId={new URLSearchParams(window.location.search).get("orderId")} />;
     case "driver":
       return <LiveDriverActionCard />;
-    case "tracking": return <LiveTracking />;
     case "cancel": return <LiveCancelOrder />;
     case "audit": return <LiveAuditLog />;
     case "reports": return <LiveReports />;
     case "drivers": return <LiveDriverManagement />;
+    case "shifts": return <LiveShiftAttendance />;
     default:
       return null;
   }
@@ -94,7 +93,9 @@ function LiveScreen({ id }: { id: string }): JSX.Element | null {
 export default function App() {
   const [screenId, setScreenId] = useState(getScreenFromHash);
   const [showQuickMenu, setShowQuickMenu] = useState(false);
-  const liveMode = new URLSearchParams(window.location.search).get("mode") === "live";
+  const [liveMode, setLiveMode] = useState(() => {
+    return new URLSearchParams(window.location.search).get("mode") === "live" || localStorage.getItem("minerva_mode") === "live";
+  });
   const active = useMemo(() => screens.find((screen) => screen.id === screenId) ?? screens[4], [screenId]);
 
   useEffect(() => {
@@ -109,7 +110,9 @@ export default function App() {
   };
 
   const ScreenComponent = active.Component;
-  const liveOnlyIds = new Set(["tracking", "cancel", "audit", "reports", "drivers"]);
+  // SCR-04 is a transactional screen: opening it must never silently fall back to the
+  // Figma mockup, otherwise attendance and availability buttons would not persist.
+  const liveOnlyIds = new Set(["cancel", "audit", "reports", "drivers", "shifts"]);
   const isExtendedScreen = liveOnlyIds.has(active.id);
   const content = (liveMode || isExtendedScreen) ? (<LiveScreen id={active.id} /> ?? <ScreenComponent />) : <ScreenComponent />;
 
@@ -120,8 +123,21 @@ export default function App() {
         {content}
       </div>
 
-      {/* Nút menu nổi nhỏ gọn góc dưới bên phải - hỗ trợ chuyển nhanh màn hình khi thuyết trình */}
-      <div className="fixed bottom-4 right-4 z-50">
+      {/* Nút điều khiển nổi góc dưới bên phải */}
+      <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            const next = !liveMode;
+            setLiveMode(next);
+            localStorage.setItem("minerva_mode", next ? "live" : "figma");
+          }}
+          className={`${liveMode ? "bg-[#15803d] hover:bg-[#166534] border-[#86efac] text-white" : "bg-[#082e40] hover:bg-[#0f1b2a] border-[#1e3a4e] text-[#b8d0db]"} text-[11px] font-semibold px-3 py-1.5 rounded-full shadow-lg border flex items-center gap-1.5 cursor-pointer transition-colors`}
+          title="Chuyển đổi giữa Chế độ xem Bản vẽ Figma (Mockup) và Dữ liệu thực từ Backend (Live Mode)"
+        >
+          <span>{liveMode ? "🟢 Dữ liệu sống (Live Mode)" : "🎨 Bản vẽ Figma (Mockup)"}</span>
+        </button>
+
         <button
           type="button"
           onClick={() => setShowQuickMenu(!showQuickMenu)}
@@ -137,6 +153,23 @@ export default function App() {
             <div className="text-[11px] font-bold text-white mb-2 px-2 pb-1 border-b border-[#1e3a4e] flex justify-between items-center">
               <span>Danh sách màn hình demo</span>
               <button onClick={() => setShowQuickMenu(false)} className="text-[#8fa0b3] hover:text-white text-[12px] cursor-pointer">✕</button>
+            </div>
+            <div className="mb-2 px-1">
+              <button
+                type="button"
+                onClick={() => {
+                  const next = !liveMode;
+                  setLiveMode(next);
+                  localStorage.setItem("minerva_mode", next ? "live" : "figma");
+                }}
+                className={`w-full py-1.5 px-2 rounded-md text-[11px] font-bold text-center border cursor-pointer transition-colors ${
+                  liveMode
+                    ? "bg-[#15803d] border-[#86efac] text-white"
+                    : "bg-[#1e3a4e] border-[#2e526e] text-[#c2dde5]"
+                }`}
+              >
+                {liveMode ? "🟢 Đang xem Dữ liệu sống (Live)" : "🎨 Chuyển sang Dữ liệu sống (Live)"}
+              </button>
             </div>
             {screens.map((screen) => (
               <button

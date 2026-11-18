@@ -16,9 +16,25 @@ function figmaAssetResolver() {
   }
 }
 
+function rootRedirect() {
+  return {
+    name: 'root-redirect',
+    configureServer(server: any) {
+      server.middlewares.use((req: any, res: any, next: any) => {
+        if (req.url === '/' || req.url === '') {
+          res.writeHead(302, { Location: '/react/' });
+          res.end();
+          return;
+        }
+        next();
+      });
+    },
+  };
+}
+
   export default defineConfig({
     base: '/react/',
-    plugins: [react(), tailwindcss(), figmaAssetResolver()],
+    plugins: [react(), tailwindcss(), figmaAssetResolver(), rootRedirect()],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
@@ -32,9 +48,13 @@ function figmaAssetResolver() {
     },
     server: {
       port: 3000,
-      open: true,
+      host: true,
+      open: false,
       proxy: {
-        '/api': 'http://localhost:8081',
+        '/api': {
+          target: 'http://localhost:8080',
+          changeOrigin: true,
+        },
       },
     },
   });

@@ -20,7 +20,15 @@ function NhanMinhHa() {
 function ChuThichKchBn() {
   return (
     <div className="content-stretch flex flex-col gap-[8px] items-start overflow-clip relative shrink-0 w-full" data-name="Chú thích kịch bản">
-      <NhanMinhHa />
+      <div className="flex items-center justify-between w-full">
+        <NhanMinhHa />
+        <button
+          onClick={() => { window.location.hash = "order-detail"; }}
+          className="bg-[#087f8c] hover:bg-[#066570] text-white text-[12px] font-semibold px-3 py-1.5 rounded-lg cursor-pointer transition-colors"
+        >
+          ← Quay lại hồ sơ đơn hàng
+        </button>
+      </div>
       <p className="[word-break:break-word] font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[30px] min-w-full not-italic relative shrink-0 text-[#142b3b] text-[22px] tracking-[-0.3px] w-[min-content]">Khi phát sinh giao thất bại</p>
       <p className="[word-break:break-word] font-['Inter:Regular',sans-serif] font-normal leading-[1.45] min-w-full not-italic relative shrink-0 text-[#657684] text-[13px] w-[min-content]">Minh họa khối ngoại lệ của một vận đơn khác. Không thuộc lịch sử hiện tại của VF261109-00842.</p>
     </div>

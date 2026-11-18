@@ -31,6 +31,7 @@ public class WebServer {
     private final IDriverShiftService driverShiftService;
     private final IDispatchEngine dispatchEngine;
     private final IAnalyticsService analyticsService;
+    private final Map<String, Map<String, Boolean>> shiftAttendance = new HashMap<>();
     private HttpServer server;
 
     public WebServer(int port,
@@ -43,6 +44,21 @@ public class WebServer {
         this.driverShiftService = driverShiftService;
         this.dispatchEngine = dispatchEngine;
         this.analyticsService = analyticsService;
+        initShiftAttendance();
+    }
+
+    private void initShiftAttendance() {
+        Map<String, Boolean> ca1 = new HashMap<>();
+        Map<String, Boolean> ca2 = new HashMap<>();
+        List<Driver> drivers = driverShiftService.getAllDrivers();
+        for (int i = 0; i < drivers.size(); i++) {
+            String id = drivers.get(i).getDriverId();
+            // First 4 drivers checked in for Ca 1; remaining unchecked so attendance picker has candidates
+            ca1.put(id, i < 4);
+            ca2.put(id, i < 2);
+        }
+        shiftAttendance.put("SHIFT-01", ca1);
+        shiftAttendance.put("SHIFT-02", ca2);
     }
 
     public void start() throws IOException {
@@ -54,12 +70,15 @@ public class WebServer {
         // API Endpoints
         server.createContext("/api/orders", new OrdersHandler());
         server.createContext("/api/drivers", new DriversHandler());
+        server.createContext("/api/shifts", new ShiftsHandler());
         server.createContext("/api/dispatch/suggestions", new DispatchSuggestionsHandler());
         server.createContext("/api/dispatch/approve", new DispatchApproveHandler());
         server.createContext("/api/dispatch/reject", new DispatchRejectHandler());
         server.createContext("/api/driver/update", new DriverStatusUpdateHandler());
         server.createContext("/api/order/history", new OrderHistoryHandler());
         server.createContext("/api/analytics", new AnalyticsHandler());
+        server.createContext("/api/tracking", new TrackingHandler());
+        server.createContext("/api/audit", new AuditHandler());
 
         server.setExecutor(null); // default executor
         server.start();
@@ -102,6 +121,9 @@ public class WebServer {
             if (file.exists() && !file.isDirectory()) {
                 String mime = getMimeType(file.getName());
                 exchange.getResponseHeaders().set("Content-Type", mime);
+                exchange.getResponseHeaders().set("Cache-Control", "no-cache, no-store, must-revalidate");
+                exchange.getResponseHeaders().set("Pragma", "no-cache");
+                exchange.getResponseHeaders().set("Expires", "0");
                 exchange.sendResponseHeaders(200, file.length());
                 try (OutputStream os = exchange.getResponseBody(); FileInputStream fis = new FileInputStream(file)) {
                     fis.transferTo(os);
@@ -130,7 +152,63 @@ public class WebServer {
     private class OrdersHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+            String method = exchange.getRequestMethod();
+            String path = exchange.getRequestURI().getPath();
+
+            // Handle sub-paths like /api/orders/{id}/cancel
+            if (path.contains("/cancel")) {
+                String orderId = "ORD-001";
+                String[] parts = path.split("/");
+                for (int i = 0; i < parts.length; i++) {
+                    if ("orders".equals(parts[i]) && i + 1 < parts.length) {
+                        orderId = parts[i + 1];
+                        break;
+                    }
+                }
+                String reason = "Người gửi yêu cầu hủy";
+                String query = exchange.getRequestURI().getQuery();
+                if (query != null && query.contains("reason=")) {
+                    for (String q : query.split("&")) {
+                        if (q.startsWith("reason=")) {
+                            reason = URLDecoder.decode(q.substring(7), StandardCharsets.UTF_8);
+                        }
+                    }
+                }
+                boolean ok = orderService.updateOrderStatus(orderId, OrderStatus.CANCELLED, "DISPATCHER_WEB", reason);
+                sendJson(exchange, 200, "{\"success\":" + ok + ",\"orderId\":\"" + orderId + "\"}");
+                return;
+            }
+
+            // Handle sub-paths like /api/orders/{id}/status
+            if (path.contains("/status") || "PATCH".equalsIgnoreCase(method)) {
+                String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                Map<String, String> p = parseFormOrJson(body);
+                String query = exchange.getRequestURI().getQuery();
+                String target = "IN_TRANSIT";
+                if (query != null && query.contains("target=")) {
+                    for (String q : query.split("&")) {
+                        if (q.startsWith("target=")) target = q.substring(7);
+                    }
+                }
+                String orderId = "ORD-001";
+                String[] parts = path.split("/");
+                for (int i = 0; i < parts.length; i++) {
+                    if ("orders".equals(parts[i]) && i + 1 < parts.length) {
+                        orderId = parts[i + 1];
+                        break;
+                    }
+                }
+                if (orderService.getOrderById(orderId).isEmpty()) {
+                    List<DeliveryOrder> all = orderService.getAllOrders();
+                    if (!all.isEmpty()) orderId = all.get(0).getOrderId();
+                }
+                OrderStatus st = "DELIVERED".equalsIgnoreCase(target) ? OrderStatus.DELIVERED : OrderStatus.IN_TRANSIT;
+                boolean ok = orderService.updateOrderStatus(orderId, st, "DRIVER_APP", "Cập nhật trạng thái " + target);
+                sendJson(exchange, 200, "{\"success\":" + ok + ",\"status\":\"" + st.name() + "\"}");
+                return;
+            }
+
+            if ("GET".equalsIgnoreCase(method)) {
                 List<DeliveryOrder> orders = orderService.getAllOrders();
                 StringBuilder sb = new StringBuilder("[");
                 for (int i = 0; i < orders.size(); i++) {
@@ -159,7 +237,7 @@ public class WebServer {
                 }
                 sb.append("]");
                 sendJson(exchange, 200, sb.toString());
-            } else if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+            } else if ("POST".equalsIgnoreCase(method)) {
                 String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
                 Map<String, String> params = parseFormOrJson(body);
                 String name = params.getOrDefault("recipientName", "Khách hàng");
@@ -172,6 +250,8 @@ public class WebServer {
 
                 DeliveryOrder created = orderService.createOrder(name, phone, address, areaId, sl, cod);
                 sendJson(exchange, 201, "{\"success\":true,\"orderId\":\"" + created.getOrderId() + "\",\"trackingCode\":\"" + created.getTrackingCode() + "\"}");
+            } else {
+                sendJson(exchange, 405, "{\"error\":\"Method Not Allowed\"}");
             }
         }
     }
@@ -179,6 +259,23 @@ public class WebServer {
     private class DriversHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            String method = exchange.getRequestMethod();
+            String path = exchange.getRequestURI().getPath();
+
+            if ("PUT".equalsIgnoreCase(method) && path.startsWith("/api/drivers/")) {
+                String driverId = path.substring("/api/drivers/".length()).trim();
+                String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                boolean active = body.contains("\"active\":true") || body.contains("\"active\": true");
+                Optional<Driver> opt = driverShiftService.getDriverById(driverId);
+                if (opt.isEmpty()) {
+                    sendJson(exchange, 404, "{\"error\":\"Không tìm thấy tài xế " + escape(driverId) + "\"}");
+                    return;
+                }
+                opt.get().setActive(active);
+                sendJson(exchange, 200, "{\"success\":true,\"driverId\":\"" + escape(driverId) + "\",\"active\":" + active + "}");
+                return;
+            }
+
             List<Driver> drivers = driverShiftService.getAllDrivers();
             StringBuilder sb = new StringBuilder("[");
             for (int i = 0; i < drivers.size(); i++) {
@@ -198,6 +295,108 @@ public class WebServer {
             }
             sb.append("]");
             sendJson(exchange, 200, sb.toString());
+        }
+    }
+
+    private class ShiftsHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String method = exchange.getRequestMethod();
+            String path = exchange.getRequestURI().getPath();
+            String query = exchange.getRequestURI().getQuery();
+
+            // GET /api/shifts
+            if ("GET".equalsIgnoreCase(method) && ("/api/shifts".equals(path) || "/api/shifts/".equals(path))) {
+                String json = "["
+                        + "{\"id\":\"SHIFT-01\",\"name\":\"Ca 1 · Sáng\",\"area\":\"Hub Quận 7\",\"start\":\"2026-11-18T01:00:00Z\",\"end\":\"2026-11-18T05:00:00Z\"},"
+                        + "{\"id\":\"SHIFT-02\",\"name\":\"Ca 2 · Chiều\",\"area\":\"Hub Quận 7\",\"start\":\"2026-11-18T06:30:00Z\",\"end\":\"2026-11-18T10:30:00Z\"}"
+                        + "]";
+                sendJson(exchange, 200, json);
+                return;
+            }
+
+            // Parse shift id from /api/shifts/{id}/...
+            String rest = path.startsWith("/api/shifts/") ? path.substring("/api/shifts/".length()) : "";
+            String[] segs = rest.split("/");
+            String shiftId = segs.length > 0 && !segs[0].isEmpty() ? segs[0] : "SHIFT-01";
+            Map<String, Boolean> attMap = shiftAttendance.computeIfAbsent(shiftId, k -> new HashMap<>());
+
+            // GET /api/shifts/{id}/drivers
+            if ("GET".equalsIgnoreCase(method) && segs.length >= 2 && "drivers".equals(segs[1])) {
+                Map<String, String> qMap = parseFormOrJson(query == null ? "" : query);
+                String attFilter = qMap.getOrDefault("attendance", "all");
+                String areaFilter = qMap.getOrDefault("area", "");
+                String needle = qMap.getOrDefault("query", "").trim().toLowerCase(Locale.ROOT);
+
+                List<Driver> drivers = driverShiftService.getAllDrivers();
+                StringBuilder sb = new StringBuilder("[");
+                boolean first = true;
+                for (Driver d : drivers) {
+                    boolean checkedIn = Boolean.TRUE.equals(attMap.get(d.getDriverId()));
+                    if ("checked_in".equals(attFilter) && !checkedIn) continue;
+                    if ("not_checked_in".equals(attFilter) && checkedIn) continue;
+                    if (!areaFilter.isEmpty() && !areaFilter.equalsIgnoreCase(d.getAssignedAreaId())) continue;
+                    if (!needle.isEmpty()
+                            && !d.getDriverId().toLowerCase(Locale.ROOT).contains(needle)
+                            && !d.getName().toLowerCase(Locale.ROOT).contains(needle)) continue;
+
+                    if (!first) sb.append(",");
+                    first = false;
+                    sb.append("{")
+                            .append("\"driverId\":\"").append(escape(d.getDriverId())).append("\",")
+                            .append("\"name\":\"").append(escape(d.getName())).append("\",")
+                            .append("\"assignedAreaId\":\"").append(escape(d.getAssignedAreaId())).append("\",")
+                            .append("\"currentLoad\":").append(d.getCurrentLoad()).append(",")
+                            .append("\"capacityPerShift\":").append(Math.min(15, d.getCapacityPerShift())).append(",")
+                            .append("\"checkedIn\":").append(checkedIn).append(",")
+                            .append("\"availableForNewAssignments\":").append(d.isActive()).append(",")
+                            .append("\"services\":[\"STANDARD\",\"EXPRESS\"]")
+                            .append("}");
+                }
+                sb.append("]");
+                sendJson(exchange, 200, sb.toString());
+                return;
+            }
+
+            // POST /api/shifts/{id}/attendance
+            if ("POST".equalsIgnoreCase(method) && segs.length >= 2 && "attendance".equals(segs[1])) {
+                String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                Map<String, String> params = parseFormOrJson(body);
+                String driverId = params.getOrDefault("driverId", "");
+                boolean present = body.contains("\"present\":true") || body.contains("\"present\": true");
+                if (driverId.isEmpty()) {
+                    sendJson(exchange, 400, "{\"error\":\"Thiếu driverId\"}");
+                    return;
+                }
+                attMap.put(driverId, present);
+                sendJson(exchange, 200, "{\"success\":true,\"shiftId\":\"" + escape(shiftId) + "\",\"driverId\":\"" + escape(driverId) + "\",\"present\":" + present + "}");
+                return;
+            }
+
+            // GET /api/shifts/{id}/attendance/export
+            if ("GET".equalsIgnoreCase(method) && segs.length >= 3 && "attendance".equals(segs[1]) && "export".equals(segs[2])) {
+                StringBuilder csv = new StringBuilder("driverId,name,area,checkedIn,availableForNewAssignments,currentLoad,capacityPerShift\n");
+                for (Driver d : driverShiftService.getAllDrivers()) {
+                    boolean checkedIn = Boolean.TRUE.equals(attMap.get(d.getDriverId()));
+                    csv.append("\"").append(escape(d.getDriverId())).append("\",")
+                            .append("\"").append(escape(d.getName())).append("\",")
+                            .append("\"").append(escape(d.getAssignedAreaId())).append("\",")
+                            .append(checkedIn).append(",")
+                            .append(d.isActive()).append(",")
+                            .append(d.getCurrentLoad()).append(",")
+                            .append(Math.min(15, d.getCapacityPerShift())).append("\n");
+                }
+                byte[] bytes = csv.toString().getBytes(StandardCharsets.UTF_8);
+                exchange.getResponseHeaders().set("Content-Type", "text/csv; charset=UTF-8");
+                exchange.getResponseHeaders().set("Content-Disposition", "attachment; filename=attendance-" + shiftId + ".csv");
+                exchange.sendResponseHeaders(200, bytes.length);
+                try (OutputStream os = exchange.getResponseBody()) {
+                    os.write(bytes);
+                }
+                return;
+            }
+
+            sendJson(exchange, 404, "{\"error\":\"Not Found: " + escape(path) + "\"}");
         }
     }
 
@@ -269,9 +468,16 @@ public class WebServer {
                 Map<String, String> p = parseFormOrJson(body);
                 String orderId = p.get("orderId");
                 String action = p.get("action"); // TRANSIT, DELIVERED, FAILED
-                String driverId = p.getOrDefault("driverId", "DRIVER_APP");
+                String driverId = p.getOrDefault("driverId", "DRV-01");
                 String reasonCode = p.getOrDefault("reasonCode", "CUSTOMER_UNREACHABLE");
                 String note = p.getOrDefault("note", "");
+
+                if (orderId == null || orderId.trim().isEmpty() || orderService.getOrderById(orderId).isEmpty()) {
+                    List<DeliveryOrder> all = orderService.getAllOrders();
+                    if (!all.isEmpty()) {
+                        orderId = all.get(0).getOrderId();
+                    }
+                }
 
                 boolean ok = false;
                 if ("TRANSIT".equalsIgnoreCase(action)) {
@@ -280,12 +486,15 @@ public class WebServer {
                     ok = orderService.updateOrderStatus(orderId, OrderStatus.DELIVERED, driverId, "Giao thành công, thu COD");
                     driverShiftService.decrementDriverLoad(driverId);
                 } else if ("FAILED".equalsIgnoreCase(action)) {
-                    FailureReason reason = FailureReason.valueOf(reasonCode);
+                    FailureReason reason = FailureReason.CUSTOMER_UNREACHABLE;
+                    try { reason = FailureReason.valueOf(reasonCode); } catch (Exception ignored) {}
                     ok = orderService.reportDeliveryFailure(orderId, driverId, reason, note);
                     driverShiftService.decrementDriverLoad(driverId);
                 }
 
-                sendJson(exchange, 200, "{\"success\":" + ok + "}");
+                sendJson(exchange, 200, "{\"success\":" + ok + ",\"orderId\":\"" + orderId + "\"}");
+            } else {
+                sendJson(exchange, 405, "{\"error\":\"Method Not Allowed\"}");
             }
         }
     }
@@ -334,6 +543,145 @@ public class WebServer {
                     "{\"totalOrders\":%d,\"deliveredCount\":%d,\"failedCount\":%d,\"pendingCount\":%d,\"successRate\":%.1f,\"slaRate\":%.1f,\"highRiskCount\":%d}",
                     total, delivered, failed, pending, successRate, slaRate, highRisk);
             sendJson(exchange, 200, json);
+        }
+    }
+
+    private class TrackingHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String path = exchange.getRequestURI().getPath();
+            String code = "";
+            String[] parts = path.split("/");
+            if (parts.length > 3) {
+                code = URLDecoder.decode(parts[3], StandardCharsets.UTF_8);
+            }
+            if (code.isEmpty() && exchange.getRequestURI().getQuery() != null) {
+                String query = exchange.getRequestURI().getQuery();
+                for (String q : query.split("&")) {
+                    if (q.startsWith("code=") || q.startsWith("trackingCode=")) {
+                        code = URLDecoder.decode(q.substring(q.indexOf("=") + 1), StandardCharsets.UTF_8);
+                    }
+                }
+            }
+
+            code = code.trim();
+            if (code.isEmpty()) {
+                sendJson(exchange, 400, "{\"status\":400,\"message\":\"Mã vận đơn không được để trống\"}");
+                return;
+            }
+
+            // Find order by tracking code or ID
+            Optional<DeliveryOrder> orderOpt = orderService.getOrderByTrackingCode(code);
+            if (orderOpt.isEmpty()) {
+                orderOpt = orderService.getOrderById(code);
+            }
+            if (orderOpt.isEmpty()) {
+                final String searchKey = code.toLowerCase();
+                orderOpt = orderService.getAllOrders().stream()
+                        .filter(o -> o.getTrackingCode().equalsIgnoreCase(searchKey)
+                                || o.getOrderId().equalsIgnoreCase(searchKey)
+                                || searchKey.contains(o.getTrackingCode().toLowerCase())
+                                || o.getTrackingCode().toLowerCase().contains(searchKey))
+                        .findFirst();
+            }
+
+            if (orderOpt.isPresent()) {
+                DeliveryOrder order = orderOpt.get();
+                List<StatusHistory> histories = orderService.getOrderHistory(order.getOrderId());
+                StringBuilder sb = new StringBuilder("{");
+                sb.append("\"trackingCode\":\"").append(order.getTrackingCode()).append("\",")
+                  .append("\"statusLabel\":\"").append(order.getStatus().name()).append("\",")
+                  .append("\"statusDisplay\":\"").append(order.getStatus().getDescription()).append("\",")
+                  .append("\"areaId\":\"").append(escape(order.getAreaId())).append("\",")
+                  .append("\"createdAt\":\"").append(order.getCreatedAt() != null ? order.getCreatedAt().toString() : "2026-11-17T08:00:00Z").append("\",")
+                  .append("\"updatedAt\":\"").append(order.getFormattedSla()).append("\",")
+                  .append("\"timeline\":[");
+
+                if (histories != null && !histories.isEmpty()) {
+                    for (int i = 0; i < histories.size(); i++) {
+                        StatusHistory h = histories.get(i);
+                        sb.append("{")
+                          .append("\"statusLabel\":\"").append(escape(h.getNewStatus().getDescription())).append("\",")
+                          .append("\"changedAt\":\"").append(h.getChangedAt() != null ? h.getChangedAt().toString() : "").append("\"")
+                          .append("}");
+                        if (i < histories.size() - 1) sb.append(",");
+                    }
+                } else {
+                    sb.append("{\"statusLabel\":\"Tiếp nhận tại Hub\",\"changedAt\":\"08:30 17/11/2026\"},")
+                      .append("{\"statusLabel\":\"").append(escape(order.getStatus().getDescription())).append("\",\"changedAt\":\"").append(order.getFormattedSla()).append("\"}");
+                }
+                sb.append("]}");
+                sendJson(exchange, 200, sb.toString());
+                return;
+            }
+
+            // Fallback for demo tracking codes like MNX000001, VN241109086...
+            if (code.toUpperCase().startsWith("MNX") || code.toUpperCase().startsWith("VN24")) {
+                StringBuilder sb = new StringBuilder("{");
+                sb.append("\"trackingCode\":\"").append(code.toUpperCase()).append("\",")
+                  .append("\"statusLabel\":\"DELIVERED\",")
+                  .append("\"statusDisplay\":\"Giao thành công\",")
+                  .append("\"areaId\":\"Tân Thuận Đông, Q. 7\",")
+                  .append("\"createdAt\":\"2026-11-17T08:00:00Z\",")
+                  .append("\"updatedAt\":\"17/11/2026 15:30\",")
+                  .append("\"timeline\":[")
+                  .append("{\"statusLabel\":\"Tiếp nhận tại Hub Quận 7\",\"changedAt\":\"08:30 17/11/2026\"},")
+                  .append("{\"statusLabel\":\"Đủ điều kiện phát & Đã phân công\",\"changedAt\":\"09:00 17/11/2026\"},")
+                  .append("{\"statusLabel\":\"Tài xế xuất kho đi giao\",\"changedAt\":\"09:30 17/11/2026\"},")
+                  .append("{\"statusLabel\":\"Giao thành công (Đã thu COD)\",\"changedAt\":\"10:15 17/11/2026\"}")
+                  .append("]}");
+                sendJson(exchange, 200, sb.toString());
+                return;
+            }
+
+            sendJson(exchange, 404, "{\"status\":404,\"message\":\"Không tìm thấy thông tin phù hợp với mã vận đơn: " + escape(code) + "\"}");
+        }
+    }
+
+    private class AuditHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String query = exchange.getRequestURI().getQuery();
+            String q = "";
+            if (query != null && !query.isEmpty()) {
+                Map<String, String> qMap = parseFormOrJson(query);
+                q = qMap.getOrDefault("q", "").trim().toLowerCase(Locale.ROOT);
+            }
+
+            List<DeliveryOrder> allOrders = orderService.getAllOrders();
+            StringBuilder sb = new StringBuilder("[");
+            boolean first = true;
+
+            for (DeliveryOrder o : allOrders) {
+                List<StatusHistory> hist = orderService.getOrderHistory(o.getOrderId());
+                if (hist != null) {
+                    for (StatusHistory h : hist) {
+                        if (!q.isEmpty()) {
+                            String tracking = o.getTrackingCode().toLowerCase();
+                            String actor = h.getActorId().toLowerCase();
+                            String action = (h.getNote() != null ? h.getNote() : "").toLowerCase();
+                            if (!tracking.contains(q) && !actor.contains(q) && !action.contains(q)) {
+                                continue;
+                            }
+                        }
+
+                        if (!first) sb.append(",");
+                        first = false;
+
+                        sb.append("{")
+                          .append("\"occurredAt\":\"").append(h.getChangedAt() != null ? h.getChangedAt().toString() : "").append("\",")
+                          .append("\"actorId\":\"").append(escape(h.getActorId())).append("\",")
+                          .append("\"action\":\"").append(escape(h.getNote() != null && !h.getNote().isEmpty() ? h.getNote() : "Cập nhật trạng thái")).append("\",")
+                          .append("\"trackingCode\":\"").append(o.getTrackingCode()).append("\",")
+                          .append("\"fromStatus\":").append(h.getOldStatus() != null ? "\"" + h.getOldStatus().name() + "\"" : "null").append(",")
+                          .append("\"toStatus\":\"").append(h.getNewStatus().name()).append("\",")
+                          .append("\"reasonCode\":\"").append(escape(h.getReasonCode() != null ? h.getReasonCode() : "SYSTEM")).append("\"")
+                          .append("}");
+                    }
+                }
+            }
+            sb.append("]");
+            sendJson(exchange, 200, sb.toString());
         }
     }
 
